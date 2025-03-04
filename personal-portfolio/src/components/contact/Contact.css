@@ -1,0 +1,25 @@
+.contact {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.contact .contact-desc {
+  color: white;
+}
+
+.contact-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  color: #0a0a0a;
+  background: #00ffff;
+  border-radius: 50px;
+  box-shadow: 0 0 12px #00ffff;
+  transition: all 0.3s;
+}
+
+.contact-btn:hover {
+  background: #ff1493;
+  box-shadow: 0 0 20px #ff1493;
+}
