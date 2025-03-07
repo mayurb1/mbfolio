@@ -1,42 +1,91 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root {
+  /**
+   * colors
+   */
+
+  /* gradient */
+
+  --bg-gradient-onyx: linear-gradient(to bottom right, #3f3f40 3%, #303030 97%);
+  --bg-gradient-jet: linear-gradient(
+      to bottom right,
+      #2d2d2e40 0%,
+      #1b1b1d00 100%
+    ),
+    #202022;
+  --bg-gradient-yellow-1: linear-gradient(
+    to bottom right,
+    #ffda6b 0%,
+    #ffc06100 50%
+  );
+  --bg-gradient-yellow-2: linear-gradient(
+      135deg,
+      #ffda6b40 0%,
+      #ffbb5c00 59.86%
+    ),
+    #202022;
+  --border-gradient-onyx: linear-gradient(
+    to bottom right,
+    #404040 0%,
+    #40404000 50%
+  );
+  --text-gradient-yellow: linear-gradient(to right, #ffdb70, #ffbb5c);
+
+  /* solid */
+
+  --light-black-1: #383838;
+  --light-black-2: #2b2b2c;
+  --black-1: #202022;
+  --black-2: #1e1e1f;
+  --smoky-black: #121212;
+  --white-1: #ffffff;
+  --white-2: #fafafa;
+  --light-yellow: #ffdb70;
+  --vegas-gold: #ceb15a;
+  --light-gray: #d6d6d6;
+  --light-gray-70: #d6d6d6b3;
+  --tomato: #b84c4c;
+
+  /**
+   * typography
+   */
+
+  /* font-family */
+  --ff-poppins: "Poppins", sans-serif;
+
+  /* font-size */
+  --fs-1: 24px;
+  --fs-2: 18px;
+  --fs-3: 17px;
+  --fs-4: 16px;
+  --fs-5: 15px;
+  --fs-6: 14px;
+  --fs-7: 13px;
+  --fs-8: 11px;
+
+  /* font-weight */
+  --fw-300: 300;
+  --fw-400: 400;
+  --fw-500: 500;
+  --fw-600: 600;
+
+  /**
+   * shadow
+   */
+
+  --shadow-1: -4px 8px 24px #00000040;
+  --shadow-2: 0 16px 30px #00000040;
+  --shadow-3: 0 16px 40px #00000040;
+  --shadow-4: 0 25px 50px #00000026;
+  --shadow-5: 0 24px 80px #00000040;
+
+  /**
+   * transition
+   */
+
+  --transition-1: 0.25s ease;
+  --transition-2: 0.5s ease-in-out;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
+/* body {
+  cursor: none;
+} */

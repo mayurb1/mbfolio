@@ -1,28 +1,93 @@
 .about {
+  padding: 80px 20px;
+  color: #fff;
+}
+
+.about-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px;
+}
+
+.about-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.about-text h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.about-desc {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #cccccc;
+  line-height: 1.6;
+}
+
+.about-subheading {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: #eeeeee;
+}
+
+.about-skills {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.about-skills li {
+  font-size: 16px;
+  margin: 8px 0;
+  color: #aaaaaa;
+}
+
+.about-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  color: var(--white-1);
+  background-color: var(--light-black-2);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Right side: empty or background */
+.about-decor {
+  flex: 1;
+  min-width: 280px;
+  /* height: 300px; */
+  background: radial-gradient(circle, #2d2d2e40, #1b1b1d00);
+  border-radius: 10px;
+}
+
+.personal-image {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.personal-image img {
+  width: 280px;
+  height: auto;
+  border-radius: 10px;
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); */
+}
+
+/* Animation on scroll */
+.about {
   opacity: 0;
-  transform: translateY(50px);
-  transition: all 1s ease-out;
-  text-align: center;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
 }
 
 .about.visible {
   opacity: 1;
   transform: translateY(0);
-}
-
-.about .about-desc {
-  color: white;
-}
-
-.about h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.about p {
-  max-width: 700px;
-  margin: 0 auto;
-  font-size: 1.2rem;
-  line-height: 1.8;
-  animation: fadeInUp 1.5s ease-in-out;
 }

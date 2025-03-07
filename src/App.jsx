@@ -3,13 +3,14 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/ui/CustomCursor";
 import ParticlesBackground from "./components/ui/ParticlesBackground";
+import "./App.css";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <ParticlesBackground />
-        <CustomCursor />
+        {/* <CustomCursor /> */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="*" element={<NotFound />} />

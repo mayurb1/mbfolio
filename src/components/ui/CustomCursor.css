@@ -2,7 +2,7 @@
   position: fixed;
   width: 20px;
   height: 20px;
-  background: radial-gradient(circle, #00ffff, transparent);
+  background: radial-gradient(circle, calc(--light-yellow), transparent);
   border-radius: 50%;
   pointer-events: none;
   mix-blend-mode: difference;

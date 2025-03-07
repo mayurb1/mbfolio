@@ -12,11 +12,16 @@ const projects = [
     description: "A sci-fi themed admin panel.",
     link: "#",
   },
+  {
+    title: "Personal portfolioo",
+    description: "Personal portfolio website for personal information",
+    link: "#",
+  },
 ];
 
 const Projects = () => (
   <section className="projects">
-    <h2 className="glow-text">Projects</h2>
+    <h2>Projects</h2>
     <div className="projects-grid">
       {projects.map((project, index) => (
         <div key={index} className="project-card">

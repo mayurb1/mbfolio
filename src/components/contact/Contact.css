@@ -1,25 +1,74 @@
-.contact {
-  padding: 80px 20px;
-  text-align: center;
+.contact-wrapper {
+  display: flex;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 30px auto;
+  flex-wrap: wrap;
+  align-items: stretch; /* Makes both sides equal height */
 }
 
-.contact .contact-desc {
-  color: white;
+/* Left (Map) */
+.contact-left {
+  flex: 1;
+  min-width: 320px;
+  height: 450px; /* Control the overall height */
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.contact-left iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Right (Form) */
+.contact-right {
+  flex: 1;
+  min-width: 320px;
+  background-color: var(--light-black-2);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 5x;
+  justify-content: center;
+}
+
+.contact-right h2,
+p {
+  color: var(--white-1);
+}
+
+.contact-right form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex-grow: 1; /* Ensures it stretches if needed */
+}
+
+.contact-right textarea {
+  min-height: 150px;
+  padding: 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  resize: vertical;
+  background-color: var(--light-black-1);
+  color: #fff;
+  max-height: 300px;
 }
 
 .contact-btn {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 12px 30px;
-  font-size: 1.1rem;
-  color: #0a0a0a;
-  background: #00ffff;
-  border-radius: 50px;
-  box-shadow: 0 0 12px #00ffff;
-  transition: all 0.3s;
-}
-
-.contact-btn:hover {
-  background: #ff1493;
-  box-shadow: 0 0 20px #ff1493;
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 16px;
+  color: var(--white-1);
+  background-color: var(--light-black-1);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
 }

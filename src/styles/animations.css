@@ -12,10 +12,10 @@
 @keyframes neonGlow {
   0%,
   100% {
-    text-shadow: 0 0 2px #00ffff, 0 0 4px #00ffff;
+    text-shadow: 0 0 2px calc(--light-yellow), 0 0 4px calc(--light-yellow);
   }
   50% {
-    text-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff;
+    text-shadow: 0 0 4px calc(--light-yellow), 0 0 8px calc(--light-yellow);
   }
 }
 
