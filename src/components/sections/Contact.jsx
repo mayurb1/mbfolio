@@ -3,25 +3,25 @@ import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Send, 
-  CheckCircle, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  CheckCircle,
   AlertCircle,
   Github,
   Linkedin,
   Twitter,
   Calendar,
   Clock,
-  Globe
+  Globe,
 } from 'lucide-react'
 
 const Contact = () => {
   const { ref, inView } = useInView({
     threshold: 0.1,
-    triggerOnce: true
+    triggerOnce: true,
   })
 
   const [submitStatus, setSubmitStatus] = useState(null) // 'success', 'error', or null
@@ -44,7 +44,7 @@ const Contact = () => {
       .max(1000, 'Message must be less than 1000 characters')
       .required('Message is required'),
     budget: Yup.string().optional(),
-    timeline: Yup.string().optional()
+    timeline: Yup.string().optional(),
   })
 
   const formik = useFormik({
@@ -54,7 +54,7 @@ const Contact = () => {
       subject: '',
       message: '',
       budget: '',
-      timeline: ''
+      timeline: '',
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -64,15 +64,15 @@ const Contact = () => {
       try {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 2000))
-        
+
         // In a real app, you would send the form data to your backend
         console.log('Form submitted:', values)
-        
+
         // Analytics tracking
         if (window.gtag) {
           window.gtag('event', 'form_submit', {
             event_category: 'engagement',
-            event_label: 'contact_form'
+            event_label: 'contact_form',
           })
         }
 
@@ -84,7 +84,7 @@ const Contact = () => {
       } finally {
         setIsSubmitting(false)
       }
-    }
+    },
   })
 
   const contactInfo = [
@@ -93,22 +93,22 @@ const Contact = () => {
       label: 'Email',
       value: 'mayur@example.com',
       href: 'mailto:mayur@example.com',
-      description: 'Send me an email anytime'
+      description: 'Send me an email anytime',
     },
     {
       icon: Phone,
       label: 'Phone',
       value: '+1 (555) 123-4567',
       href: 'tel:+15551234567',
-      description: 'Call during business hours'
+      description: 'Call during business hours',
     },
     {
       icon: MapPin,
       label: 'Location',
       value: 'San Francisco, CA',
       href: 'https://maps.google.com/?q=San+Francisco,CA',
-      description: 'Available for remote work worldwide'
-    }
+      description: 'Available for remote work worldwide',
+    },
   ]
 
   const socialLinks = [
@@ -116,23 +116,30 @@ const Contact = () => {
       icon: Github,
       label: 'GitHub',
       href: 'https://github.com/mayurbhalgama',
-      color: 'hover:text-gray-900 dark:hover:text-white'
+      color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       icon: Linkedin,
       label: 'LinkedIn',
       href: 'https://linkedin.com/in/mayurbhalgama',
-      color: 'hover:text-blue-600'
+      color: 'hover:text-blue-600',
     },
     {
       icon: Twitter,
       label: 'Twitter',
       href: 'https://twitter.com/mayurbhalgama',
-      color: 'hover:text-blue-400'
-    }
+      color: 'hover:text-blue-400',
+    },
   ]
 
-  const FormField = ({ label, name, type = 'text', as = 'input', required = false, ...props }) => {
+  const FormField = ({
+    label,
+    name,
+    type = 'text',
+    as = 'input',
+    required = false,
+    ...props
+  }) => {
     const hasError = formik.touched[name] && formik.errors[name]
     const Component = as
 
@@ -146,9 +153,9 @@ const Contact = () => {
           id={name}
           name={name}
           type={type}
-          className={`w-full px-4 py-3 rounded-lg border transition-colors duration-200 bg-background text-text placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary ${
-            hasError 
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' 
+          className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border transition-colors duration-200 bg-background text-text placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base ${
+            hasError
+              ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
               : 'border-border focus:border-primary'
           }`}
           placeholder={props.placeholder}
@@ -161,9 +168,9 @@ const Contact = () => {
           <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-red-500 text-sm flex items-center space-x-1"
+            className="text-red-500 text-xs sm:text-sm flex items-center space-x-1"
           >
-            <AlertCircle size={14} />
+            <AlertCircle size={12} className="sm:w-3.5 sm:h-3.5" />
             <span>{formik.errors[name]}</span>
           </motion.p>
         )}
@@ -172,11 +179,7 @@ const Contact = () => {
   }
 
   return (
-    <section 
-      id="contact" 
-      className="py-20 lg:py-32 bg-background"
-      ref={ref}
-    >
+    <section id="contact" className="py-20 lg:py-32 bg-background" ref={ref}>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
@@ -187,45 +190,61 @@ const Contact = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
-              Let's Work Together
+              Let&apos;s Work Together
             </h2>
             <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-              Have a project in mind? I'd love to hear about it. Send me a message and let's create something amazing together.
+              Have a project in mind? I&apos;d love to hear about it. Send me a
+              message and let&apos;s create something amazing together.
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Contact Information */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="lg:col-span-1 space-y-8"
+              className="lg:col-span-1 space-y-6 sm:space-y-8 order-2 lg:order-1"
             >
               {/* Contact Info Cards */}
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {contactInfo.map((info, index) => {
                   const Icon = info.icon
                   return (
                     <motion.a
                       key={index}
                       href={info.href}
-                      target={info.href.startsWith('http') ? '_blank' : undefined}
-                      rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                      className="block p-6 bg-surface border border-border rounded-xl hover:shadow-lg transition-all duration-200 group"
+                      target={
+                        info.href.startsWith('http') ? '_blank' : undefined
+                      }
+                      rel={
+                        info.href.startsWith('http')
+                          ? 'noopener noreferrer'
+                          : undefined
+                      }
+                      className="block p-4 sm:p-6 bg-surface border border-border rounded-xl hover:shadow-lg transition-all duration-200 group"
                       whileHover={{ scale: 1.02 }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={inView ? { opacity: 1, y: 0 } : {}}
                       transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                     >
-                      <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-background transition-colors duration-200">
-                          <Icon size={24} className="text-primary group-hover:text-background" />
+                      <div className="flex items-start space-x-3 sm:space-x-4">
+                        <div className="p-2.5 sm:p-3 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-background transition-colors duration-200 flex-shrink-0">
+                          <Icon
+                            size={20}
+                            className="sm:w-6 sm:h-6 text-primary group-hover:text-background"
+                          />
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-text mb-1">{info.label}</h3>
-                          <p className="text-primary font-medium mb-1">{info.value}</p>
-                          <p className="text-text-secondary text-sm">{info.description}</p>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-text mb-1 text-sm sm:text-base">
+                            {info.label}
+                          </h3>
+                          <p className="text-primary font-medium mb-1 text-sm sm:text-base break-all">
+                            {info.value}
+                          </p>
+                          <p className="text-text-secondary text-xs sm:text-sm">
+                            {info.description}
+                          </p>
                         </div>
                       </div>
                     </motion.a>
@@ -238,23 +257,34 @@ const Contact = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.8 }}
-                className="p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl"
+                className="p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl"
               >
-                <h3 className="font-semibold text-text mb-4 flex items-center">
-                  <Calendar size={20} className="mr-2 text-primary" />
+                <h3 className="font-semibold text-text mb-4 flex items-center text-sm sm:text-base">
+                  <Calendar
+                    size={18}
+                    className="sm:w-5 sm:h-5 mr-2 text-primary"
+                  />
                   Availability
                 </h3>
-                <div className="space-y-3 text-sm">
+                <div className="space-y-3 text-xs sm:text-sm">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-text">Available for new projects</span>
+                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-text">
+                      Available for new projects
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2 text-text-secondary">
-                    <Clock size={14} />
+                    <Clock
+                      size={12}
+                      className="sm:w-3.5 sm:h-3.5 flex-shrink-0"
+                    />
                     <span>Response time: Within 24 hours</span>
                   </div>
                   <div className="flex items-center space-x-2 text-text-secondary">
-                    <Globe size={14} />
+                    <Globe
+                      size={12}
+                      className="sm:w-3.5 sm:h-3.5 flex-shrink-0"
+                    />
                     <span>Timezone: PST (UTC-8)</span>
                   </div>
                 </div>
@@ -267,8 +297,10 @@ const Contact = () => {
                 transition={{ duration: 0.5, delay: 1.0 }}
                 className="text-center"
               >
-                <h3 className="font-semibold text-text mb-4">Connect With Me</h3>
-                <div className="flex justify-center space-x-4">
+                <h3 className="font-semibold text-text mb-4 text-sm sm:text-base">
+                  Connect With Me
+                </h3>
+                <div className="flex justify-center space-x-3 sm:space-x-4">
                   {socialLinks.map((social, index) => {
                     const Icon = social.icon
                     return (
@@ -277,12 +309,12 @@ const Contact = () => {
                         href={social.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`p-3 bg-surface border border-border rounded-lg text-text-secondary transition-colors duration-200 ${social.color}`}
+                        className={`p-2.5 sm:p-3 bg-surface border border-border rounded-lg text-text-secondary transition-colors duration-200 ${social.color}`}
                         whileHover={{ scale: 1.1, y: -2 }}
                         whileTap={{ scale: 0.9 }}
                         aria-label={`Visit my ${social.label} profile`}
                       >
-                        <Icon size={20} />
+                        <Icon size={18} className="sm:w-5 sm:h-5" />
                       </motion.a>
                     )
                   })}
@@ -295,23 +327,31 @@ const Contact = () => {
               initial={{ opacity: 0, x: 30 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="lg:col-span-2"
+              className="lg:col-span-2 order-1 lg:order-2"
             >
-              <div className="bg-surface border border-border rounded-xl p-8">
-                <h3 className="text-2xl font-bold text-text mb-6">Send Me a Message</h3>
-                
+              <div className="bg-surface border border-border rounded-xl p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-text mb-6">
+                  Send Me a Message
+                </h3>
+
                 {/* Success Message */}
                 {submitStatus === 'success' && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center space-x-3"
+                    className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-start space-x-3"
                   >
-                    <CheckCircle size={20} className="text-green-500" />
+                    <CheckCircle
+                      size={20}
+                      className="text-green-500 flex-shrink-0 mt-0.5"
+                    />
                     <div>
-                      <h4 className="font-semibold text-green-600">Message Sent!</h4>
-                      <p className="text-green-600/80 text-sm">
-                        Thank you for reaching out. I'll get back to you within 24 hours.
+                      <h4 className="font-semibold text-green-600 text-sm sm:text-base">
+                        Message Sent!
+                      </h4>
+                      <p className="text-green-600/80 text-xs sm:text-sm">
+                        Thank you for reaching out. I&apos;ll get back to you
+                        within 24 hours.
                       </p>
                     </div>
                   </motion.div>
@@ -322,21 +362,30 @@ const Contact = () => {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center space-x-3"
+                    className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start space-x-3"
                   >
-                    <AlertCircle size={20} className="text-red-500" />
+                    <AlertCircle
+                      size={20}
+                      className="text-red-500 flex-shrink-0 mt-0.5"
+                    />
                     <div>
-                      <h4 className="font-semibold text-red-600">Error Sending Message</h4>
-                      <p className="text-red-600/80 text-sm">
-                        Sorry, there was an error sending your message. Please try again or contact me directly.
+                      <h4 className="font-semibold text-red-600 text-sm sm:text-base">
+                        Error Sending Message
+                      </h4>
+                      <p className="text-red-600/80 text-xs sm:text-sm">
+                        Sorry, there was an error sending your message. Please
+                        try again or contact me directly.
                       </p>
                     </div>
                   </motion.div>
                 )}
 
-                <form onSubmit={formik.handleSubmit} className="space-y-6">
+                <form
+                  onSubmit={formik.handleSubmit}
+                  className="space-y-4 sm:space-y-6"
+                >
                   {/* Name and Email */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <FormField
                       label="Full Name"
                       name="name"
@@ -361,35 +410,47 @@ const Contact = () => {
                   />
 
                   {/* Budget and Timeline */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
-                      <label htmlFor="budget" className="block text-sm font-medium text-text">
+                      <label
+                        htmlFor="budget"
+                        className="block text-sm font-medium text-text"
+                      >
                         Budget Range
                       </label>
                       <select
                         id="budget"
                         name="budget"
-                        className="w-full px-4 py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
+                        className="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 text-sm sm:text-base"
                         value={formik.values.budget}
                         onChange={formik.handleChange}
                       >
                         <option value="">Select budget range</option>
                         <option value="< $5,000">Less than $5,000</option>
-                        <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                        <option value="$10,000 - $25,000">$10,000 - $25,000</option>
-                        <option value="$25,000 - $50,000">$25,000 - $50,000</option>
+                        <option value="$5,000 - $10,000">
+                          $5,000 - $10,000
+                        </option>
+                        <option value="$10,000 - $25,000">
+                          $10,000 - $25,000
+                        </option>
+                        <option value="$25,000 - $50,000">
+                          $25,000 - $50,000
+                        </option>
                         <option value="> $50,000">More than $50,000</option>
                       </select>
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="timeline" className="block text-sm font-medium text-text">
+                      <label
+                        htmlFor="timeline"
+                        className="block text-sm font-medium text-text"
+                      >
                         Project Timeline
                       </label>
                       <select
                         id="timeline"
                         name="timeline"
-                        className="w-full px-4 py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
+                        className="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 text-sm sm:text-base"
                         value={formik.values.timeline}
                         onChange={formik.handleChange}
                       >
@@ -409,7 +470,7 @@ const Contact = () => {
                     label="Message"
                     name="message"
                     as="textarea"
-                    rows={5}
+                    rows={4}
                     placeholder="Tell me about your project, goals, and how I can help you achieve them..."
                     required
                   />
@@ -418,22 +479,26 @@ const Contact = () => {
                   <motion.button
                     type="submit"
                     disabled={isSubmitting || !formik.isValid}
-                    className={`w-full flex items-center justify-center space-x-2 px-8 py-4 rounded-lg font-semibold transition-all duration-200 ${
+                    className={`w-full flex items-center justify-center space-x-2 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
                       isSubmitting || !formik.isValid
                         ? 'bg-text-secondary text-surface cursor-not-allowed'
                         : 'bg-primary text-background hover:bg-secondary shadow-lg hover:shadow-xl'
                     }`}
-                    whileHover={!isSubmitting && formik.isValid ? { scale: 1.02 } : {}}
-                    whileTap={!isSubmitting && formik.isValid ? { scale: 0.98 } : {}}
+                    whileHover={
+                      !isSubmitting && formik.isValid ? { scale: 1.02 } : {}
+                    }
+                    whileTap={
+                      !isSubmitting && formik.isValid ? { scale: 0.98 } : {}
+                    }
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-surface border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-surface border-t-transparent rounded-full animate-spin" />
                         <span>Sending...</span>
                       </>
                     ) : (
                       <>
-                        <Send size={20} />
+                        <Send size={18} className="sm:w-5 sm:h-5" />
                         <span>Send Message</span>
                       </>
                     )}
@@ -448,16 +513,16 @@ const Contact = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-16"
+            className="mt-12 lg:mt-16"
           >
-            <div className="bg-surface border border-border rounded-xl p-6">
-              <h3 className="text-xl font-bold text-text mb-4 flex items-center">
-                <MapPin size={20} className="mr-2 text-primary" />
+            <div className="bg-surface border border-border rounded-xl p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-bold text-text mb-4 flex items-center">
+                <MapPin size={18} className="sm:w-5 sm:h-5 mr-2 text-primary" />
                 My Location
               </h3>
-              
+
               {/* Embedded Map */}
-              <div className="relative h-64 bg-background rounded-lg overflow-hidden">
+              <div className="relative h-48 sm:h-64 bg-background rounded-lg overflow-hidden">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50323.61899092698!2d-122.48395624692456!3d37.768093625703344!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1635787234567!5m2!1sen!2sus"
                   width="100%"
@@ -469,14 +534,15 @@ const Contact = () => {
                   title="San Francisco Location"
                   className="grayscale hover:grayscale-0 transition-all duration-300"
                 ></iframe>
-                
+
                 {/* Overlay for better integration */}
                 <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
               </div>
-              
-              <p className="text-text-secondary text-sm mt-4">
-                Based in San Francisco, but available for remote work worldwide. 
-                I'm happy to work across different timezones and travel for the right projects.
+
+              <p className="text-text-secondary text-xs sm:text-sm mt-4">
+                Based in San Francisco, but available for remote work worldwide.
+                I&apos;m happy to work across different timezones and travel for
+                the right projects.
               </p>
             </div>
           </motion.div>

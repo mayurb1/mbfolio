@@ -1,13 +1,20 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowDown, Download, Mail, Github, Linkedin, ExternalLink } from 'lucide-react'
+import {
+  ArrowDown,
+  Download,
+  Mail,
+  Github,
+  Linkedin,
+  ExternalLink,
+} from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
 const Hero = () => {
   const canvasRef = useRef(null)
   const { ref, inView } = useInView({
     threshold: 0.1,
-    triggerOnce: true
+    triggerOnce: true,
   })
 
   // Animated background with particles
@@ -17,7 +24,8 @@ const Hero = () => {
 
     const ctx = canvas.getContext('2d')
     const particles = []
-    const particleCount = 100
+    const isMobile = window.innerWidth < 768
+    const particleCount = isMobile ? 50 : 100
 
     // Set canvas size
     const resizeCanvas = () => {
@@ -33,9 +41,9 @@ const Hero = () => {
       constructor() {
         this.x = Math.random() * canvas.width
         this.y = Math.random() * canvas.height
-        this.size = Math.random() * 2 + 1
-        this.speedX = Math.random() * 3 - 1.5
-        this.speedY = Math.random() * 3 - 1.5
+        this.size = Math.random() * (isMobile ? 1.5 : 2) + 1
+        this.speedX = Math.random() * (isMobile ? 2 : 3) - (isMobile ? 1 : 1.5)
+        this.speedY = Math.random() * (isMobile ? 2 : 3) - (isMobile ? 1 : 1.5)
         this.opacity = Math.random() * 0.5 + 0.2
       }
 
@@ -52,8 +60,9 @@ const Hero = () => {
       draw() {
         ctx.save()
         ctx.globalAlpha = this.opacity
-        ctx.fillStyle = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-primary')
+        ctx.fillStyle = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue('--color-primary')
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
         ctx.fill()
@@ -69,24 +78,27 @@ const Hero = () => {
     // Animation loop
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
+
       particles.forEach(particle => {
         particle.update()
         particle.draw()
       })
 
-      // Draw connections between nearby particles
+      // Draw connections between nearby particles (reduced for mobile)
+      const connectionDistance = isMobile ? 80 : 100
       particles.forEach((particle, index) => {
         particles.slice(index + 1).forEach(otherParticle => {
           const dx = particle.x - otherParticle.x
           const dy = particle.y - otherParticle.y
           const distance = Math.sqrt(dx * dx + dy * dy)
 
-          if (distance < 100) {
+          if (distance < connectionDistance) {
             ctx.save()
-            ctx.globalAlpha = (1 - distance / 100) * 0.2
-            ctx.strokeStyle = getComputedStyle(document.documentElement)
-              .getPropertyValue('--color-primary')
+            ctx.globalAlpha =
+              (1 - distance / connectionDistance) * (isMobile ? 0.15 : 0.2)
+            ctx.strokeStyle = getComputedStyle(
+              document.documentElement
+            ).getPropertyValue('--color-primary')
             ctx.lineWidth = 1
             ctx.beginPath()
             ctx.moveTo(particle.x, particle.y)
@@ -107,13 +119,13 @@ const Hero = () => {
     }
   }, [])
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = sectionId => {
     const element = document.getElementById(sectionId)
     if (element) {
       const offsetTop = element.offsetTop - 80
       window.scrollTo({
         top: offsetTop,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
   }
@@ -123,10 +135,10 @@ const Hero = () => {
     if (window.gtag) {
       window.gtag('event', 'file_download', {
         file_name: 'resume.pdf',
-        event_category: 'engagement'
+        event_category: 'engagement',
       })
     }
-    
+
     // Create download link
     const link = document.createElement('a')
     link.href = '/resume.pdf'
@@ -139,32 +151,32 @@ const Hero = () => {
       name: 'GitHub',
       url: 'https://github.com/mayurbhalgama',
       icon: Github,
-      color: 'hover:text-gray-900 dark:hover:text-white'
+      color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
       url: 'https://linkedin.com/in/mayurbhalgama',
       icon: Linkedin,
-      color: 'hover:text-blue-600'
+      color: 'hover:text-blue-600',
     },
     {
       name: 'Email',
       url: 'mailto:mayur@example.com',
       icon: Mail,
-      color: 'hover:text-red-500'
-    }
+      color: 'hover:text-red-500',
+    },
   ]
 
   return (
-    <section 
-      id="hero" 
+    <section
+      id="hero"
       className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-surface to-background pt-16 lg:pt-20"
       ref={ref}
     >
       {/* Animated background canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 opacity-30"
+        className="absolute inset-0 opacity-20 sm:opacity-30"
         style={{ pointerEvents: 'none' }}
       />
 
@@ -173,177 +185,192 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-5rem)]">
-        <div className="container mx-auto px-4 lg:px-8 py-20 lg:py-32">
+        <div className="container mx-auto px-4 lg:px-8 py-16 sm:py-20 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
-          {/* Main heading */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-6"
-          >
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
-              <span className="block text-text">Hi, I'm</span>
-              <span className="block text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Mayur Bhalgama
-              </span>
-            </h1>
-          </motion.div>
-
-          {/* Tagline */}
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl lg:text-3xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed"
-          >
-            A passionate{' '}
-            <motion.span
-              className="text-primary font-semibold"
-              animate={{ 
-                color: ['var(--color-primary)', 'var(--color-secondary)', 'var(--color-primary)']
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
+            {/* Main heading */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-6"
             >
-              Software Engineer
-            </motion.span>{' '}
-            who creates innovative digital experiences with clean code and beautiful design.
-          </motion.p>
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
+                <span className="block text-text">Hi, I&apos;m</span>
+                <span className="block text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Mayur Bhalgama
+                </span>
+              </h1>
+            </motion.div>
 
-          {/* Specialties */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap justify-center gap-4 mb-12"
-          >
-            {['React', 'Node.js', 'TypeScript', 'Full-Stack', 'UI/UX'].map((skill, index) => (
+            {/* Tagline */}
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed"
+            >
+              A passionate{' '}
               <motion.span
-                key={skill}
-                className="px-4 py-2 bg-surface border border-border rounded-full text-text-secondary text-sm font-medium"
-                whileHover={{ 
-                  scale: 1.05, 
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-background)'
+                className="text-primary font-semibold"
+                animate={{
+                  color: [
+                    'var(--color-primary)',
+                    'var(--color-secondary)',
+                    'var(--color-primary)',
+                  ],
                 }}
-                transition={{ duration: 0.2 }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={inView ? { opacity: 1, scale: 1 } : {}}
-                style={{ transitionDelay: `${0.8 + index * 0.1}s` }}
+                transition={{ duration: 3, repeat: Infinity }}
               >
-                {skill}
-              </motion.span>
-            ))}
-          </motion.div>
+                Software Engineer
+              </motion.span>{' '}
+              who creates innovative digital experiences with clean code and
+              beautiful design.
+            </motion.p>
 
-          {/* Call to action buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-          >
-            <motion.button
-              onClick={() => scrollToSection('projects')}
-              className="group bg-primary text-background px-8 py-4 rounded-lg font-semibold text-lg hover:bg-secondary transition-colors duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            {/* Specialties */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-12"
             >
-              <span>View My Work</span>
-              <ExternalLink size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
-            </motion.button>
+              {['React', 'Node.js', 'TypeScript', 'Full-Stack', 'UI/UX'].map(
+                (skill, index) => (
+                  <motion.span
+                    key={skill}
+                    className="px-3 py-2 sm:px-4 bg-surface border border-border rounded-full text-text-secondary text-xs sm:text-sm font-medium"
+                    whileHover={{
+                      scale: 1.05,
+                      backgroundColor: 'var(--color-primary)',
+                      color: 'var(--color-background)',
+                    }}
+                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={inView ? { opacity: 1, scale: 1 } : {}}
+                    style={{ transitionDelay: `${0.8 + index * 0.1}s` }}
+                  >
+                    {skill}
+                  </motion.span>
+                )
+              )}
+            </motion.div>
 
-            <motion.button
-              onClick={handleDownloadResume}
-              className="group border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary hover:text-background transition-colors duration-200 flex items-center space-x-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            {/* Call to action buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12"
             >
-              <Download size={20} className="group-hover:translate-y-1 transition-transform duration-200" />
-              <span>Download Resume</span>
-            </motion.button>
-          </motion.div>
+              <motion.button
+                onClick={() => scrollToSection('projects')}
+                className="group bg-primary text-background px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-secondary transition-colors duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span>View My Work</span>
+                <ExternalLink
+                  size={18}
+                  className="sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-200"
+                />
+              </motion.button>
 
-          {/* Social links */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 1.0 }}
-            className="flex justify-center space-x-6 mb-16"
-          >
-            {socialLinks.map((social, index) => {
-              const Icon = social.icon
-              return (
-                <motion.a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`text-text-secondary text-2xl transition-colors duration-200 ${social.color}`}
-                  whileHover={{ scale: 1.2, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 1.2 + index * 0.1, duration: 0.5 }}
-                  aria-label={`Visit my ${social.name} profile`}
-                >
-                  <Icon size={28} />
-                </motion.a>
-              )
-            })}
-          </motion.div>
+              <motion.button
+                onClick={handleDownloadResume}
+                className="group border-2 border-primary text-primary px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-primary hover:text-background transition-colors duration-200 flex items-center space-x-2 w-full sm:w-auto justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Download
+                  size={18}
+                  className="sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform duration-200"
+                />
+                <span>Download Resume</span>
+              </motion.button>
+            </motion.div>
 
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.8, delay: 1.4 }}
-            className="flex flex-col items-center"
-          >
-            <p className="text-text-secondary text-sm mb-4">Scroll to explore</p>
-            <motion.button
-              onClick={() => scrollToSection('about')}
-              className="text-text-secondary hover:text-primary transition-colors duration-200"
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              aria-label="Scroll to about section"
+            {/* Social links */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 1.0 }}
+              className="flex justify-center space-x-4 sm:space-x-6 mb-12 sm:mb-16"
             >
-              <ArrowDown size={24} />
-            </motion.button>
-          </motion.div>
-        </div>
+              {socialLinks.map((social, index) => {
+                const Icon = social.icon
+                return (
+                  <motion.a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-text-secondary text-xl sm:text-2xl transition-colors duration-200 ${social.color}`}
+                    whileHover={{ scale: 1.2, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 1.2 + index * 0.1, duration: 0.5 }}
+                    aria-label={`Visit my ${social.name} profile`}
+                  >
+                    <Icon size={24} className="sm:w-7 sm:h-7" />
+                  </motion.a>
+                )
+              })}
+            </motion.div>
+
+            {/* Scroll indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.8, delay: 1.4 }}
+              className="flex flex-col items-center"
+            >
+              <p className="text-text-secondary text-xs sm:text-sm mb-4">
+                Scroll to explore
+              </p>
+              <motion.button
+                onClick={() => scrollToSection('about')}
+                className="text-text-secondary hover:text-primary transition-colors duration-200"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                aria-label="Scroll to about section"
+              >
+                <ArrowDown size={20} className="sm:w-6 sm:h-6" />
+              </motion.button>
+            </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Floating geometric shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-1/4 left-1/4 w-32 h-32 border border-primary/20 rounded-full"
-          animate={{ 
+          className="absolute top-1/4 left-1/4 w-24 h-24 sm:w-32 sm:h-32 border border-primary/20 rounded-full"
+          animate={{
             rotate: 360,
-            scale: [1, 1.1, 1]
+            scale: [1, 1.1, 1],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
-            scale: { duration: 4, repeat: Infinity }
+            scale: { duration: 4, repeat: Infinity },
           }}
         />
         <motion.div
-          className="absolute top-3/4 right-1/4 w-24 h-24 border border-secondary/20"
-          animate={{ 
+          className="absolute top-3/4 right-1/4 w-16 h-16 sm:w-24 sm:h-24 border border-secondary/20"
+          animate={{
             rotate: -360,
-            y: [0, -20, 0]
+            y: [0, -20, 0],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 15, repeat: Infinity, ease: 'linear' },
-            y: { duration: 3, repeat: Infinity }
+            y: { duration: 3, repeat: Infinity },
           }}
         />
         <motion.div
-          className="absolute top-1/2 right-1/6 w-16 h-16 bg-accent/10 rounded-full"
-          animate={{ 
+          className="absolute top-1/2 right-1/6 w-12 h-12 sm:w-16 sm:h-16 bg-accent/10 rounded-full"
+          animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3]
+            opacity: [0.3, 0.6, 0.3],
           }}
           transition={{ duration: 2.5, repeat: Infinity }}
         />

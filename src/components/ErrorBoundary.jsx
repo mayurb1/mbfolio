@@ -6,27 +6,13 @@ class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null, errorInfo: null }
   }
 
-  static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI
+  static getDerivedStateFromError(_error) {
     return { hasError: true }
   }
 
-  componentDidCatch(error, errorInfo) {
-    // Log error details
-    console.error('Error Boundary caught an error:', error, errorInfo)
-    
-    this.setState({
-      error: error,
-      errorInfo: errorInfo
-    })
-
-    // Send error to analytics if available
-    if (window.gtag) {
-      window.gtag('event', 'exception', {
-        description: error.toString(),
-        fatal: false
-      })
-    }
+  componentDidCatch(_error, errorInfo) {
+    // Log error to monitoring service
+    console.error('Error caught by boundary:', errorInfo)
   }
 
   handleReset = () => {
@@ -36,53 +22,30 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background px-4">
-          <div className="max-w-md w-full text-center">
-            <div className="mb-8">
-              <div className="text-6xl mb-4">🚧</div>
-              <h1 className="text-2xl font-bold text-text mb-2">
-                Oops! Something went wrong
-              </h1>
-              <p className="text-text-secondary mb-6">
-                We encountered an unexpected error. Don't worry, it's not you - it's us!
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              <button
-                onClick={this.handleReset}
-                className="w-full bg-primary text-background py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
-              >
-                Try Again
-              </button>
-              
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full border border-border text-text py-3 px-6 rounded-lg font-medium hover:bg-surface transition-colors"
-              >
-                Refresh Page
-              </button>
-            </div>
-
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-8 text-left bg-surface border border-border rounded-lg p-4">
-                <summary className="cursor-pointer font-medium text-text mb-2">
-                  Error Details (Development Only)
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="max-w-md mx-auto text-center p-8">
+            <div className="text-6xl mb-6">⚠️</div>
+            <h2 className="text-2xl font-bold text-text mb-4">
+              Something went wrong
+            </h2>
+            <p className="text-text-secondary mb-6">
+              We&apos;re sorry, but something unexpected happened. Please try
+              refreshing the page or contact us if the problem persists.
+            </p>
+            <button
+              onClick={() => this.setState({ hasError: false })}
+              className="bg-primary text-background px-6 py-3 rounded-lg font-semibold hover:bg-secondary transition-colors duration-200"
+            >
+              Try Again
+            </button>
+            {typeof window !== 'undefined' && import.meta.env?.DEV && (
+              <details className="mt-6 text-left">
+                <summary className="cursor-pointer text-text-secondary">
+                  Error Details (Development)
                 </summary>
-                <div className="text-sm text-text-secondary space-y-2">
-                  <div>
-                    <strong>Error:</strong>
-                    <pre className="mt-1 whitespace-pre-wrap break-all bg-background p-2 rounded text-xs">
-                      {this.state.error && this.state.error.toString()}
-                    </pre>
-                  </div>
-                  <div>
-                    <strong>Component Stack:</strong>
-                    <pre className="mt-1 whitespace-pre-wrap break-all bg-background p-2 rounded text-xs">
-                      {this.state.errorInfo.componentStack}
-                    </pre>
-                  </div>
-                </div>
+                <pre className="mt-2 p-4 bg-surface rounded text-xs overflow-auto">
+                  {this.state.error?.toString()}
+                </pre>
               </details>
             )}
           </div>

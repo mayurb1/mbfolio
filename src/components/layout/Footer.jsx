@@ -1,5 +1,12 @@
 import { motion } from 'framer-motion'
-import { Github, Linkedin, Twitter, Mail, Heart, ExternalLink } from 'lucide-react'
+import {
+  Github,
+  Linkedin,
+  Twitter,
+  Mail,
+  Heart,
+  ExternalLink,
+} from 'lucide-react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -9,50 +16,58 @@ const Footer = () => {
       name: 'GitHub',
       url: 'https://github.com/mayurbhalgama',
       icon: Github,
-      color: 'hover:text-gray-900 dark:hover:text-white'
+      color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
       url: 'https://linkedin.com/in/mayurbhalgama',
       icon: Linkedin,
-      color: 'hover:text-blue-600'
+      color: 'hover:text-blue-600',
     },
     {
       name: 'Twitter',
       url: 'https://twitter.com/mayurbhalgama',
       icon: Twitter,
-      color: 'hover:text-blue-400'
+      color: 'hover:text-blue-400',
     },
     {
       name: 'Email',
       url: 'mailto:mayur@example.com',
       icon: Mail,
-      color: 'hover:text-red-500'
-    }
+      color: 'hover:text-red-500',
+    },
   ]
 
   const quickLinks = [
     { name: 'About', href: '#about' },
     { name: 'Projects', href: '#projects' },
     { name: 'Experience', href: '#experience' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Contact', href: '#contact' },
   ]
 
   const resources = [
     { name: 'Resume', href: '/resume.pdf', external: true },
     { name: 'Blog', href: '#blog' },
-    { name: 'GitHub', href: 'https://github.com/mayurbhalgama', external: true },
-    { name: 'LinkedIn', href: 'https://linkedin.com/in/mayurbhalgama', external: true }
+    {
+      name: 'GitHub',
+      href: 'https://github.com/mayurbhalgama',
+      external: true,
+    },
+    {
+      name: 'LinkedIn',
+      href: 'https://linkedin.com/in/mayurbhalgama',
+      external: true,
+    },
   ]
 
-  const scrollToSection = (href) => {
+  const scrollToSection = href => {
     if (href.startsWith('#')) {
       const element = document.getElementById(href.slice(1))
       if (element) {
         const offsetTop = element.offsetTop - 80
         window.scrollTo({
           top: offsetTop,
-          behavior: 'smooth'
+          behavior: 'smooth',
         })
       }
     }
@@ -76,16 +91,17 @@ const Footer = () => {
               className="text-2xl font-bold text-gradient"
               whileHover={{ scale: 1.05 }}
             >
-              &lt;JD /&gt;
+              &lt;MB /&gt;
             </motion.div>
             <p className="text-text-secondary text-sm leading-relaxed">
-              Software Engineer passionate about creating innovative solutions 
-              and beautiful user experiences. Let's build something amazing together!
+              Software Engineer passionate about creating innovative solutions
+              and beautiful user experiences. Let&apos;s build something amazing
+              together!
             </p>
-            
+
             {/* Social Links */}
             <div className="flex space-x-4">
-              {socialLinks.map((social) => {
+              {socialLinks.map(social => {
                 const Icon = social.icon
                 return (
                   <motion.a
@@ -109,11 +125,11 @@ const Footer = () => {
           <div>
             <h3 className="text-text font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              {quickLinks.map((link) => (
+              {quickLinks.map(link => (
                 <li key={link.name}>
                   <motion.a
                     href={link.href}
-                    onClick={(e) => handleLinkClick(e, link.href, false)}
+                    onClick={e => handleLinkClick(e, link.href, false)}
                     className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm"
                     whileHover={{ x: 4 }}
                   >
@@ -128,11 +144,13 @@ const Footer = () => {
           <div>
             <h3 className="text-text font-semibold mb-4">Resources</h3>
             <ul className="space-y-2">
-              {resources.map((resource) => (
+              {resources.map(resource => (
                 <li key={resource.name}>
                   <motion.a
                     href={resource.href}
-                    onClick={(e) => handleLinkClick(e, resource.href, resource.external)}
+                    onClick={e =>
+                      handleLinkClick(e, resource.href, resource.external)
+                    }
                     target={resource.external ? '_blank' : undefined}
                     rel={resource.external ? 'noopener noreferrer' : undefined}
                     className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm flex items-center space-x-1"
@@ -209,8 +227,7 @@ const Footer = () => {
         {/* Developer Credit */}
         <div className="pt-4 text-center">
           <p className="text-text-secondary text-xs">
-            Designed and developed with modern web technologies. 
-            View source on{' '}
+            Designed and developed with modern web technologies. View source on{' '}
             <motion.a
               href="https://github.com/mayurbhalgama/portfolio"
               target="_blank"

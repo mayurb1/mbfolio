@@ -1,19 +1,28 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, ArrowLeft, Tag, Eye, Heart, MessageCircle, Share2 } from 'lucide-react'
+import {
+  Calendar,
+  Clock,
+  ArrowLeft,
+  Tag,
+  Eye,
+  Heart,
+  MessageCircle,
+  Share2,
+} from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 const BlogPost = () => {
-  const { slug } = useParams()
   const navigate = useNavigate()
 
   // Mock blog post data - in a real app, this would be fetched from an API
   const post = {
     id: 1,
     title: 'Building Scalable React Applications: Best Practices and Patterns',
-    excerpt: 'Learn how to structure React applications for scale with modern patterns, state management, and performance optimization techniques.',
+    excerpt:
+      'Learn how to structure React applications for scale with modern patterns, state management, and performance optimization techniques.',
     category: 'React',
     author: 'Mayur Bhalgama',
     date: '2024-01-15',
@@ -224,7 +233,7 @@ Remember, these are guidelines, not rigid rules. Adapt them to your specific nee
 ---
 
 What patterns do you use in your React applications? Share your thoughts in the comments below!
-    `
+    `,
   }
 
   const goBack = () => {
@@ -342,7 +351,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
             >
               <ReactMarkdown
                 components={{
-                  code({ node, inline, className, children, ...props }) {
+                  code({ node: _node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '')
                     return !inline && match ? (
                       <SyntaxHighlighter
@@ -360,22 +369,49 @@ What patterns do you use in your React applications? Share your thoughts in the 
                       </code>
                     )
                   },
-                  h1: ({ children }) => <h1 className="text-3xl font-bold text-text mb-6">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-2xl font-bold text-text mb-4 mt-8">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-xl font-bold text-text mb-3 mt-6">{children}</h3>,
-                  p: ({ children }) => <p className="text-text-secondary mb-4 leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="text-text-secondary mb-4 list-disc list-inside space-y-2">{children}</ul>,
-                  ol: ({ children }) => <ol className="text-text-secondary mb-4 list-decimal list-inside space-y-2">{children}</ol>,
+                  h1: ({ children }) => (
+                    <h1 className="text-3xl font-bold text-text mb-6">
+                      {children}
+                    </h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-2xl font-bold text-text mb-4 mt-8">
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-xl font-bold text-text mb-3 mt-6">
+                      {children}
+                    </h3>
+                  ),
+                  p: ({ children }) => (
+                    <p className="text-text-secondary mb-4 leading-relaxed">
+                      {children}
+                    </p>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="text-text-secondary mb-4 list-disc list-inside space-y-2">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="text-text-secondary mb-4 list-decimal list-inside space-y-2">
+                      {children}
+                    </ol>
+                  ),
                   blockquote: ({ children }) => (
                     <blockquote className="border-l-4 border-primary pl-6 py-4 bg-surface/50 rounded-r-lg italic text-text-secondary mb-6">
                       {children}
                     </blockquote>
                   ),
                   a: ({ href, children }) => (
-                    <a href={href} className="text-primary hover:text-secondary transition-colors duration-200 underline">
+                    <a
+                      href={href}
+                      className="text-primary hover:text-secondary transition-colors duration-200 underline"
+                    >
                       {children}
                     </a>
-                  )
+                  ),
                 }}
               >
                 {post.content}
@@ -415,7 +451,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
                   src="/profile-photo.jpg"
                   alt={post.author}
                   className="w-16 h-16 rounded-full object-cover"
-                  onError={(e) => {
+                  onError={e => {
                     e.target.src = `data:image/svg+xml,${encodeURIComponent(`
                       <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100%" height="100%" fill="#e2e8f0"/>
@@ -430,9 +466,10 @@ What patterns do you use in your React applications? Share your thoughts in the 
                     About {post.author}
                   </h4>
                   <p className="text-text-secondary leading-relaxed">
-                    John is a passionate software engineer with over 5 years of experience 
-                    in full-stack development. He loves sharing knowledge and helping other 
-                    developers grow in their careers.
+                    John is a passionate software engineer with over 5 years of
+                    experience in full-stack development. He loves sharing
+                    knowledge and helping other developers grow in their
+                    careers.
                   </p>
                 </div>
               </div>
