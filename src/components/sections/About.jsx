@@ -12,7 +12,7 @@ const About = () => {
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
-        file_name: 'resume.pdf',
+        file_name: 'Mayur_s_resume.pdf',
         event_category: 'engagement',
         event_label: 'about_section',
       })
@@ -20,25 +20,25 @@ const About = () => {
 
     // Create download link
     const link = document.createElement('a')
-    link.href = '/resume.pdf'
-    link.download = 'John_Doe_Resume.pdf'
+    link.href = '/Mayur_s_resume.pdf'
+    link.download = 'Mayur_Bhalgama_Resume.pdf'
     link.click()
   }
 
   const stats = [
-    { number: '5+', label: 'Years Experience', icon: Calendar },
-    { number: '50+', label: 'Projects Completed', icon: Code },
+    { number: '3+', label: 'Years Experience', icon: Calendar },
+    { number: '20+', label: 'Projects Completed', icon: Code },
     { number: '1000+', label: 'Cups of Coffee', icon: Coffee },
     { number: '∞', label: 'Lines of Code', icon: Heart },
   ]
 
   const highlights = [
-    'Full-stack web development with modern technologies',
-    'Responsive design and mobile-first development',
-    'API design and database architecture',
-    'DevOps and cloud deployment strategies',
-    'UI/UX design with attention to accessibility',
-    'Agile development and team collaboration',
+    'React.js, Next.js, JavaScript, HTML5, CSS3',
+    'Reusable UI with Material UI, Ant Design, Tailwind CSS',
+    'Application design, debugging, and performance improvement',
+    'Front-end architecture and webpage optimization',
+    'Strong client communication and requirement understanding',
+    'Manual testing and issue resolution',
   ]
 
   return (
@@ -123,7 +123,7 @@ const About = () => {
                   className="flex items-center justify-center mt-6 text-text-secondary"
                 >
                   <MapPin size={18} className="mr-2" />
-                  <span>San Francisco, CA</span>
+                  <span>Ahmedabad, India</span>
                 </motion.div>
               </div>
 
@@ -176,28 +176,23 @@ const About = () => {
 
                 <div className="space-y-4 text-text-secondary leading-relaxed text-sm sm:text-base">
                   <p>
-                    I&apos;m a passionate software engineer with over 5 years of
-                    experience building scalable web applications and creating
-                    exceptional user experiences. My journey started with
-                    curiosity about how websites work, and it has evolved into a
-                    deep love for crafting elegant solutions to complex
-                    problems.
+                    I&apos;m a frontend-focused software engineer with 3+ years
+                    of experience building modern web applications with React.js
+                    and Next.js. I specialize in translating client requirements
+                    into scalable, maintainable solutions.
                   </p>
 
                   <p>
-                    When I&apos;m not coding, you&apos;ll find me exploring the
-                    latest technologies, contributing to open-source projects,
-                    or sharing knowledge with the developer community. I believe
-                    in writing clean, maintainable code and creating
-                    applications that make a positive impact on users&apos;
-                    lives.
+                    I&apos;ve delivered responsive interfaces, reusable
+                    component systems, and performance improvements across
+                    multiple products. I care deeply about clean code,
+                    usability, and accessibility.
                   </p>
 
                   <p>
-                    Currently, I&apos;m focused on full-stack development with
-                    React, Node.js, and cloud technologies, always eager to
-                    learn and adapt to new challenges in the ever-evolving world
-                    of technology.
+                    I collaborate closely with stakeholders, maintain clear
+                    communication, and enjoy shipping reliable features that
+                    solve real problems.
                   </p>
                 </div>
               </div>

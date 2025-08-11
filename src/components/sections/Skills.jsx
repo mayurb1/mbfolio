@@ -50,16 +50,18 @@ const Skills = () => {
   }, [inView, isPaused, chartTypes])
 
   const skillsData = [
-    { name: 'React', level: 95, category: 'Frontend', color: '#61DAFB' },
-    { name: 'JavaScript', level: 92, category: 'Language', color: '#F7DF1E' },
-    { name: 'TypeScript', level: 88, category: 'Language', color: '#3178C6' },
-    { name: 'Node.js', level: 85, category: 'Backend', color: '#339933' },
-    { name: 'Python', level: 82, category: 'Language', color: '#3776AB' },
-    { name: 'SQL', level: 78, category: 'Database', color: '#336791' },
-    { name: 'AWS', level: 75, category: 'Cloud', color: '#FF9900' },
-    { name: 'Docker', level: 72, category: 'DevOps', color: '#2496ED' },
-    { name: 'GraphQL', level: 70, category: 'API', color: '#E10098' },
-    { name: 'MongoDB', level: 68, category: 'Database', color: '#47A248' },
+    { name: 'React', level: 92, category: 'Frontend', color: '#61DAFB' },
+    { name: 'JavaScript', level: 90, category: 'Language', color: '#F7DF1E' },
+    { name: 'Redux', level: 85, category: 'Frontend', color: '#764ABC' },
+    { name: 'Next.js', level: 80, category: 'Frontend', color: '#000000' },
+    { name: 'HTML5', level: 88, category: 'Language', color: '#E34F26' },
+    { name: 'CSS3', level: 86, category: 'Language', color: '#1572B6' },
+    { name: 'Material UI', level: 84, category: 'Frontend', color: '#0288D1' },
+    { name: 'Ant Design', level: 82, category: 'Frontend', color: '#1890FF' },
+    { name: 'Tailwind CSS', level: 88, category: 'Frontend', color: '#06B6D4' },
+    { name: 'Bootstrap', level: 80, category: 'Frontend', color: '#7952B3' },
+    { name: 'Git', level: 85, category: 'DevOps', color: '#F05032' },
+    { name: 'GitHub', level: 85, category: 'DevOps', color: '#333333' },
   ]
 
   const categories = {

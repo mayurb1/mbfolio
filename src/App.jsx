@@ -16,9 +16,9 @@ const About = lazy(() => import('./components/sections/About'))
 const Skills = lazy(() => import('./components/sections/Skills'))
 const Experience = lazy(() => import('./components/sections/Experience'))
 const Projects = lazy(() => import('./components/sections/Projects'))
-const Blog = lazy(() => import('./components/sections/Blog'))
+// const Blog = lazy(() => import('./components/sections/Blog'))
 
-const Testimonials = lazy(() => import('./components/sections/Testimonials'))
+// const Testimonials = lazy(() => import('./components/sections/Testimonials'))
 const Contact = lazy(() => import('./components/sections/Contact'))
 const BlogPost = lazy(() => import('./components/blog/BlogPost'))
 const NotFound = lazy(() => import('./components/pages/NotFound'))
@@ -59,8 +59,8 @@ function App() {
       </Helmet>
 
       {/* Skip to content link for accessibility */}
-      <a 
-        href="#main-content" 
+      <a
+        href="#main-content"
         className="skip-to-content"
         aria-label="Skip to main content"
       >
@@ -74,30 +74,35 @@ function App() {
         {/* Main content */}
         <main id="main-content" role="main">
           <AnimatePresence mode="wait">
-            <Suspense fallback={
-              <div className="min-h-screen flex items-center justify-center">
-                <LoadingSpinner size="large" />
-              </div>
-            }>
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  <LoadingSpinner size="large" />
+                </div>
+              }
+            >
               <Routes location={location} key={location.pathname}>
                 {/* Single page application - all sections on one page */}
-                <Route path="/" element={
-                  <>
-                    <Hero />
-                    <About />
-                    <Skills />
-                    <Experience />
-                    <Projects />
-                    <Blog />
-        
-                    <Testimonials />
-                    <Contact />
-                  </>
-                } />
-                
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <Hero />
+                      <About />
+                      <Skills />
+                      <Experience />
+                      <Projects />
+                      {/* <Blog /> */}
+
+                      {/* <Testimonials /> */}
+                      <Contact />
+                    </>
+                  }
+                />
+
                 {/* Individual blog post pages */}
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                
+
                 {/* 404 page */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

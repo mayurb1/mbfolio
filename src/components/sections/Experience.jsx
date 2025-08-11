@@ -11,119 +11,71 @@ const Experience = () => {
   const experiences = [
     {
       id: 1,
-      company: 'TechCorp Inc.',
-      position: 'Senior Full-Stack Developer',
-      duration: '2022 - Present',
-      location: 'San Francisco, CA',
+      company: 'IndiaNIC Infotech Limited',
+      position: 'Software Engineer',
+      duration: 'June 2024 – Present',
+      location: 'Ahmedabad, India',
       type: 'Full-time',
-      logo: '/logos/techcorp.png',
-      website: 'https://techcorp.com',
+      logo: '/logos/indianic.png',
+      website: 'https://www.indianic.com/',
       description:
-        'Leading development of scalable web applications serving 1M+ users. Architecting microservices with React, Node.js, and AWS.',
+        'Contributed to Cybuild (construction completions and permit system) with form builder modules, analytics dashboards using Chart.js, and multi-role access. Maintained direct client communication to gather requirements and refine UX.',
       achievements: [
-        'Increased application performance by 40% through code optimization',
-        'Led a team of 5 developers on critical product features',
-        'Implemented CI/CD pipeline reducing deployment time by 60%',
-        'Mentored junior developers and conducted code reviews',
+        'Built analytics dashboards and role-based access modules',
+        'Led client discussions for requirements and UX iterations',
+        'Delivered reusable, responsive React components with API integration',
       ],
-      technologies: [
-        'React',
-        'Node.js',
-        'TypeScript',
-        'AWS',
-        'Docker',
-        'PostgreSQL',
-      ],
+      technologies: ['React', 'Chart.js', 'REST APIs', 'Tailwind CSS'],
       highlights: [
-        { metric: '40%', description: 'Performance improvement' },
-        { metric: '1M+', description: 'Users served' },
-        { metric: '5', description: 'Team members led' },
+        { metric: 'Multi-role', description: 'Access management' },
+        { metric: 'Dashboards', description: 'Analytics reporting' },
+        { metric: 'UX', description: 'Client feedback driven' },
       ],
     },
     {
       id: 2,
-      company: 'StartupXYZ',
-      position: 'Full-Stack Developer',
-      duration: '2020 - 2022',
-      location: 'Remote',
+      company: 'Brainvire Infotech',
+      position: 'UI Developer',
+      duration: 'March 2023 – June 2024',
+      location: 'Ahmedabad, India',
       type: 'Full-time',
-      logo: '/logos/startupxyz.png',
-      website: 'https://startupxyz.com',
+      logo: '/logos/brainvire.png',
+      website: 'https://www.brainvire.com/',
       description:
-        'Built the entire web platform from scratch for a fintech startup. Developed both frontend and backend systems.',
+        'Built a browser-based PDF editor with annotations and collaborative features. Developed an online exam platform with role management and analytics. Led redesign of company website with modern responsive layouts and performance optimizations.',
       achievements: [
-        'Developed MVP that secured $2M in Series A funding',
-        'Built real-time trading dashboard with WebSocket integration',
-        'Implemented secure payment processing with Stripe',
-        'Achieved 99.9% uptime through robust error handling',
+        'Implemented collaborative PDF annotation editor',
+        'Shipped exam platform with roles, scheduling, and analytics',
+        'Led responsive redesign with improved Lighthouse scores',
       ],
-      technologies: [
-        'Vue.js',
-        'Python',
-        'Django',
-        'Redis',
-        'PostgreSQL',
-        'Stripe API',
-      ],
+      technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Redux'],
       highlights: [
-        { metric: '$2M', description: 'Funding secured' },
-        { metric: '99.9%', description: 'Uptime achieved' },
-        { metric: '0-1', description: 'Built from scratch' },
+        { metric: 'Redesign', description: 'Website modernization' },
+        { metric: 'Platform', description: 'Exam system launch' },
+        { metric: 'Perf', description: 'Optimized UX' },
       ],
     },
     {
       id: 3,
-      company: 'Digital Agency Pro',
-      position: 'Frontend Developer',
-      duration: '2019 - 2020',
-      location: 'New York, NY',
+      company: 'Virtual Height IT Services Pvt. Ltd.',
+      position: 'React Developer',
+      duration: 'Feb 2022 – Feb 2023',
+      location: 'Ahmedabad, India',
       type: 'Full-time',
-      logo: '/logos/digital-agency.png',
-      website: 'https://digitalagencypro.com',
+      logo: '/logos/virtual-height.png',
+      website: 'https://www.virtualheight.com/',
       description:
-        'Created responsive websites and web applications for various clients across different industries.',
+        'Developed a B2B jewelry e-commerce platform with React, Redux-Saga, and MUI. Contributed to restaurant delivery app with geo search and order placement. Refactored legacy code and improved performance via lazy loading and code splitting.',
       achievements: [
-        'Delivered 15+ client projects on time and within budget',
-        'Improved client website load times by average of 50%',
-        'Implemented accessibility standards achieving WCAG 2.1 compliance',
-        'Collaborated with design team to create pixel-perfect implementations',
+        'Shipped B2B e-commerce features (catalog, cart, payments)',
+        'Improved performance using code splitting and lazy loading',
+        'Built responsive UIs from Figma/XD designs',
       ],
-      technologies: [
-        'React',
-        'JavaScript',
-        'SASS',
-        'WordPress',
-        'Gatsby',
-        'GraphQL',
-      ],
+      technologies: ['React', 'Redux-Saga', 'Material UI', 'Tailwind CSS'],
       highlights: [
-        { metric: '15+', description: 'Projects delivered' },
-        { metric: '50%', description: 'Load time improvement' },
-        { metric: 'WCAG 2.1', description: 'Accessibility standard' },
-      ],
-    },
-    {
-      id: 4,
-      company: 'FreelanceWork',
-      position: 'Web Developer',
-      duration: '2018 - 2019',
-      location: 'Remote',
-      type: 'Freelance',
-      logo: '/logos/freelance.png',
-      website: '',
-      description:
-        'Provided web development services to small businesses and startups, focusing on modern web technologies.',
-      achievements: [
-        'Built custom e-commerce solutions for 5+ small businesses',
-        'Developed mobile-responsive websites with modern frameworks',
-        'Integrated third-party APIs and payment gateways',
-        'Provided ongoing maintenance and support services',
-      ],
-      technologies: ['HTML5', 'CSS3', 'JavaScript', 'PHP', 'MySQL', 'jQuery'],
-      highlights: [
-        { metric: '5+', description: 'Businesses served' },
-        { metric: '100%', description: 'Client satisfaction' },
-        { metric: '24/7', description: 'Support provided' },
+        { metric: 'E‑commerce', description: 'B2B platform' },
+        { metric: 'Refactor', description: 'Reusable components' },
+        { metric: 'UX', description: 'Responsive design' },
       ],
     },
   ]
@@ -131,20 +83,15 @@ const Experience = () => {
   const education = [
     {
       id: 1,
-      institution: 'University of California, Berkeley',
-      degree: 'Bachelor of Science in Computer Science',
-      duration: '2014 - 2018',
-      location: 'Berkeley, CA',
-      gpa: '3.8/4.0',
-      logo: '/logos/ucb.png',
+      institution: 'Silver Oak College of Engineering and Technology',
+      degree: 'B.Tech in Computer Science',
+      duration: '2018 – 2022',
+      location: 'Ahmedabad, India',
+      gpa: 'CGPA: 8.00/10',
+      logo: '/logos/socet.png',
       description:
-        'Focused on software engineering, algorithms, and data structures. Active member of the Computer Science club.',
-      achievements: [
-        "Dean's List for 6 semesters",
-        'Led team in ACM Programming Contest',
-        'Teaching Assistant for Data Structures course',
-        'Senior project: Machine Learning recommendation system',
-      ],
+        'Focused on core CS fundamentals and web development. Final year project: RTO applicant portal.',
+      achievements: ['Built RTO applicant portal as final year project'],
     },
   ]
 
@@ -385,7 +332,7 @@ const Experience = () => {
           </div>
 
           {/* Call to Action */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.8 }}
@@ -411,7 +358,7 @@ const Experience = () => {
             >
               Get In Touch
             </motion.button>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </section>

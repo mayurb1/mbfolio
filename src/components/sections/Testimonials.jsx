@@ -27,7 +27,7 @@ const Testimonials = () => {
       company: 'TechCorp Inc.',
       avatar: '/testimonials/sarah.jpg',
       content:
-        'Working with John has been an absolute pleasure. His technical expertise and problem-solving skills are exceptional. He delivered our project ahead of schedule and exceeded all expectations.',
+        'Working with Mayur has been an absolute pleasure. His technical expertise and problem-solving skills are exceptional. He delivered our project ahead of schedule and exceeded all expectations.',
       rating: 5,
       project: 'E-commerce Platform',
       linkedin: 'https://linkedin.com/in/sarahjohnson',
@@ -40,7 +40,7 @@ const Testimonials = () => {
       company: 'StartupXYZ',
       avatar: '/testimonials/michael.jpg',
       content:
-        "John's full-stack development skills are top-notch. He built our entire platform from scratch and his code quality is impeccable. A true professional who goes above and beyond.",
+        "Mayur's frontend development skills are top-notch. He built critical modules from scratch and his code quality is impeccable. A true professional who goes above and beyond.",
       rating: 5,
       project: 'Fintech Platform',
       twitter: 'https://twitter.com/michaelchen',
@@ -53,7 +53,7 @@ const Testimonials = () => {
       company: 'Digital Agency Pro',
       avatar: '/testimonials/emily.jpg',
       content:
-        'John has an excellent eye for translating designs into pixel-perfect code. His collaboration skills and attention to detail make him a joy to work with.',
+        'Mayur has an excellent eye for translating designs into pixel-perfect code. His collaboration skills and attention to detail make him a joy to work with.',
       rating: 5,
       project: 'Agency Website Redesign',
       linkedin: 'https://linkedin.com/in/emilyrodriguez',
@@ -66,7 +66,7 @@ const Testimonials = () => {
       company: 'InnovateNow',
       avatar: '/testimonials/david.jpg',
       content:
-        'John delivered exactly what we needed and more. His technical insights and suggestions significantly improved our product. Highly recommend for any complex development project.',
+        'Mayur delivered exactly what we needed and more. His technical insights and suggestions significantly improved our product. Highly recommend for any complex development project.',
       rating: 5,
       project: 'SaaS Dashboard',
       linkedin: 'https://linkedin.com/in/davidkim',
@@ -79,7 +79,7 @@ const Testimonials = () => {
       company: 'GrowthCo',
       avatar: '/testimonials/lisa.jpg',
       content:
-        'The website John built for us increased our conversion rate by 40%. His understanding of both technical implementation and business goals is remarkable.',
+        'The website Mayur built for us increased our conversion rate by 40%. His understanding of both technical implementation and business goals is remarkable.',
       rating: 5,
       project: 'Marketing Website',
       twitter: 'https://twitter.com/lisathompson',
@@ -92,7 +92,7 @@ const Testimonials = () => {
       company: 'FutureTech',
       avatar: '/testimonials/alex.jpg',
       content:
-        'John is a rare find - a developer who truly understands the business side of technology. His solutions are not just technically sound but also strategically smart.',
+        'Mayur is a rare find - a developer who truly understands the business side of technology. His solutions are not just technically sound but also strategically smart.',
       rating: 5,
       project: 'Corporate Platform',
       linkedin: 'https://linkedin.com/in/alexrivera',

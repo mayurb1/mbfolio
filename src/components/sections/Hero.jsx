@@ -134,34 +134,34 @@ const Hero = () => {
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
-        file_name: 'resume.pdf',
+        file_name: 'Mayur_s_resume.pdf',
         event_category: 'engagement',
       })
     }
 
     // Create download link
     const link = document.createElement('a')
-    link.href = '/resume.pdf'
-    link.download = 'John_Doe_Resume.pdf'
+    link.href = '/Mayur_s_resume.pdf'
+    link.download = 'Mayur_Bhalgama_Resume.pdf'
     link.click()
   }
 
   const socialLinks = [
     {
       name: 'GitHub',
-      url: 'https://github.com/mayurbhalgama',
+      url: 'https://github.com/mayurb1',
       icon: Github,
       color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
-      url: 'https://linkedin.com/in/mayurbhalgama',
+      url: 'https://linkedin.com/in/mayur-bhalgama',
       icon: Linkedin,
       color: 'hover:text-blue-600',
     },
     {
       name: 'Email',
-      url: 'mailto:mayur@example.com',
+      url: 'mailto:mayurbhalgama2419@gmail.com',
       icon: Mail,
       color: 'hover:text-red-500',
     },

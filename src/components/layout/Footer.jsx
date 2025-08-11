@@ -14,25 +14,25 @@ const Footer = () => {
   const socialLinks = [
     {
       name: 'GitHub',
-      url: 'https://github.com/mayurbhalgama',
+      url: 'https://github.com/mayurb1',
       icon: Github,
       color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
-      url: 'https://linkedin.com/in/mayurbhalgama',
+      url: 'https://linkedin.com/in/mayur-bhalgama',
       icon: Linkedin,
       color: 'hover:text-blue-600',
     },
     {
       name: 'Twitter',
-      url: 'https://twitter.com/mayurbhalgama',
+      url: 'https://twitter.com/',
       icon: Twitter,
       color: 'hover:text-blue-400',
     },
     {
       name: 'Email',
-      url: 'mailto:mayur@example.com',
+      url: 'mailto:mayurbhalgama2419@gmail.com',
       icon: Mail,
       color: 'hover:text-red-500',
     },
@@ -46,16 +46,16 @@ const Footer = () => {
   ]
 
   const resources = [
-    { name: 'Resume', href: '/resume.pdf', external: true },
+    { name: 'Resume', href: '/Mayur_s_resume.pdf', external: true },
     { name: 'Blog', href: '#blog' },
     {
       name: 'GitHub',
-      href: 'https://github.com/mayurbhalgama',
+      href: 'https://github.com/mayurb1',
       external: true,
     },
     {
       name: 'LinkedIn',
-      href: 'https://linkedin.com/in/mayurbhalgama',
+      href: 'https://linkedin.com/in/mayur-bhalgama',
       external: true,
     },
   ]
@@ -171,7 +171,7 @@ const Footer = () => {
               Get notified about new projects and blog posts.
             </p>
             <motion.a
-              href="mailto:mayur@example.com"
+              href="mailto:mayurbhalgama2419@gmail.com"
               className="inline-flex items-center space-x-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -229,7 +229,7 @@ const Footer = () => {
           <p className="text-text-secondary text-xs">
             Designed and developed with modern web technologies. View source on{' '}
             <motion.a
-              href="https://github.com/mayurbhalgama/portfolio"
+              href="https://github.com/mayurb1/personal-portfolio"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"

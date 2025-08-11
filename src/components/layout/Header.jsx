@@ -8,7 +8,7 @@ import {
   Code,
   Briefcase,
   FolderOpen,
-  BookOpen,
+  // BookOpen,
   Mail,
 } from 'lucide-react'
 
@@ -23,7 +23,7 @@ const Header = () => {
     { id: 'skills', label: 'Skills', icon: Code },
     { id: 'experience', label: 'Experience', icon: Briefcase },
     { id: 'projects', label: 'Projects', icon: FolderOpen },
-    { id: 'blog', label: 'Blog', icon: BookOpen },
+    // { id: 'blog', label: 'Blog', icon: BookOpen },
 
     { id: 'contact', label: 'Contact', icon: Mail },
   ]

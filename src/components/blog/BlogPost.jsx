@@ -466,10 +466,10 @@ What patterns do you use in your React applications? Share your thoughts in the 
                     About {post.author}
                   </h4>
                   <p className="text-text-secondary leading-relaxed">
-                    John is a passionate software engineer with over 5 years of
-                    experience in full-stack development. He loves sharing
-                    knowledge and helping other developers grow in their
-                    careers.
+                    Mayur is a passionate software engineer with 3+ years of
+                    experience focused on frontend development with React and
+                    Next.js. He loves sharing knowledge and helping other
+                    developers grow in their careers.
                   </p>
                 </div>
               </div>

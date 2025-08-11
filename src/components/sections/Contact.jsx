@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useFormik } from 'formik'
@@ -12,11 +12,58 @@ import {
   AlertCircle,
   Github,
   Linkedin,
-  Twitter,
   Calendar,
   Clock,
   Globe,
 } from 'lucide-react'
+
+// Stable form field component to prevent remounts (and focus loss)
+const FormField = ({
+  formik,
+  label,
+  name,
+  type = 'text',
+  as = 'input',
+  required = false,
+  ...props
+}) => {
+  const hasError = formik.touched[name] && formik.errors[name]
+  const Component = as
+
+  return (
+    <div className="space-y-2">
+      <label htmlFor={name} className="block text-sm font-medium text-text">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <Component
+        id={name}
+        name={name}
+        type={type}
+        className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border transition-colors duration-200 bg-background text-text placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base ${
+          hasError
+            ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+            : 'border-border focus:border-primary'
+        }`}
+        placeholder={props.placeholder}
+        value={formik.values[name]}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        {...props}
+      />
+      {hasError && (
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-500 text-xs sm:text-sm flex items-center space-x-1"
+        >
+          <AlertCircle size={12} className="sm:w-3.5 sm:h-3.5" />
+          <span>{formik.errors[name]}</span>
+        </motion.p>
+      )}
+    </div>
+  )
+}
 
 const Contact = () => {
   const { ref, inView } = useInView({
@@ -26,6 +73,8 @@ const Contact = () => {
 
   const [submitStatus, setSubmitStatus] = useState(null) // 'success', 'error', or null
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const formRef = useRef(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -35,10 +84,7 @@ const Contact = () => {
     email: Yup.string()
       .email('Invalid email address')
       .required('Email is required'),
-    subject: Yup.string()
-      .min(5, 'Subject must be at least 5 characters')
-      .max(100, 'Subject must be less than 100 characters')
-      .required('Subject is required'),
+    subject: Yup.string().required('Subject is required'),
     message: Yup.string()
       .min(10, 'Message must be at least 10 characters')
       .max(1000, 'Message must be less than 1000 characters')
@@ -55,20 +101,110 @@ const Contact = () => {
       message: '',
       budget: '',
       timeline: '',
+      botField: '',
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
       setIsSubmitting(true)
       setSubmitStatus(null)
+      setErrorMessage('')
+
+      const encode = data =>
+        Object.keys(data)
+          .map(
+            key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])
+          )
+          .join('&')
 
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        // 24-hour per-email rate limit (client-side)
+        const emailKey = (values.email || '').trim().toLowerCase()
+        const storageKey = `contact:lastSubmit:${emailKey}`
+        const DAY_MS = 24 * 60 * 60 * 1000
+        const now = Date.now()
+        const last = parseInt(localStorage.getItem(storageKey) || '0', 10)
+        if (emailKey && last && now - last < DAY_MS) {
+          const remainingMs = DAY_MS - (now - last)
+          const hrs = Math.floor(remainingMs / (60 * 60 * 1000))
+          const mins = Math.floor(
+            (remainingMs % (60 * 60 * 1000)) / (60 * 1000)
+          )
+          setSubmitStatus('error')
+          setErrorMessage(
+            `You have already submitted a message with this email in the last 24 hours. Please try again in ${hrs}h ${mins}m.`
+          )
+          return
+        }
 
-        // In a real app, you would send the form data to your backend
-        console.log('Form submitted:', values)
+        const formspreeId = import.meta.env.VITE_FORMSPREE_FORM_ID
+        if (formspreeId) {
+          const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
+          const lines = [
+            'Hello Mayur,',
+            '',
+            'You have a new contact request via your portfolio:',
+            '',
+            `• Name: ${values.name}`,
+            `• Email: ${values.email}`,
+            `• Subject: ${values.subject}`,
+          ]
 
-        // Analytics tracking
+          if (values.budget) lines.push(`• Budget: ${values.budget}`)
+          if (values.timeline) lines.push(`• Timeline: ${values.timeline}`)
+
+          lines.push(
+            '',
+            'Message:',
+            values.message,
+            '',
+            '—',
+            'Sent from mayurbhalgama.dev'
+          )
+
+          const emailText = lines.join('\n')
+
+          const body = {
+            subject: emailSubject,
+            reply_to: values.email,
+            message: emailText,
+            name: values.name,
+            email: values.email,
+          }
+
+          if (values.budget) body.budget = values.budget
+          if (values.timeline) body.timeline = values.timeline
+
+          const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify(body),
+          })
+
+          if (!res.ok) throw new Error('Formspree request failed')
+        } else {
+          const payload = {
+            'form-name': 'contact',
+            name: values.name,
+            email: values.email,
+            subject: values.subject,
+            message: values.message,
+            budget: values.budget,
+            timeline: values.timeline,
+            'bot-field': values.botField || '',
+          }
+
+          const res = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encode(payload),
+          })
+
+          if (!res.ok) throw new Error('Netlify request failed')
+        }
+
         if (window.gtag) {
           window.gtag('event', 'form_submit', {
             event_category: 'engagement',
@@ -78,9 +214,22 @@ const Contact = () => {
 
         setSubmitStatus('success')
         resetForm()
+        if (formRef.current) {
+          try {
+            formRef.current.reset()
+          } catch (e) {
+            // ignore reset errors
+          }
+        }
+        // Save last submit timestamp for this email
+        if (emailKey) localStorage.setItem(storageKey, String(now))
       } catch (error) {
         console.error('Error submitting form:', error)
         setSubmitStatus('error')
+        if (!errorMessage)
+          setErrorMessage(
+            'Sorry, there was an error sending your message. Please try again later.'
+          )
       } finally {
         setIsSubmitting(false)
       }
@@ -91,22 +240,22 @@ const Contact = () => {
     {
       icon: Mail,
       label: 'Email',
-      value: 'mayur@example.com',
-      href: 'mailto:mayur@example.com',
+      value: 'mayurbhalgama2419@gmail.com',
+      href: 'mailto:mayurbhalgama2419@gmail.com',
       description: 'Send me an email anytime',
     },
     {
       icon: Phone,
       label: 'Phone',
-      value: '+1 (555) 123-4567',
-      href: 'tel:+15551234567',
+      value: '+91 8160146264',
+      href: 'tel:+918160146264',
       description: 'Call during business hours',
     },
     {
       icon: MapPin,
       label: 'Location',
-      value: 'San Francisco, CA',
-      href: 'https://maps.google.com/?q=San+Francisco,CA',
+      value: 'Ahmedabad, India',
+      href: 'https://maps.google.com/?q=Ahmedabad,India',
       description: 'Available for remote work worldwide',
     },
   ]
@@ -115,68 +264,16 @@ const Contact = () => {
     {
       icon: Github,
       label: 'GitHub',
-      href: 'https://github.com/mayurbhalgama',
+      href: 'https://github.com/mayurb1',
       color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       icon: Linkedin,
       label: 'LinkedIn',
-      href: 'https://linkedin.com/in/mayurbhalgama',
+      href: 'https://linkedin.com/in/mayur-bhalgama',
       color: 'hover:text-blue-600',
     },
-    {
-      icon: Twitter,
-      label: 'Twitter',
-      href: 'https://twitter.com/mayurbhalgama',
-      color: 'hover:text-blue-400',
-    },
   ]
-
-  const FormField = ({
-    label,
-    name,
-    type = 'text',
-    as = 'input',
-    required = false,
-    ...props
-  }) => {
-    const hasError = formik.touched[name] && formik.errors[name]
-    const Component = as
-
-    return (
-      <div className="space-y-2">
-        <label htmlFor={name} className="block text-sm font-medium text-text">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-        <Component
-          id={name}
-          name={name}
-          type={type}
-          className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border transition-colors duration-200 bg-background text-text placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base ${
-            hasError
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-              : 'border-border focus:border-primary'
-          }`}
-          placeholder={props.placeholder}
-          value={formik.values[name]}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          {...props}
-        />
-        {hasError && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-red-500 text-xs sm:text-sm flex items-center space-x-1"
-          >
-            <AlertCircle size={12} className="sm:w-3.5 sm:h-3.5" />
-            <span>{formik.errors[name]}</span>
-          </motion.p>
-        )}
-      </div>
-    )
-  }
 
   return (
     <section id="contact" className="py-20 lg:py-32 bg-background" ref={ref}>
@@ -285,7 +382,7 @@ const Contact = () => {
                       size={12}
                       className="sm:w-3.5 sm:h-3.5 flex-shrink-0"
                     />
-                    <span>Timezone: PST (UTC-8)</span>
+                    <span>Timezone: IST (UTC+5:30)</span>
                   </div>
                 </div>
               </motion.div>
@@ -373,26 +470,41 @@ const Contact = () => {
                         Error Sending Message
                       </h4>
                       <p className="text-red-600/80 text-xs sm:text-sm">
-                        Sorry, there was an error sending your message. Please
-                        try again or contact me directly.
+                        {errorMessage ||
+                          'Sorry, there was an error sending your message. Please try again or contact me directly.'}
                       </p>
                     </div>
                   </motion.div>
                 )}
 
                 <form
+                  name="contact"
+                  method="POST"
+                  data-netlify="true"
+                  data-netlify-honeypot="bot-field"
                   onSubmit={formik.handleSubmit}
+                  ref={formRef}
                   className="space-y-4 sm:space-y-6"
                 >
+                  {/* Netlify hidden fields */}
+                  <input type="hidden" name="form-name" value="contact" />
+                  <input
+                    type="hidden"
+                    name="bot-field"
+                    value={formik.values.botField}
+                    onChange={formik.handleChange}
+                  />
                   {/* Name and Email */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <FormField
+                      formik={formik}
                       label="Full Name"
                       name="name"
                       placeholder="Mayur Bhalgama"
                       required
                     />
                     <FormField
+                      formik={formik}
                       label="Email Address"
                       name="email"
                       type="email"
@@ -402,12 +514,41 @@ const Contact = () => {
                   </div>
 
                   {/* Subject */}
-                  <FormField
-                    label="Subject"
-                    name="subject"
-                    placeholder="Project Inquiry / Collaboration / Question"
-                    required
-                  />
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-medium text-text"
+                    >
+                      Subject<span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      className="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 text-sm sm:text-base"
+                      value={formik.values.subject}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    >
+                      <option value="">Select subject</option>
+                      <option value="Project Inquiry">Project Inquiry</option>
+                      <option value="Collaboration">Collaboration</option>
+                      <option value="General Question">General Question</option>
+                      <option value="Bug Report">Bug Report</option>
+                      <option value="Speaking/Workshop">
+                        Speaking/Workshop
+                      </option>
+                    </select>
+                    {formik.touched.subject && formik.errors.subject && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-xs sm:text-sm flex items-center space-x-1"
+                      >
+                        <AlertCircle size={12} className="sm:w-3.5 sm:h-3.5" />
+                        <span>{formik.errors.subject}</span>
+                      </motion.p>
+                    )}
+                  </div>
 
                   {/* Budget and Timeline */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -467,6 +608,7 @@ const Contact = () => {
 
                   {/* Message */}
                   <FormField
+                    formik={formik}
                     label="Message"
                     name="message"
                     as="textarea"
@@ -524,14 +666,14 @@ const Contact = () => {
               {/* Embedded Map */}
               <div className="relative h-48 sm:h-64 bg-background rounded-lg overflow-hidden">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50323.61899092698!2d-122.48395624692456!3d37.768093625703344!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1635787234567!5m2!1sen!2sus"
+                  src="https://www.google.com/maps?q=Ahmedabad,+India&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="San Francisco Location"
+                  title="Ahmedabad Location"
                   className="grayscale hover:grayscale-0 transition-all duration-300"
                 ></iframe>
 
@@ -540,9 +682,9 @@ const Contact = () => {
               </div>
 
               <p className="text-text-secondary text-xs sm:text-sm mt-4">
-                Based in San Francisco, but available for remote work worldwide.
-                I&apos;m happy to work across different timezones and travel for
-                the right projects.
+                Based in Ahmedabad India, but available for remote work
+                worldwide. I&apos;m happy to work across different timezones and
+                travel for the right projects.
               </p>
             </div>
           </motion.div>
