@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const ThemeContext = createContext()
 
@@ -7,32 +7,32 @@ export const themes = {
     name: 'Light',
     class: 'light',
     icon: '☀️',
-    description: 'Clean and minimal light theme'
+    description: 'Clean and minimal light theme',
   },
   dark: {
     name: 'Dark',
     class: 'dark',
     icon: '🌙',
-    description: 'Easy on the eyes dark theme'
+    description: 'Easy on the eyes dark theme',
   },
   cosmic: {
     name: 'Cosmic',
     class: 'cosmic',
     icon: '🌌',
-    description: 'Deep space inspired theme'
+    description: 'Deep space inspired theme',
   },
   neon: {
     name: 'Neon',
     class: 'neon',
     icon: '⚡',
-    description: 'Electric cyberpunk vibes'
+    description: 'Electric cyberpunk vibes',
   },
   forest: {
     name: 'Forest',
     class: 'forest',
     icon: '🌲',
-    description: 'Natural and calming green theme'
-  }
+    description: 'Natural and calming green theme',
+  },
 }
 
 export const ThemeProvider = ({ children }) => {
@@ -47,7 +47,9 @@ export const ThemeProvider = ({ children }) => {
         setCurrentTheme(savedTheme)
       } else {
         // Check user's system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const prefersDark = window.matchMedia(
+          '(prefers-color-scheme: dark)'
+        ).matches
         setCurrentTheme(prefersDark ? 'dark' : 'light')
       }
     } catch (error) {
@@ -61,15 +63,15 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     if (!isLoading) {
       const htmlElement = document.documentElement
-      
+
       // Remove all theme classes
       Object.values(themes).forEach(theme => {
         htmlElement.classList.remove(theme.class)
       })
-      
+
       // Add current theme class
       htmlElement.classList.add(themes[currentTheme].class)
-      
+
       // Save to localStorage
       try {
         localStorage.setItem('portfolio-theme', currentTheme)
@@ -85,7 +87,7 @@ export const ThemeProvider = ({ children }) => {
           dark: '#0f172a',
           cosmic: '#0c0a1e',
           neon: '#000011',
-          forest: '#f0fdf4'
+          forest: '#f0fdf4',
         }
         metaThemeColor.setAttribute('content', colors[currentTheme])
       }
@@ -95,8 +97,8 @@ export const ThemeProvider = ({ children }) => {
   // Listen for system theme changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
-    const handleChange = (e) => {
+
+    const handleChange = e => {
       // Only auto-switch if user hasn't manually selected a theme
       const savedTheme = localStorage.getItem('portfolio-theme')
       if (!savedTheme) {
@@ -108,15 +110,15 @@ export const ThemeProvider = ({ children }) => {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
-  const changeTheme = (themeName) => {
+  const changeTheme = themeName => {
     if (themes[themeName]) {
       setCurrentTheme(themeName)
-      
+
       // Analytics tracking for theme changes
       if (window.gtag) {
         window.gtag('event', 'theme_change', {
           event_category: 'engagement',
-          event_label: themeName
+          event_label: themeName,
         })
       }
     }
@@ -147,14 +149,10 @@ export const ThemeProvider = ({ children }) => {
     toggleTheme,
     getNextTheme,
     isDarkMode,
-    isLoading
+    isLoading,
   }
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
 export const useTheme = () => {

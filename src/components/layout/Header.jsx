@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Home, User, Code, Briefcase, FolderOpen, BookOpen, Star, Mail } from 'lucide-react'
+import {
+  Menu,
+  X,
+  Home,
+  User,
+  Code,
+  Briefcase,
+  FolderOpen,
+  // BookOpen,
+  Mail,
+} from 'lucide-react'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -13,7 +23,7 @@ const Header = () => {
     { id: 'skills', label: 'Skills', icon: Code },
     { id: 'experience', label: 'Experience', icon: Briefcase },
     { id: 'projects', label: 'Projects', icon: FolderOpen },
-    { id: 'blog', label: 'Blog', icon: BookOpen },
+    // { id: 'blog', label: 'Blog', icon: BookOpen },
 
     { id: 'contact', label: 'Contact', icon: Mail },
   ]
@@ -42,13 +52,13 @@ const Header = () => {
   }, [])
 
   // Handle smooth scrolling to sections
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = sectionId => {
     const element = document.getElementById(sectionId)
     if (element) {
       const offsetTop = element.offsetTop - 80 // Account for header height
       window.scrollTo({
         top: offsetTop,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
     setIsMenuOpen(false)
@@ -64,7 +74,7 @@ const Header = () => {
 
   // Close mobile menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (isMenuOpen && !event.target.closest('.mobile-menu')) {
         setIsMenuOpen(false)
       }
@@ -77,15 +87,19 @@ const Header = () => {
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-lg' 
+        isScrolled
+          ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-lg'
           : 'bg-transparent'
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <nav className="container mx-auto px-4 lg:px-8" role="navigation" aria-label="Main navigation">
+      <nav
+        className="container mx-auto px-4 lg:px-8"
+        role="navigation"
+        aria-label="Main navigation"
+      >
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <motion.div
@@ -98,19 +112,19 @@ const Header = () => {
               className="text-xl lg:text-2xl font-bold text-gradient focus:outline-none rounded-lg p-1"
               aria-label="Go to top of page"
             >
-              &lt;JD /&gt;
+              &lt;MB /&gt;
             </button>
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => {
+            {navItems.map(item => {
               const Icon = item.icon
               return (
                 <motion.button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  onKeyDown={(e) => handleKeyDown(e, item.id)}
+                  onKeyDown={e => handleKeyDown(e, item.id)}
                   className={`relative px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none ${
                     activeSection === item.id
                       ? 'text-primary bg-primary/10'
@@ -124,7 +138,7 @@ const Header = () => {
                     <Icon size={16} />
                     <span>{item.label}</span>
                   </div>
-                  
+
                   {activeSection === item.id && (
                     <motion.div
                       className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"
@@ -163,13 +177,13 @@ const Header = () => {
             >
               <div className="container mx-auto px-4 py-4">
                 <div className="grid grid-cols-2 gap-2">
-                  {navItems.map((item) => {
+                  {navItems.map(item => {
                     const Icon = item.icon
                     return (
                       <motion.button
                         key={item.id}
                         onClick={() => scrollToSection(item.id)}
-                        onKeyDown={(e) => handleKeyDown(e, item.id)}
+                        onKeyDown={e => handleKeyDown(e, item.id)}
                         className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none ${
                           activeSection === item.id
                             ? 'text-primary bg-primary/10'
