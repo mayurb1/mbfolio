@@ -62,6 +62,8 @@ const Skills = () => {
     { name: 'Bootstrap', level: 80, category: 'Frontend', color: '#7952B3' },
     { name: 'Git', level: 85, category: 'DevOps', color: '#F05032' },
     { name: 'GitHub', level: 85, category: 'DevOps', color: '#333333' },
+    { name: 'MongoDB', level: 78, category: 'Database', color: '#47A248' },
+    { name: 'PostgreSQL', level: 75, category: 'Database', color: '#336791' },
   ]
 
   const categories = {
@@ -244,12 +246,14 @@ const Skills = () => {
       .attr('transform', `translate(${size / 2},${size / 2})`)
 
     // Category averages for radar chart
-    const radarData = Object.entries(categories).map(([category, data]) => {
-      const avgLevel =
-        data.skills.reduce((sum, skill) => sum + skill.level, 0) /
-        data.skills.length
-      return { category, level: avgLevel, color: data.color }
-    })
+    const radarData = Object.entries(categories)
+      .filter(([_category, data]) => data.skills && data.skills.length > 0)
+      .map(([category, data]) => {
+        const avgLevel =
+          data.skills.reduce((sum, skill) => sum + skill.level, 0) /
+          data.skills.length
+        return { category, level: avgLevel, color: data.color }
+      })
 
     const angleSlice = (Math.PI * 2) / radarData.length
 
@@ -701,42 +705,46 @@ const Skills = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
           >
-            {Object.entries(categories).map(([category, data], index) => (
-              <motion.div
-                key={category}
-                className="bg-surface border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-200"
-                initial={{ opacity: 0, y: 20 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex items-center mb-4">
-                  <div
-                    className="w-4 h-4 rounded-full mr-3"
-                    style={{ backgroundColor: data.color }}
-                  />
-                  <h3 className="text-lg font-semibold text-text">
-                    {category}
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  {data.skills.map(skill => (
+            {Object.entries(categories)
+              .filter(
+                ([_category, data]) => data.skills && data.skills.length > 0
+              )
+              .map(([category, data], index) => (
+                <motion.div
+                  key={category}
+                  className="bg-surface border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-200"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="flex items-center mb-4">
                     <div
-                      key={skill.name}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="text-text-secondary text-sm">
-                        {skill.name}
-                      </span>
-                      <span className="text-text font-medium text-sm">
-                        {skill.level}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
+                      className="w-4 h-4 rounded-full mr-3"
+                      style={{ backgroundColor: data.color }}
+                    />
+                    <h3 className="text-lg font-semibold text-text">
+                      {category}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    {data.skills.map(skill => (
+                      <div
+                        key={skill.name}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="text-text-secondary text-sm">
+                          {skill.name}
+                        </span>
+                        <span className="text-text font-medium text-sm">
+                          {skill.level}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
           </motion.div>
         </div>
       </div>
