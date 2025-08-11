@@ -81,7 +81,7 @@ const About = () => {
 
                   {/* Profile photo */}
                   <img
-                    src="/profile-photo.jpg"
+                    src="/images/profile-pic.jpg"
                     alt="Mayur Bhalgama - Software Engineer"
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-2xl"
                     onError={e => {

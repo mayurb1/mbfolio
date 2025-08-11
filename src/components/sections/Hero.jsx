@@ -341,40 +341,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
-      {/* Floating geometric shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-24 h-24 sm:w-32 sm:h-32 border border-primary/20 rounded-full"
-          animate={{
-            rotate: 360,
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
-            scale: { duration: 4, repeat: Infinity },
-          }}
-        />
-        <motion.div
-          className="absolute top-3/4 right-1/4 w-16 h-16 sm:w-24 sm:h-24 border border-secondary/20"
-          animate={{
-            rotate: -360,
-            y: [0, -20, 0],
-          }}
-          transition={{
-            rotate: { duration: 15, repeat: Infinity, ease: 'linear' },
-            y: { duration: 3, repeat: Infinity },
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 right-1/6 w-12 h-12 sm:w-16 sm:h-16 bg-accent/10 rounded-full"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity }}
-        />
-      </div>
     </section>
   )
 }
