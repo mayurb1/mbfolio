@@ -738,50 +738,6 @@ const Skills = () => {
               </motion.div>
             ))}
           </motion.div>
-
-          {/* Additional Skills */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 1.0 }}
-            className="mt-16 text-center"
-          >
-            <h3 className="text-xl font-semibold text-text mb-8">
-              Additional Technologies & Tools
-            </h3>
-
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-              {[
-                'Git',
-                'Webpack',
-                'Jest',
-                'Cypress',
-                'Figma',
-                'Adobe XD',
-                'Linux',
-                'Nginx',
-                'Redis',
-                'PostgreSQL',
-                'Firebase',
-                'Vercel',
-                'GitHub Actions',
-                'Terraform',
-                'Kubernetes',
-                'Jira',
-              ].map((tech, index) => (
-                <motion.span
-                  key={tech}
-                  className="px-3 py-2 sm:px-4 bg-background border border-border rounded-full text-text-secondary text-xs sm:text-sm hover:border-primary hover:text-primary transition-colors duration-200"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={inView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.3, delay: 1.2 + index * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  {tech}
-                </motion.span>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </div>
     </section>
