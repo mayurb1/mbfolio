@@ -13,6 +13,9 @@ import {
   Code,
   Eye,
 } from 'lucide-react'
+import { LINKS } from '../../data/links'
+
+const GITHUB_PROFILE = LINKS.github
 
 const Projects = () => {
   const { ref, inView } = useInView({
@@ -39,8 +42,8 @@ const Projects = () => {
         'MongoDB',
         'Tailwind CSS',
       ],
-      github: 'https://github.com/mayurb1',
-      demo: 'https://github.com/mayurb1',
+      github: GITHUB_PROFILE,
+      demo: GITHUB_PROFILE,
       featured: true,
       status: 'completed',
       duration: '3 months',
@@ -63,8 +66,8 @@ const Projects = () => {
       category: 'Frontend',
       image: '/projects/calculator.jpg',
       technologies: ['React', 'CSS3'],
-      github: 'https://github.com/mayurb1',
-      demo: 'https://github.com/mayurb1',
+      github: GITHUB_PROFILE,
+      demo: GITHUB_PROFILE,
       featured: false,
       status: 'completed',
       duration: '1 week',
@@ -87,8 +90,8 @@ const Projects = () => {
       category: 'Frontend',
       image: '/projects/weather-data.jpg',
       technologies: ['React', 'OpenWeather API', 'Tailwind CSS'],
-      github: 'https://github.com/mayurb1',
-      demo: 'https://github.com/mayurb1',
+      github: GITHUB_PROFILE,
+      demo: GITHUB_PROFILE,
       featured: true,
       status: 'completed',
       duration: '1 week',
@@ -517,7 +520,7 @@ const Projects = () => {
               Check out my GitHub profile for more projects and contributions.
             </p>
             <motion.a
-              href="https://github.com/mayurb1"
+              href={GITHUB_PROFILE}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 bg-primary text-background px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition-colors duration-200"

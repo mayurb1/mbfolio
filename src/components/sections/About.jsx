@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
 import { Download, MapPin, Calendar, Coffee, Code, Heart } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
@@ -7,6 +8,76 @@ const About = () => {
     threshold: 0.1,
     triggerOnce: true,
   })
+
+  const [showLikeBurst, setShowLikeBurst] = useState(false)
+  const [likeParticles, setLikeParticles] = useState([])
+  const [showLikeHint, setShowLikeHint] = useState(true)
+  const burstTimeoutRef = useRef(null)
+  const lastBurstRef = useRef(0)
+  const gradientIdRef = useRef(
+    `igHeartGrad-${Math.random().toString(36).slice(2)}`
+  )
+
+  const GradientHeart = ({ size = 120 }) => (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient
+          id={gradientIdRef.current}
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="100%"
+        >
+          <stop offset="0%" stopColor="#feda75" />
+          <stop offset="30%" stopColor="#fa7e1e" />
+          <stop offset="60%" stopColor="#d62976" />
+          <stop offset="80%" stopColor="#962fbf" />
+          <stop offset="100%" stopColor="#4f5bd5" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"
+        fill={`url(#${gradientIdRef.current})`}
+      />
+    </svg>
+  )
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowLikeHint(false), 5000)
+    return () => clearTimeout(t)
+  }, [])
+
+  const triggerLikeBurst = () => {
+    // create small confetti hearts with random directions
+    const num = 8
+    const particles = Array.from({ length: num }).map(() => {
+      const angle = Math.random() * Math.PI * 2
+      const distance = 60 + Math.random() * 60
+      const x = Math.cos(angle) * distance
+      const y = Math.sin(angle) * distance
+      const rot = (Math.random() - 0.5) * 60
+      const delay = Math.random() * 0.1
+      return { x, y, rot, delay }
+    })
+    setLikeParticles(particles)
+
+    setShowLikeBurst(true)
+    setShowLikeHint(false)
+    if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current)
+    burstTimeoutRef.current = setTimeout(() => setShowLikeBurst(false), 3500)
+  }
+
+  const safeTriggerBurst = () => {
+    const now = Date.now()
+    if (now - lastBurstRef.current < 600) return
+    lastBurstRef.current = now
+    triggerLikeBurst()
+  }
 
   const handleDownloadResume = () => {
     // Analytics tracking
@@ -83,7 +154,7 @@ const About = () => {
                   <img
                     src="/images/profile-pic.jpg"
                     alt="Mayur Bhalgama - Software Engineer"
-                    className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-2xl"
+                    className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-2xl select-none"
                     onError={e => {
                       // Fallback to placeholder if image doesn't exist
                       e.target.src = `data:image/svg+xml,${encodeURIComponent(`
@@ -95,7 +166,52 @@ const About = () => {
                         </svg>
                       `)}`
                     }}
+                    draggable={false}
                   />
+
+                  {/* Instagram-like heart burst from bottom-left heart icon */}
+                  {showLikeBurst && (
+                    <>
+                      {/* central gradient heart near heart icon */}
+                      <motion.div
+                        className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 pointer-events-none"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: [0.8, 1.25, 1], opacity: [0, 1, 0] }}
+                        transition={{ duration: 2.2, ease: 'easeInOut' }}
+                      >
+                        <GradientHeart size={110} />
+                      </motion.div>
+
+                      {/* small confetti hearts flying out from heart icon */}
+                      {likeParticles.map((p, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 pointer-events-none"
+                          initial={{
+                            x: 0,
+                            y: 0,
+                            scale: 0.6,
+                            rotate: 0,
+                            opacity: 0,
+                          }}
+                          animate={{
+                            x: p.x,
+                            y: -p.y /* invert y so positive is upward visually */,
+                            scale: [0.6, 1, 0.8],
+                            rotate: p.rot,
+                            opacity: [0, 1, 0],
+                          }}
+                          transition={{
+                            duration: 2.8,
+                            ease: 'easeOut',
+                            delay: p.delay,
+                          }}
+                        >
+                          <GradientHeart size={18} />
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
 
                   {/* Floating badges */}
                   <motion.div
@@ -106,13 +222,32 @@ const About = () => {
                     <Code size={16} className="sm:w-5 sm:h-5" />
                   </motion.div>
 
-                  <motion.div
+                  <motion.button
+                    type="button"
                     className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-secondary text-background p-2 sm:p-3 rounded-full shadow-lg"
                     animate={{ y: [0, 10, 0] }}
                     transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                    onClick={safeTriggerBurst}
+                    onDoubleClick={e => {
+                      e.preventDefault()
+                      safeTriggerBurst()
+                    }}
+                    aria-label="Like"
                   >
                     <Heart size={16} className="sm:w-5 sm:h-5" />
-                  </motion.div>
+                  </motion.button>
+
+                  {/* Hint near heart icon */}
+                  {showLikeHint && (
+                    <motion.div
+                      className="absolute bottom-12 left-2 sm:bottom-14 sm:left-3 bg-surface/90 text-text border border-border rounded-full px-2.5 py-1 text-xs shadow-md pointer-events-none"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      Tap
+                    </motion.div>
+                  )}
                 </motion.div>
 
                 {/* Location */}
