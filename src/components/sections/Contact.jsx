@@ -15,6 +15,7 @@ import {
   Globe,
 } from 'lucide-react'
 import { LINKS } from '../../data/links'
+import Toast from '../ui/Toast'
 
 // Stable form field component to prevent remounts (and focus loss)
 const FormField = ({
@@ -74,6 +75,7 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const formRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [toastOpen, setToastOpen] = useState(false)
 
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -173,11 +175,15 @@ const Contact = () => {
           if (values.budget) body.budget = values.budget
           if (values.timeline) body.timeline = values.timeline
 
-          const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+          const apiUrl = import.meta.env.VITE_CONTACT_API_URL
+          const endpoint = apiUrl || `https://formspree.io/f/${formspreeId}`
+
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               Accept: 'application/json',
+              ...(apiUrl ? { 'X-Formspree-Id': formspreeId } : {}),
             },
             body: JSON.stringify(body),
           })
@@ -222,6 +228,7 @@ const Contact = () => {
         }
         // Save last submit timestamp for this email
         if (emailKey) localStorage.setItem(storageKey, String(now))
+        setToastOpen(true)
       } catch (error) {
         console.error('Error submitting form:', error)
         setSubmitStatus('error')
@@ -278,6 +285,8 @@ const Contact = () => {
               message and let&apos;s create something amazing together.
             </p>
           </motion.div>
+
+          {/* Instruction about unique email submission */}
 
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Contact Information */}
@@ -411,9 +420,16 @@ const Contact = () => {
               className="lg:col-span-2 order-1 lg:order-2"
             >
               <div className="bg-surface border border-border rounded-xl p-6 sm:p-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-text mb-6">
+                <h3 className="text-xl sm:text-2xl font-bold text-text mb-2">
                   Send Me a Message
                 </h3>
+                <p className="text-xs sm:text-sm text-text-secondary bg-background border border-border rounded-md px-3 py-2 mb-4">
+                  Note: Each unique email can submit the form{' '}
+                  <span className="text-primary font-medium">
+                    only once within 24 hours
+                  </span>
+                  . Please fill in the details carefully.
+                </p>
 
                 {/* Success Message */}
                 {submitStatus === 'success' && (
@@ -674,6 +690,14 @@ const Contact = () => {
           </motion.div>
         </div>
       </div>
+      {/* Toast */}
+      <Toast
+        open={toastOpen}
+        onClose={() => setToastOpen(false)}
+        variant="success"
+        title="Message sent"
+        description="Thanks for reaching out! I'll reply within 24 hours."
+      />
     </section>
   )
 }

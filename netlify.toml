@@ -2,6 +2,13 @@
 [build]
   publish = "dist"
   command = "npm run build"
+  functions = "netlify/functions"
+
+# Redirect API to serverless function
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/contact"
+  status = 200
 
 # Redirects for SPA
 [[redirects]]
@@ -26,5 +33,5 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 # Environment variables (set in Netlify UI)
-# VITE_GA_ID = "G-XXXXXXXXXX"
-# VITE_CONTACT_API_URL = "https://your-api.com/contact"
+# FORMSPREE_ID = "your_formspree_id"
+# VITE_CONTACT_API_URL = "/api/contact"
