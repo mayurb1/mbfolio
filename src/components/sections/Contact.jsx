@@ -138,7 +138,8 @@ const Contact = () => {
         }
 
         const formspreeId = import.meta.env.VITE_FORMSPREE_FORM_ID
-        if (formspreeId) {
+        const apiUrl = import.meta.env.VITE_CONTACT_API_URL
+        if (apiUrl) {
           const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
           const lines = [
             'Hello Mayur,',
@@ -149,10 +150,8 @@ const Contact = () => {
             `• Email: ${values.email}`,
             `• Subject: ${values.subject}`,
           ]
-
           if (values.budget) lines.push(`• Budget: ${values.budget}`)
           if (values.timeline) lines.push(`• Timeline: ${values.timeline}`)
-
           lines.push(
             '',
             'Message:',
@@ -161,7 +160,6 @@ const Contact = () => {
             '—',
             'Sent from mayurbhalgama.dev'
           )
-
           const emailText = lines.join('\n')
 
           const body = {
@@ -171,19 +169,57 @@ const Contact = () => {
             name: values.name,
             email: values.email,
           }
-
           if (values.budget) body.budget = values.budget
           if (values.timeline) body.timeline = values.timeline
 
-          const apiUrl = import.meta.env.VITE_CONTACT_API_URL
-          const endpoint = apiUrl || `https://formspree.io/f/${formspreeId}`
-
-          const res = await fetch(endpoint, {
+          const res = await fetch(apiUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               Accept: 'application/json',
-              ...(apiUrl ? { 'X-Formspree-Id': formspreeId } : {}),
+            },
+            body: JSON.stringify(body),
+          })
+
+          if (!res.ok) throw new Error('Contact API request failed')
+        } else if (formspreeId) {
+          const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
+          const lines = [
+            'Hello Mayur,',
+            '',
+            'You have a new contact request via your portfolio:',
+            '',
+            `• Name: ${values.name}`,
+            `• Email: ${values.email}`,
+            `• Subject: ${values.subject}`,
+          ]
+          if (values.budget) lines.push(`• Budget: ${values.budget}`)
+          if (values.timeline) lines.push(`• Timeline: ${values.timeline}`)
+          lines.push(
+            '',
+            'Message:',
+            values.message,
+            '',
+            '—',
+            'Sent from mayurbhalgama.dev'
+          )
+          const emailText = lines.join('\n')
+
+          const body = {
+            subject: emailSubject,
+            reply_to: values.email,
+            message: emailText,
+            name: values.name,
+            email: values.email,
+          }
+          if (values.budget) body.budget = values.budget
+          if (values.timeline) body.timeline = values.timeline
+
+          const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
             },
             body: JSON.stringify(body),
           })
@@ -200,13 +236,11 @@ const Contact = () => {
             timeline: values.timeline,
             'bot-field': values.botField || '',
           }
-
           const res = await fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: encode(payload),
           })
-
           if (!res.ok) throw new Error('Netlify request failed')
         }
 
