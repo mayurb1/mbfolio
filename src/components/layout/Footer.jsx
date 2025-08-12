@@ -1,12 +1,6 @@
 import { motion } from 'framer-motion'
-import {
-  Github,
-  Linkedin,
-  Twitter,
-  Mail,
-  Heart,
-  ExternalLink,
-} from 'lucide-react'
+import { Github, Linkedin, Mail, Heart, ExternalLink } from 'lucide-react'
+import { LINKS } from '../../data/links'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -14,25 +8,19 @@ const Footer = () => {
   const socialLinks = [
     {
       name: 'GitHub',
-      url: 'https://github.com/mayurb1',
+      url: LINKS.github,
       icon: Github,
       color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
-      url: 'https://linkedin.com/in/mayur-bhalgama',
+      url: LINKS.linkedin,
       icon: Linkedin,
       color: 'hover:text-blue-600',
     },
     {
-      name: 'Twitter',
-      url: 'https://twitter.com/',
-      icon: Twitter,
-      color: 'hover:text-blue-400',
-    },
-    {
       name: 'Email',
-      url: 'mailto:mayurbhalgama2419@gmail.com',
+      url: LINKS.email,
       icon: Mail,
       color: 'hover:text-red-500',
     },
@@ -46,18 +34,9 @@ const Footer = () => {
   ]
 
   const resources = [
-    { name: 'Resume', href: '/Mayur_s_resume.pdf', external: true },
-    { name: 'Blog', href: '#blog' },
-    {
-      name: 'GitHub',
-      href: 'https://github.com/mayurb1',
-      external: true,
-    },
-    {
-      name: 'LinkedIn',
-      href: 'https://linkedin.com/in/mayur-bhalgama',
-      external: true,
-    },
+    { name: 'Resume', href: LINKS.resume, external: true },
+    { name: 'GitHub', href: LINKS.github, external: true },
+    { name: 'LinkedIn', href: LINKS.linkedin, external: true },
   ]
 
   const scrollToSection = href => {
@@ -65,10 +44,7 @@ const Footer = () => {
       const element = document.getElementById(href.slice(1))
       if (element) {
         const offsetTop = element.offsetTop - 80
-        window.scrollTo({
-          top: offsetTop,
-          behavior: 'smooth',
-        })
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' })
       }
     }
   }
@@ -82,162 +58,120 @@ const Footer = () => {
 
   return (
     <footer className="bg-surface border-t border-border">
-      <div className="container mx-auto px-4 lg:px-8 py-12">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* Brand Section */}
+      <div className="container mx-auto px-4 lg:px-8 py-10">
+        {/* Mobile-first simplified footer */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* Brand + Social */}
           <div className="space-y-4">
-            <motion.div
-              className="text-2xl font-bold text-gradient"
-              whileHover={{ scale: 1.05 }}
+            <button
+              onClick={() => scrollToSection('#hero')}
+              className="text-xl lg:text-2xl font-bold text-gradient focus:outline-none rounded-lg p-1"
+              aria-label="Go to top of page"
             >
               &lt;MB /&gt;
-            </motion.div>
+            </button>
             <p className="text-text-secondary text-sm leading-relaxed">
-              Software Engineer passionate about creating innovative solutions
-              and beautiful user experiences. Let&apos;s build something amazing
-              together!
+              Software Engineer crafting modern web experiences.
             </p>
-
-            {/* Social Links */}
-            <div className="flex space-x-4">
+            <div className="flex flex-wrap gap-3">
               {socialLinks.map(social => {
                 const Icon = social.icon
                 return (
-                  <motion.a
+                  <a
                     key={social.name}
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`text-text-secondary transition-colors duration-200 ${social.color}`}
-                    whileHover={{ scale: 1.2, y: -2 }}
-                    whileTap={{ scale: 0.9 }}
+                    className={`p-2 bg-background border border-border rounded-lg text-text-secondary transition-colors duration-200 ${social.color}`}
                     aria-label={`Visit my ${social.name} profile`}
                   >
-                    <Icon size={20} />
-                  </motion.a>
+                    <Icon size={18} />
+                  </a>
                 )
               })}
             </div>
+            {/* Mobile Contact CTA */}
+            <a
+              href={LINKS.email}
+              className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity md:hidden"
+            >
+              <Mail size={16} />
+              <span>Get in Touch</span>
+            </a>
           </div>
 
-          {/* Quick Links */}
+          {/* Links (merged Quick + Resources on mobile) */}
           <div>
-            <h3 className="text-text font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
+            <h3 className="text-text font-semibold mb-3">Links</h3>
+            <ul className="grid grid-cols-2 gap-2 text-sm">
               {quickLinks.map(link => (
                 <li key={link.name}>
-                  <motion.a
+                  <a
                     href={link.href}
                     onClick={e => handleLinkClick(e, link.href, false)}
-                    className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm"
-                    whileHover={{ x: 4 }}
+                    className="text-text-secondary hover:text-primary transition-colors"
                   >
                     {link.name}
-                  </motion.a>
+                  </a>
                 </li>
               ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="text-text font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2">
               {resources.map(resource => (
                 <li key={resource.name}>
-                  <motion.a
+                  <a
                     href={resource.href}
                     onClick={e =>
                       handleLinkClick(e, resource.href, resource.external)
                     }
                     target={resource.external ? '_blank' : undefined}
                     rel={resource.external ? 'noopener noreferrer' : undefined}
-                    className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm flex items-center space-x-1"
-                    whileHover={{ x: 4 }}
+                    className="text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1"
                   >
                     <span>{resource.name}</span>
                     {resource.external && <ExternalLink size={12} />}
-                  </motion.a>
+                  </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Newsletter/Contact */}
-          <div>
-            <h3 className="text-text font-semibold mb-4">Stay Connected</h3>
+          {/* Newsletter/Contact (hidden on small, simplified on md+) */}
+          <div className="hidden md:block">
+            <h3 className="text-text font-semibold mb-3">Stay Connected</h3>
             <p className="text-text-secondary text-sm mb-4">
-              Get notified about new projects and blog posts.
+              Get notified about new projects and posts.
             </p>
-            <motion.a
-              href="mailto:mayurbhalgama2419@gmail.com"
-              className="inline-flex items-center space-x-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <a
+              href={LINKS.email}
+              className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
             >
               <Mail size={16} />
               <span>Get in Touch</span>
-            </motion.a>
+            </a>
           </div>
         </div>
 
-        {/* Divider */}
         <div className="border-t border-border"></div>
 
         {/* Bottom Footer */}
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="text-text-secondary text-sm flex items-center space-x-1">
-            <span>© {currentYear} Mayur Bhalgama. Made with</span>
+        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
+          <div className="text-text-secondary text-sm flex items-center gap-1">
+            <span>© {currentYear} Mayur Bhalgama</span>
             <motion.span
               className="text-red-500"
-              animate={{ scale: [1, 1.2, 1] }}
+              animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
             >
-              <Heart size={16} fill="currentColor" />
+              <Heart size={14} fill="currentColor" />
             </motion.span>
-            <span>using React & Tailwind CSS</span>
+            <span>Thanks for visiting.</span>
           </div>
 
-          <div className="flex items-center space-x-6 text-text-secondary text-sm">
-            <motion.a
-              href="/privacy"
-              className="hover:text-primary transition-colors duration-200"
-              whileHover={{ y: -1 }}
-            >
-              Privacy Policy
-            </motion.a>
-            <motion.a
-              href="/terms"
-              className="hover:text-primary transition-colors duration-200"
-              whileHover={{ y: -1 }}
-            >
-              Terms of Service
-            </motion.a>
-            <motion.a
-              href="/sitemap.xml"
-              className="hover:text-primary transition-colors duration-200"
-              whileHover={{ y: -1 }}
-            >
-              Sitemap
-            </motion.a>
+          {/* Removed policy links for a cleaner footer; keep spacing balanced */}
+          <div className="text-text-secondary text-xs">
+            <span className="opacity-70">
+              Stay curious. Build great things.
+            </span>
           </div>
-        </div>
-
-        {/* Developer Credit */}
-        <div className="pt-4 text-center">
-          <p className="text-text-secondary text-xs">
-            Designed and developed with modern web technologies. View source on{' '}
-            <motion.a
-              href="https://github.com/mayurb1/personal-portfolio"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-              whileHover={{ scale: 1.05 }}
-            >
-              GitHub
-            </motion.a>
-          </p>
         </div>
       </div>
     </footer>

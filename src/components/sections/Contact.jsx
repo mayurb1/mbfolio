@@ -10,12 +10,11 @@ import {
   Send,
   CheckCircle,
   AlertCircle,
-  Github,
-  Linkedin,
   Calendar,
   Clock,
   Globe,
 } from 'lucide-react'
+import { LINKS } from '../../data/links'
 
 // Stable form field component to prevent remounts (and focus loss)
 const FormField = ({
@@ -241,7 +240,7 @@ const Contact = () => {
       icon: Mail,
       label: 'Email',
       value: 'mayurbhalgama2419@gmail.com',
-      href: 'mailto:mayurbhalgama2419@gmail.com',
+      href: LINKS.email,
       description: 'Send me an email anytime',
     },
     {
@@ -257,21 +256,6 @@ const Contact = () => {
       value: 'Ahmedabad, India',
       href: 'https://maps.google.com/?q=Ahmedabad,India',
       description: 'Available for remote work worldwide',
-    },
-  ]
-
-  const socialLinks = [
-    {
-      icon: Github,
-      label: 'GitHub',
-      href: 'https://github.com/mayurb1',
-      color: 'hover:text-gray-900 dark:hover:text-white',
-    },
-    {
-      icon: Linkedin,
-      label: 'LinkedIn',
-      href: 'https://linkedin.com/in/mayur-bhalgama',
-      color: 'hover:text-blue-600',
     },
   ]
 
@@ -388,7 +372,7 @@ const Contact = () => {
               </motion.div>
 
               {/* Social Links */}
-              <motion.div
+              {/* <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 1.0 }}
@@ -416,7 +400,7 @@ const Contact = () => {
                     )
                   })}
                 </div>
-              </motion.div>
+              </motion.div> */}
             </motion.div>
 
             {/* Contact Form */}

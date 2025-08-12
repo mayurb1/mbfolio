@@ -72,14 +72,29 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-background);
   overflow-x: hidden;
+}
+
+/* Prevent media/content overflow on small screens */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* Custom Scrollbar */
@@ -141,17 +156,23 @@ body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, 
-    var(--color-surface) 25%, 
-    var(--color-border) 50%, 
-    var(--color-surface) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-border) 50%,
+    var(--color-surface) 75%
+  );
   background-size: 200px 100%;
   animation: skeleton-loading 1.5s infinite;
 }
 
 /* Custom utilities */
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -170,7 +191,10 @@ body {
 
 /* Smooth transitions for theme changes */
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Print styles */
@@ -178,7 +202,7 @@ body {
   .no-print {
     display: none !important;
   }
-  
+
   body {
     background: white !important;
     color: black !important;
@@ -192,7 +216,7 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   html {
     scroll-behavior: auto;
   }

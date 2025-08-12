@@ -1,14 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import {
-  ArrowDown,
-  Download,
-  Mail,
-  Github,
-  Linkedin,
-  ExternalLink,
-} from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
+import { Github, Linkedin, Mail, Download, ArrowDown } from 'lucide-react'
+import { LINKS } from '../../data/links'
 
 const Hero = () => {
   const canvasRef = useRef(null)
@@ -139,9 +133,8 @@ const Hero = () => {
       })
     }
 
-    // Create download link
     const link = document.createElement('a')
-    link.href = '/Mayur_s_resume.pdf'
+    link.href = LINKS.resume
     link.download = 'Mayur_Bhalgama_Resume.pdf'
     link.click()
   }
@@ -149,19 +142,19 @@ const Hero = () => {
   const socialLinks = [
     {
       name: 'GitHub',
-      url: 'https://github.com/mayurb1',
+      url: LINKS.github,
       icon: Github,
       color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
-      url: 'https://linkedin.com/in/mayur-bhalgama',
+      url: LINKS.linkedin,
       icon: Linkedin,
       color: 'hover:text-blue-600',
     },
     {
       name: 'Email',
-      url: 'mailto:mayurbhalgama2419@gmail.com',
+      url: LINKS.email,
       icon: Mail,
       color: 'hover:text-red-500',
     },
@@ -170,7 +163,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-surface to-background pt-16 lg:pt-20"
+      className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-background via-surface to-background pt-16 lg:pt-20"
       ref={ref}
     >
       {/* Animated background canvas */}
@@ -194,9 +187,9 @@ const Hero = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="mb-6"
             >
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 break-words leading-snug overflow-visible">
                 <span className="block text-text">Hi, I&apos;m</span>
-                <span className="block text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="block text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pb-1 sm:pb-1.5">
                   Mayur Bhalgama
                 </span>
               </h1>
@@ -228,7 +221,7 @@ const Hero = () => {
             </motion.p>
 
             {/* Specialties */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -253,7 +246,7 @@ const Hero = () => {
                   </motion.span>
                 )
               )}
-            </motion.div>
+            </motion.div> */}
 
             {/* Call to action buttons */}
             <motion.div
@@ -269,10 +262,10 @@ const Hero = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <span>View My Work</span>
-                <ExternalLink
+                {/* <ExternalLink
                   size={18}
                   className="sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-200"
-                />
+                /> */}
               </motion.button>
 
               <motion.button
