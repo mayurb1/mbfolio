@@ -257,17 +257,6 @@ const Header = () => {
           </motion.button>
         </div>
 
-        {/* Mobile trigger */}
-        <div className="lg:hidden pb-2">
-          <button
-            onClick={openDrawer}
-            className="px-3 py-1.5 rounded-full border border-border bg-background text-text-secondary hover:text-text text-sm"
-            aria-label="Open sections menu"
-          >
-            Sections
-          </button>
-        </div>
-
         {/* Mobile Drawer Navigation (via portal + AnimatePresence) */}
         {createPortal(
           <AnimatePresence>
