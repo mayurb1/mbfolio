@@ -115,13 +115,46 @@ const PROJECTS_DATA = [
   // Organization projects from resume (confidential: no public links)
   {
     id: 4,
-    title: 'Cybuild WebApp',
+    title: 'CyBuild',
     description:
-      'Construction completions and permit system with form builder modules, analytics dashboards, and multi-role access management.',
-    category: 'Frontend',
-    mainImage: '/projects/cybuild.jpg',
-    images: ['/projects/cybuild.jpg'],
-    technologies: ['React', 'Chart.js', 'REST APIs'],
+      'Industrial commissioning & project management platform: permits, assets, safety workflows, QA/QC, project controls, analytics, and handovers for large-scale construction.',
+    category: 'Full-Stack',
+    mainImage: '/images/cybuild_main_img.png',
+    images: ['/images/cybuild_main_img.png', '/images/cybuild_img_1.png'],
+    technologies: [
+      // Frontend
+      'React',
+      'TypeScript',
+      'Tailwind CSS',
+      'Redux Toolkit',
+      'React Query',
+      'Axios',
+      'D3.js',
+      'ApexCharts',
+      'Recharts',
+      'VisX',
+      'AG Grid',
+      'React Select',
+      'React DatePicker',
+      'React Grid Layout',
+      'Lucide React',
+      'Leaflet',
+      'Formik',
+      'Yup',
+      'XYFlow',
+      // Backend
+      'Django',
+      'Django REST Framework',
+      'PostgreSQL',
+      'JWT Auth',
+      'Celery',
+      'Redis',
+      'Django Channels',
+      'Pandas',
+      'OpenPyXL',
+      'SendGrid',
+      'Twilio',
+    ],
     github: null,
     demo: null,
     featured: false,
@@ -130,50 +163,114 @@ const PROJECTS_DATA = [
     team: 'Team project',
     type: 'organization',
     highlights: [
-      'Built form builder modules',
-      'Analytics dashboards with Chart.js',
-      'Multi-role access management',
+      'Workflow engine for permits and safety procedures',
+      'Multi-tenant architecture with role-based access',
+      'Real-time collaboration via WebSockets',
+      'Advanced analytics dashboards and reporting',
+      'GIS mapping for assets and permits (Leaflet)',
+      'Document management with versioning',
+      'Mobile-responsive, field-ready interface',
     ],
     fullDescription:
-      'Contributed to Cybuild by developing key UI modules and analytics, collaborating closely with stakeholders to refine UX based on feedback.',
+      'CyBuild is a commissioning and project management platform for industrial construction. It manages permits, isolation schedules, SWMS safety workflows, QA/QC checklists, punch lists, asset and cable tracking, project controls (schedules, milestones, progress), and structured handovers. The backend is powered by Django, Django REST Framework, PostgreSQL, Celery/Redis, JWT, Channels (real-time), and data tooling (Pandas/OpenPyXL), with comms via SendGrid and Twilio. The frontend is built with React + TypeScript using Tailwind CSS, Redux Toolkit, React Query, and a rich UI toolkit (AG Grid, D3/ApexCharts/Recharts/VisX, React Select, DatePicker, Grid Layout, XYFlow). It includes GIS features with Leaflet, robust form/checklist builders, and an analytics layer for performance insights.',
     screenshots: [],
     metrics: null,
   },
   {
     id: 5,
-    title: 'BYHH - Hospital Management System',
+    title: 'WoundCare Pro - HIPAA-Compliant Healthcare Platform',
     description:
-      'Patient management system for visit histories, wound tracking, structured assessments, and notifications.',
-    category: 'Frontend',
+      'Comprehensive HIPAA-compliant wound care management solution with web dashboard and mobile capabilities for healthcare providers.',
+    category: 'Full-Stack',
     mainImage: '/images/byhh_main_img.png',
     images: ['/images/byhh_main_img.png'],
-    technologies: ['React', 'Reusable Components', 'REST APIs'],
+    technologies: [
+      // Frontend
+      'Next.js',
+      'React',
+      'TypeScript',
+      'Bootstrap',
+      'SASS/SCSS',
+      'Redux Toolkit',
+      'React Redux',
+      'Redux Persist',
+      'Formik',
+      'Yup',
+      'React Select',
+      'React DatePicker',
+      'React Dropzone',
+      'React Toastify',
+      // Auth & Security
+      'Google OAuth',
+      'JS Cookie',
+      'HIPAA Compliance',
+      // Infrastructure
+      'Docker',
+      'Kubernetes',
+      'AWS CloudFront',
+      'Harbor Registry',
+      'SonarQube',
+    ],
     github: null,
     demo: null,
-    featured: false,
-    status: 'ongoing',
+    featured: true,
+    status: 'completed',
     duration: null,
     team: 'Team project',
     type: 'organization',
     highlights: [
-      'Structured medical assessments and notifications',
-      'Reusable component-driven React UI',
-      'Seamless API data flow',
+      'HIPAA-compliant wound care management with anatomical location mapping',
+      'Comprehensive patient management with visit tracking and communication tools',
+      'Next.js 14 with TypeScript, Redux Toolkit, and Bootstrap UI components',
+      'Multi-environment Kubernetes deployments (Dev/QA/UAT)',
+      'Google OAuth integration with secure session management',
+      'Advanced form handling with Formik/Yup validation',
+      'AWS CloudFront CDN for optimized media delivery',
+      'Mobile-responsive design with touch-friendly healthcare interfaces',
     ],
     fullDescription:
-      'Built a comprehensive React-based UI for a hospital system ensuring consistent UX and smooth API integrations for core patient workflows.',
+      'WoundCare Pro is a comprehensive healthcare platform that combines a web dashboard with mobile capabilities to streamline wound tracking, assessment, and communication among healthcare teams. Built with Next.js 14 and TypeScript, it features a robust architecture with Redux Toolkit for state management, Bootstrap for responsive UI, and HIPAA-compliant security measures. The platform includes wound management with anatomical mapping, patient management systems, Google OAuth authentication, and is deployed across multiple Kubernetes environments with Docker containerization and AWS CloudFront CDN integration.',
     screenshots: [],
     metrics: null,
   },
   {
     id: 6,
-    title: 'Topspin Menu App',
+    title: 'Menu Topspin - Digital Restaurant Ordering Platform',
     description:
-      'In-house food ordering system with PetPooja API integration, real-time listings, add-to-cart, and category filtering.',
-    category: 'Frontend',
-    mainImage: '/projects/topspin-menu.jpg',
-    images: ['/projects/topspin-menu.jpg'],
-    technologies: ['React', 'PetPooja API', 'Responsive UI'],
+      'React-based digital restaurant menu application with interactive browsing, order customization, cart management, and Stripe payment integration.',
+    category: 'Full-Stack',
+    mainImage: '/images/topspin_main_img.png',
+    images: [
+      '/images/topspin_main_img.png',
+      '/images/topspin_img_1.png',
+      '/images/topspin_img_2.png',
+    ],
+    technologies: [
+      // Frontend
+      'React',
+      'React Router DOM',
+      'Redux Toolkit',
+      'React Redux',
+      'RTK Query',
+      'SASS',
+      'Swiper',
+      'React Loading Skeleton',
+      // Payment
+      'Stripe React',
+      'Stripe JS',
+      // Utilities
+      'Moment.js',
+      'React Intersection Observer',
+      'Web Vitals',
+      // Testing
+      'Jest',
+      'React Testing Library',
+      // Build & Deploy
+      'React Scripts',
+      'Docker',
+      'Kubernetes',
+      'Petpooja-api',
+    ],
     github: null,
     demo: null,
     featured: false,
@@ -182,12 +279,17 @@ const PROJECTS_DATA = [
     team: 'Team project',
     type: 'organization',
     highlights: [
-      'Real-time listings and add-to-cart',
-      'Category-based filtering',
-      'Mobile-optimized and QR-accessible UI',
+      'Interactive menu browsing with category-based navigation and scroll synchronization',
+      'Item customization with add-ons, ingredients, and quantity selection',
+      'Shopping cart management with add, remove, and modify functionality',
+      'Stripe-powered payment integration for secure checkout',
+      'Redux Toolkit state management with RTK Query for API calls',
+      'Performance optimized with React Intersection Observer',
+      'Mobile-first responsive design with SASS styling',
+      'Docker containerization with Kubernetes deployment',
     ],
     fullDescription:
-      'Delivered a mobile-first ordering experience for a cafe with third-party API integration and streamlined item discovery and checkout.',
+      'Menu Topspin is a comprehensive digital restaurant menu application built with React 18 and modern web technologies. The platform features interactive menu browsing with smooth scroll synchronization, advanced item customization capabilities, and integrated shopping cart management. Built with Redux Toolkit for state management and RTK Query for efficient data fetching, it includes Stripe payment processing for secure transactions. The application emphasizes performance with React Intersection Observer for efficient scrolling and includes comprehensive testing with Jest and React Testing Library. Deployed using Docker containerization and Kubernetes orchestration for scalable restaurant operations.',
     screenshots: [],
     metrics: null,
   },
@@ -369,14 +471,14 @@ const Projects = () => {
         onClick={() => handleSelectProject(project)}
       >
         {/* Project Image */}
-        <div className="relative h-40 sm:h-48 md:h-52 overflow-hidden">
+        <div className="relative w-full aspect-[16/10] overflow-hidden rounded-t-xl">
           <img
             src={project.mainImage || (project.images && project.images[0])}
             alt={project.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
             onError={e => {
               e.target.src = `data:image/svg+xml,${encodeURIComponent(`
-                <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+                <svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
                   <rect width="100%" height="100%" fill="#e2e8f0"/>
                   <text x="50%" y="50%" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="16" fill="#64748b">Project Image</text>
                 </svg>

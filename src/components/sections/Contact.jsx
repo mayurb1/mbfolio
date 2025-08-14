@@ -297,7 +297,7 @@ const Contact = () => {
       label: 'Location',
       value: 'Ahmedabad, India',
       href: 'https://maps.google.com/?q=Ahmedabad,India',
-      description: 'Available for remote work worldwide',
+      description: 'Remote collaboration worldwide',
     },
   ]
 
@@ -717,9 +717,10 @@ const Contact = () => {
               </div>
 
               <p className="text-text-secondary text-xs sm:text-sm mt-4">
-                Based in Ahmedabad India, but available for remote work
-                worldwide. I&apos;m happy to work across different timezones and
-                travel for the right projects.
+                <span className="block sm:inline">
+                  <span className="font-medium text-text">Location:</span>{' '}
+                  Ahmedabad, India.
+                </span>
               </p>
             </div>
           </motion.div>
