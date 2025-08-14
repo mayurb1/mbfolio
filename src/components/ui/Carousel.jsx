@@ -19,7 +19,7 @@ const Carousel = ({ images = [], altPrefix = 'Slide' }) => {
   return (
     <div className="relative w-full">
       <div
-        className="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 overflow-hidden rounded-lg border border-border bg-surface"
+        className="relative w-full aspect-[16/10] max-h-96 overflow-hidden rounded-lg border border-border bg-surface"
         tabIndex={0}
         onKeyDown={e => {
           if (e.key === 'ArrowLeft') goPrev()
@@ -33,14 +33,14 @@ const Carousel = ({ images = [], altPrefix = 'Slide' }) => {
             key={safeImages[current]}
             src={safeImages[current]}
             alt={`${altPrefix} ${current + 1}`}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain object-center bg-surface"
             initial={{ opacity: 0.2, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.3 }}
             onError={e => {
               e.currentTarget.src = `data:image/svg+xml,${encodeURIComponent(`
-                <svg width='800' height='450' xmlns='http://www.w3.org/2000/svg'>
+                <svg width='800' height='500' xmlns='http://www.w3.org/2000/svg'>
                   <rect width='100%' height='100%' fill='#e2e8f0'/>
                   <text x='50%' y='50%' text-anchor='middle' dy='0.3em' font-family='Arial' font-size='16' fill='#64748b'>Image ${current + 1}</text>
                 </svg>

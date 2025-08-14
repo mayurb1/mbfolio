@@ -98,7 +98,7 @@ const About = () => {
 
   const stats = [
     { number: '3+', label: 'Years Experience', icon: Calendar },
-    { number: '20+', label: 'Projects Completed', icon: Code },
+    { number: '9+', label: 'Projects Completed', icon: Code },
     { number: '2', label: 'Certifications', icon: Award },
     { number: '∞', label: 'Lines of Code', icon: Heart },
   ]
