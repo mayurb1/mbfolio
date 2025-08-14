@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { LINKS } from '../../data/links'
 import Toast from '../ui/Toast'
+import Select from '../ui/Select'
 
 // Stable form field component to prevent remounts (and focus loss)
 const FormField = ({
@@ -555,13 +556,13 @@ const Contact = () => {
                     >
                       Subject<span className="text-red-500 ml-1">*</span>
                     </label>
-                    <select
+                    <Select
                       id="subject"
                       name="subject"
-                      className="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 text-sm sm:text-base"
                       value={formik.values.subject}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
+                      className="sm:py-3 sm:pl-4"
                     >
                       <option value="">Select subject</option>
                       <option value="Project Inquiry">Project Inquiry</option>
@@ -571,7 +572,7 @@ const Contact = () => {
                       <option value="Speaking/Workshop">
                         Speaking/Workshop
                       </option>
-                    </select>
+                    </Select>
                     {formik.touched.subject && formik.errors.subject && (
                       <motion.p
                         initial={{ opacity: 0, y: -10 }}
@@ -593,12 +594,12 @@ const Contact = () => {
                       >
                         Budget Range
                       </label>
-                      <select
+                      <Select
                         id="budget"
                         name="budget"
-                        className="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 text-sm sm:text-base"
                         value={formik.values.budget}
                         onChange={formik.handleChange}
+                        className="sm:py-3 sm:pl-4"
                       >
                         <option value="">Select budget range</option>
                         <option value="< $5,000">Less than $5,000</option>
@@ -612,7 +613,7 @@ const Contact = () => {
                           $25,000 - $50,000
                         </option>
                         <option value="> $50,000">More than $50,000</option>
-                      </select>
+                      </Select>
                     </div>
 
                     <div className="space-y-2">
@@ -622,12 +623,12 @@ const Contact = () => {
                       >
                         Project Timeline
                       </label>
-                      <select
+                      <Select
                         id="timeline"
                         name="timeline"
-                        className="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg border border-border bg-background text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 text-sm sm:text-base"
                         value={formik.values.timeline}
                         onChange={formik.handleChange}
+                        className="sm:py-3 sm:pl-4"
                       >
                         <option value="">Select timeline</option>
                         <option value="ASAP">ASAP</option>
@@ -636,7 +637,7 @@ const Contact = () => {
                         <option value="2-3 months">2-3 months</option>
                         <option value="3+ months">3+ months</option>
                         <option value="Just exploring">Just exploring</option>
-                      </select>
+                      </Select>
                     </div>
                   </div>
 

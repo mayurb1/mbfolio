@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
-import { Download, MapPin, Calendar, Coffee, Code, Heart } from 'lucide-react'
+import { Download, MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
 const About = () => {
@@ -99,7 +99,7 @@ const About = () => {
   const stats = [
     { number: '3+', label: 'Years Experience', icon: Calendar },
     { number: '20+', label: 'Projects Completed', icon: Code },
-    { number: '1000+', label: 'Cups of Coffee', icon: Coffee },
+    { number: '2', label: 'Certifications', icon: Award },
     { number: '∞', label: 'Lines of Code', icon: Heart },
   ]
 

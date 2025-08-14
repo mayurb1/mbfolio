@@ -100,38 +100,49 @@ const Footer = () => {
             </a>
           </div>
 
-          {/* Links (merged Quick + Resources on mobile) */}
+          {/* Links split into Website and External */}
           <div>
-            <h3 className="text-text font-semibold mb-3">Links</h3>
-            <ul className="grid grid-cols-2 gap-2 text-sm">
-              {quickLinks.map(link => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    onClick={e => handleLinkClick(e, link.href, false)}
-                    className="text-text-secondary hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-              {resources.map(resource => (
-                <li key={resource.name}>
-                  <a
-                    href={resource.href}
-                    onClick={e =>
-                      handleLinkClick(e, resource.href, resource.external)
-                    }
-                    target={resource.external ? '_blank' : undefined}
-                    rel={resource.external ? 'noopener noreferrer' : undefined}
-                    className="text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>{resource.name}</span>
-                    {resource.external && <ExternalLink size={12} />}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-text font-semibold mb-3">Site links</h3>
+                <ul className="space-y-2 text-sm">
+                  {quickLinks.map(link => (
+                    <li key={link.name}>
+                      <a
+                        href={link.href}
+                        onClick={e => handleLinkClick(e, link.href, false)}
+                        className="text-text-secondary hover:text-primary transition-colors"
+                      >
+                        {link.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-text font-semibold mb-3">External links</h3>
+                <ul className="space-y-2 text-sm">
+                  {resources.map(resource => (
+                    <li key={resource.name}>
+                      <a
+                        href={resource.href}
+                        onClick={e =>
+                          handleLinkClick(e, resource.href, resource.external)
+                        }
+                        target={resource.external ? '_blank' : undefined}
+                        rel={
+                          resource.external ? 'noopener noreferrer' : undefined
+                        }
+                        className="text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1"
+                      >
+                        <span>{resource.name}</span>
+                        {resource.external && <ExternalLink size={12} />}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* Newsletter/Contact (hidden on small, simplified on md+) */}
