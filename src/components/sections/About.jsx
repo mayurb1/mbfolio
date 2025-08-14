@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { Download, MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
+import CodeEditor from '../ui/CodeEditor'
 
 const About = () => {
   const { ref, inView } = useInView({
@@ -11,12 +12,33 @@ const About = () => {
 
   const [showLikeBurst, setShowLikeBurst] = useState(false)
   const [likeParticles, setLikeParticles] = useState([])
-  const [showLikeHint, setShowLikeHint] = useState(true)
+  const [showLikeHint] = useState(true)
+  const [showCodeHint] = useState(true)
+  const [showCodeEditor, setShowCodeEditor] = useState(false)
   const burstTimeoutRef = useRef(null)
   const lastBurstRef = useRef(0)
   const gradientIdRef = useRef(
     `igHeartGrad-${Math.random().toString(36).slice(2)}`
   )
+
+  // Close code editor when switching to mobile view
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if window width is below sm breakpoint (640px in Tailwind)
+      if (window.innerWidth < 640 && showCodeEditor) {
+        setShowCodeEditor(false)
+      }
+    }
+
+    // Add event listener
+    window.addEventListener('resize', handleResize)
+
+    // Check immediately on mount
+    handleResize()
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize)
+  }, [showCodeEditor])
 
   const GradientHeart = ({ size = 120 }) => (
     <svg
@@ -47,10 +69,11 @@ const About = () => {
     </svg>
   )
 
-  useEffect(() => {
-    const t = setTimeout(() => setShowLikeHint(false), 5000)
-    return () => clearTimeout(t)
-  }, [])
+  // Keep hint visible permanently
+  // useEffect(() => {
+  //   const t = setTimeout(() => setShowLikeHint(false), 5000)
+  //   return () => clearTimeout(t)
+  // }, [])
 
   const triggerLikeBurst = () => {
     // create small confetti hearts with random directions
@@ -67,7 +90,8 @@ const About = () => {
     setLikeParticles(particles)
 
     setShowLikeBurst(true)
-    setShowLikeHint(false)
+    // Keep hint visible even after clicking
+    // setShowLikeHint(false)
     if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current)
     burstTimeoutRef.current = setTimeout(() => setShowLikeBurst(false), 3500)
   }
@@ -94,6 +118,21 @@ const About = () => {
     link.href = '/Mayur_s_resume.pdf'
     link.download = 'Mayur_Bhalgama_Resume.pdf'
     link.click()
+  }
+
+  const handleOpenCodeEditor = () => {
+    setShowCodeEditor(true)
+    // Analytics tracking
+    if (window.gtag) {
+      window.gtag('event', 'code_editor_open', {
+        event_category: 'engagement',
+        event_label: 'about_section',
+      })
+    }
+  }
+
+  const handleCloseCodeEditor = () => {
+    setShowCodeEditor(false)
   }
 
   const stats = [
@@ -214,13 +253,89 @@ const About = () => {
                   )}
 
                   {/* Floating badges */}
-                  <motion.div
-                    className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-primary text-background p-2 sm:p-3 rounded-full shadow-lg"
+                  <motion.button
+                    type="button"
+                    className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-primary text-background p-2 sm:p-3 rounded-full shadow-lg cursor-pointer sm:cursor-pointer cursor-default sm:pointer-events-auto pointer-events-none"
                     animate={{ y: [0, -10, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
+                    onClick={handleOpenCodeEditor}
+                    aria-label="Open Code Editor"
                   >
                     <Code size={16} className="sm:w-5 sm:h-5" />
-                  </motion.div>
+
+                    {/* Code indicator - same as heart indicator */}
+                    {showCodeHint && (
+                      <motion.div
+                        className="absolute pointer-events-none hidden sm:flex items-center"
+                        style={{
+                          top: '50%',
+                          left: '100%',
+                          transform: 'translateY(-50%)',
+                          marginLeft: '6px',
+                        }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {/* Text label */}
+                        <motion.span
+                          className="ml-2 sm:ml-3 text-xs sm:text-sm font-medium whitespace-nowrap text-text-secondary"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            ease: 'easeOut',
+                            delay: 1,
+                          }}
+                        >
+                          <span className="hidden sm:inline">Genius Tap</span>
+                          <span className="sm:hidden">Tap</span>
+                        </motion.span>
+
+                        {/* Straight horizontal line */}
+                        <motion.div
+                          className="h-px bg-text-secondary w-6 sm:w-8 md:w-10"
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{
+                            duration: 0.8,
+                            ease: 'easeOut',
+                            delay: 0.2,
+                          }}
+                        />
+                      </motion.div>
+                    )}
+
+                    {/* Mobile version for code - hidden on mobile */}
+                    {showCodeHint && (
+                      <motion.div
+                        className="absolute pointer-events-none hidden"
+                        style={{
+                          top: '120%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                        }}
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <motion.span
+                          className="bg-surface/90 text-text-secondary border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            ease: 'easeOut',
+                            delay: 0.5,
+                          }}
+                        >
+                          CODE
+                        </motion.span>
+                      </motion.div>
+                    )}
+                  </motion.button>
 
                   <motion.button
                     type="button"
@@ -235,19 +350,82 @@ const About = () => {
                     aria-label="Like"
                   >
                     <Heart size={16} className="sm:w-5 sm:h-5" />
-                  </motion.button>
 
-                  {/* Hint near heart icon */}
-                  {showLikeHint && (
-                    <motion.div
-                      className="absolute bottom-12 left-2 sm:bottom-14 sm:left-3 bg-surface/90 text-text border border-border rounded-full px-2.5 py-1 text-xs shadow-md pointer-events-none"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      Tap
-                    </motion.div>
-                  )}
+                    {/* CyBuild-style indicator - line extends from heart to label */}
+                    {showLikeHint && (
+                      <motion.div
+                        className="absolute pointer-events-none hidden sm:flex items-center"
+                        style={{
+                          top: '50%',
+                          right: '100%',
+                          transform: 'translateY(-50%)',
+                          marginRight: '6px',
+                        }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {/* Text label - responsive sizing */}
+                        <motion.span
+                          className="mr-2 sm:mr-3 text-xs sm:text-sm font-medium whitespace-nowrap text-text-secondary"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            ease: 'easeOut',
+                            delay: 1,
+                          }}
+                        >
+                          <span className="hidden sm:inline">
+                            Tap to see the magic
+                          </span>
+                          <span className="sm:hidden">Tap</span>
+                        </motion.span>
+
+                        {/* Straight horizontal line - responsive width */}
+                        <motion.div
+                          className="h-px bg-text-secondary w-6 sm:w-8 md:w-10"
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{
+                            duration: 0.8,
+                            ease: 'easeOut',
+                            delay: 0.2,
+                          }}
+                        />
+                      </motion.div>
+                    )}
+
+                    {/* Mobile-only version - simpler indicator */}
+                    {showLikeHint && (
+                      <motion.div
+                        className="absolute pointer-events-none sm:hidden"
+                        style={{
+                          bottom: '120%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                        }}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <motion.span
+                          className="bg-surface/90 text-text-secondary border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            ease: 'easeOut',
+                            delay: 0.5,
+                          }}
+                        >
+                          TAP
+                        </motion.span>
+                      </motion.div>
+                    )}
+                  </motion.button>
                 </motion.div>
 
                 {/* Location */}
@@ -393,6 +571,9 @@ const About = () => {
           </div>
         </div>
       </div>
+
+      {/* Code Editor Modal */}
+      <CodeEditor isOpen={showCodeEditor} onClose={handleCloseCodeEditor} />
     </section>
   )
 }
