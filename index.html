@@ -1,58 +1,77 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Meta Tags -->
-    <title>Mayur Bhalgama - Software Engineer Portfolio</title>
-    <meta name="description" content="Software Engineer specializing in React, Node.js, and full-stack development. View my projects, experience, and get in touch." />
-    <meta name="keywords" content="software engineer, full stack developer, react, nodejs, javascript, portfolio" />
-    <meta name="author" content="Mayur Bhalgama" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://mayurbhalgama.dev" />
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Mayur Bhalgama - Software Engineer Portfolio" />
-    <meta property="og:description" content="Software Engineer specializing in React, Node.js, and full-stack development. View my projects, experience, and get in touch." />
-    <meta property="og:image" content="/og-image.jpg" />
-    <meta property="og:url" content="https://mayurbhalgama.dev" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Mayur Bhalgama Portfolio" />
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:creator" content="@mayurbhalgama" />
-    <meta name="twitter:title" content="Mayur Bhalgama - Software Engineer Portfolio" />
-    <meta name="twitter:description" content="Software Engineer specializing in React, Node.js, and full-stack development." />
-    <meta name="twitter:image" content="/og-image.jpg" />
-    
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-    
-    <!-- PWA Icons -->
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="mask-icon" href="/masked-icon.svg" color="#000000" />
-    <meta name="theme-color" content="#000000" />
-    
-    <!-- Analytics -->
-    <!-- Google Analytics will be added here -->
-    
-    <script>
-      // Prevent FOUC (Flash of Unstyled Content) by setting theme immediately
-      try {
-        const theme = localStorage.getItem('portfolio-theme') || 'light';
-        document.documentElement.className = theme;
-      } catch (e) {
-        document.documentElement.className = 'light';
-      }
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO Meta Tags -->
+  <title>Mayur Bhalgama - Software Engineer</title>
+  <meta name="description"
+    content="Software Engineer specializing in React, Node.js, and full-stack development. View my projects, experience, and get in touch." />
+  <meta name="keywords" content="software engineer, full stack developer, react, nodejs, javascript, portfolio" />
+  <meta name="author" content="Mayur Bhalgama" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mbfolio.netlify.app" />
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Mayur Bhalgama - Software Engineer" />
+  <meta property="og:description"
+    content="Software Engineer specializing in React, Node.js, and full-stack development. View my projects, experience, and get in touch." />
+  <meta property="og:image" content="https://mbfolio.netlify.app/images/og-image.png" />
+  <meta property="og:url" content="https://mbfolio.netlify.app" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mayur Bhalgama Portfolio" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Mayur Bhalgama - Software Engineer Portfolio" />
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator" content="@mayurbhalgama" />
+  <meta name="twitter:title" content="Mayur Bhalgama - Software Engineer" />
+  <meta name="twitter:description"
+    content="Software Engineer specializing in React, Node.js, and full-stack development." />
+  <meta name="twitter:image" content="https://mbfolio.netlify.app/images/og-image.png" />
+  <meta name="twitter:image:alt" content="Mayur Bhalgama - Software Engineer Portfolio" />
+  <meta name="twitter:site" content="@mayurbhalgama" />
+
+  <!-- Additional SEO Meta Tags -->
+  <meta name="application-name" content="Mayur Bhalgama Portfolio" />
+  <meta name="msapplication-TileColor" content="#000000" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- PWA Icons -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="mask-icon" href="/masked-icon.svg" color="#000000" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Analytics -->
+  <!-- Google Analytics will be added here -->
+
+  <script>
+    // Prevent FOUC (Flash of Unstyled Content) by setting theme immediately
+    try {
+      const theme = localStorage.getItem('portfolio-theme') || 'light';
+      document.documentElement.className = theme;
+    } catch (e) {
+      document.documentElement.className = 'light';
+    }
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
