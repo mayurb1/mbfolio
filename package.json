@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run postbuild",
-    "postbuild": "cp Mayur_s_resume.pdf dist/ || copy Mayur_s_resume.pdf dist\\Mayur_s_resume.pdf",
+    "postbuild": "cp public/Mayur_s_resume.pdf dist/ || copy public\\Mayur_s_resume.pdf dist\\Mayur_s_resume.pdf",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext js,jsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\"",
