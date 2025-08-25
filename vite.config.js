@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'Mayur_s_resume.pdf'],
       manifest: {
         name: 'Personal Portfolio',
         short_name: 'Portfolio',
@@ -30,7 +30,19 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2,pdf}'],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: /\/Mayur_s_resume\.pdf$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'pdf-cache'
+            }
+          }
+        ]
       }
     })
   ],
