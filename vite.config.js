@@ -7,8 +7,14 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      // Auto-update service worker without user prompt for seamless updates
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'Mayur_s_resume.pdf'],
+      
+      // Static assets to include in the service worker precache
+      // These files will be cached during service worker installation
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'resume.pdf'],
+      
+      // PWA manifest configuration for installable app
       manifest: {
         name: 'Personal Portfolio',
         short_name: 'Portfolio',
@@ -29,17 +35,33 @@ export default defineConfig({
           }
         ]
       },
+      
+      // Workbox service worker configuration
       workbox: {
+        // File patterns to include in precache (cached during SW install)
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2,pdf}'],
-        skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
+        
+        // Service worker lifecycle options for immediate updates
+        skipWaiting: true,        // New SW takes control immediately
+        clientsClaim: true,       // SW controls all tabs immediately
+        cleanupOutdatedCaches: true, // Remove old cache versions automatically
+        
+        // Runtime caching strategies for specific routes/files
         runtimeCaching: [
           {
-            urlPattern: /\/Mayur_s_resume\.pdf$/,
-            handler: 'StaleWhileRevalidate',
+            // Cache strategy specifically for resume PDF
+            urlPattern: /\/resume\.pdf$/,
+            
+            // NetworkFirst: Always try network first, fallback to cache
+            // This prevents serving stale 404s when file becomes available
+            handler: 'NetworkFirst',
+            
             options: {
-              cacheName: 'pdf-cache'
+              // Separate cache for PDF files (v2 to invalidate old 404 cache)
+              cacheName: 'pdf-cache-v2',
+              
+              // Network timeout - fallback to cache after 3 seconds
+              networkTimeoutSeconds: 3
             }
           }
         ]

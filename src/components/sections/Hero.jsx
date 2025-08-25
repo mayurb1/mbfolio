@@ -128,7 +128,7 @@ const Hero = () => {
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
-        file_name: 'Mayur_s_resume.pdf',
+        file_name: 'resume.pdf',
         event_category: 'engagement',
       })
     }
