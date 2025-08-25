@@ -107,7 +107,7 @@ const About = () => {
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
-        file_name: 'Mayur_s_resume.pdf',
+        file_name: 'resume.pdf',
         event_category: 'engagement',
         event_label: 'about_section',
       })
@@ -115,7 +115,7 @@ const About = () => {
 
     // Create download link
     const link = document.createElement('a')
-    link.href = '/Mayur_s_resume.pdf'
+    link.href = '/resume.pdf'
     link.download = 'Mayur_Bhalgama_Resume.pdf'
     link.click()
   }
