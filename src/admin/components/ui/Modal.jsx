@@ -11,6 +11,8 @@ const Modal = ({
   if (!isOpen) return null
 
   const sizes = {
+    xs: 'max-w-sm',
+    sm: 'max-w-md', 
     small: 'max-w-md',
     medium: 'max-w-2xl',
     large: 'max-w-4xl',
@@ -25,15 +27,15 @@ const Modal = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Backdrop */}
       <div 
-        className="flex items-center justify-center min-h-screen px-4 text-center"
-        onClick={handleBackdropClick}
-      >
-        {/* Backdrop */}
-        <div className="fixed inset-0 bg-black opacity-50" />
-        
+        className="fixed inset-0 bg-black opacity-50"
+        onClick={onClose}
+      />
+      
+      <div className="flex items-center justify-center min-h-screen px-4 text-center">
         {/* Modal */}
-        <div className={`relative inline-block w-full ${sizes[size]} p-6 my-8 overflow-hidden text-left align-middle bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-slate-200 dark:border-slate-600`}>
+        <div className={`relative inline-block w-full ${sizes[size]} p-6 my-8 overflow-hidden text-left align-middle bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-slate-200 dark:border-slate-600 z-10`}>
           {/* Header */}
           {(title || showCloseButton) && (
             <div className="flex items-center justify-between mb-4">

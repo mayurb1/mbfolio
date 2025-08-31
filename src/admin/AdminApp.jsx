@@ -1,24 +1,35 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { checkAuth } from './store/authSlice'
+import { checkAuth, resetAuth } from './store/authSlice'
 import AdminProvider from './store/AdminProvider'
 import authService from './services/authService'
+import { startTokenExpiryCheck } from './utils/tokenManager'
 
 // Components
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Skills from './pages/Skills'
+import Categories from './pages/Categories'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 const AdminContent = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [registrationAllowed, setRegistrationAllowed] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Check for existing authentication on app load
     dispatch(checkAuth())
+    
+    // Start token expiry checking
+    startTokenExpiryCheck(() => {
+      // On token expiry, reset auth state and redirect to login
+      dispatch(resetAuth())
+      navigate('/admin/login', { replace: true })
+    })
     
     // Check if registration is allowed
     const checkRegistrationStatus = async () => {
@@ -34,7 +45,7 @@ const AdminContent = () => {
     }
 
     checkRegistrationStatus()
-  }, [dispatch])
+  }, [dispatch, navigate])
 
   if (loading) {
     return (
@@ -65,6 +76,22 @@ const AdminContent = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/skills"
+        element={
+          <ProtectedRoute>
+            <Skills />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/categories"
+        element={
+          <ProtectedRoute>
+            <Categories />
           </ProtectedRoute>
         }
       />

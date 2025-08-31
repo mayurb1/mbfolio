@@ -40,14 +40,20 @@ api.interceptors.response.use(
   (error) => {
     // Handle common errors
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      if (error.config?.url?.includes('/admin/')) {
-        localStorage.removeItem('admin_token')
-        localStorage.removeItem('admin_user')
-        window.location.href = '/admin/login'
-      } else {
-        localStorage.removeItem('auth_token')
-        window.location.href = '/login'
+      // Token expired or invalid - clear storage and redirect
+      localStorage.removeItem('admin_token')
+      localStorage.removeItem('admin_user')
+      
+      // Only redirect if not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        // For admin routes, redirect to admin login
+        if (window.location.pathname.includes('/admin')) {
+          window.location.href = '/admin/login'
+        } else {
+          // For regular routes, redirect to regular login
+          localStorage.removeItem('auth_token')
+          window.location.href = '/login'
+        }
       }
     }
     
