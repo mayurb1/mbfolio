@@ -5,6 +5,8 @@ import {
   Mail, 
   Image, 
   Settings,
+  Zap,
+  Layers,
   X
 } from 'lucide-react'
 
@@ -21,6 +23,18 @@ const Sidebar = ({ isOpen = true, onClose }) => {
       path: '/admin/projects', 
       icon: FolderOpen,
       description: 'Manage projects'
+    },
+    { 
+      name: 'Skills', 
+      path: '/admin/skills', 
+      icon: Zap,
+      description: 'Manage skills'
+    },
+    { 
+      name: 'Categories', 
+      path: '/admin/categories', 
+      icon: Layers,
+      description: 'Manage categories'
     },
     { 
       name: 'Contact Forms', 
