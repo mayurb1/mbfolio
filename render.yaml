@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: mbfolio-backend
+    runtime: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    branch: main
+    rootDir: ./
+    healthCheckPath: /
