@@ -10,7 +10,10 @@ connectDB();
 
 const app = express();
 app.use(cors({
-    origin: 'https://mbfolio.netlify.app/'
+    origin: process.env.NODE_ENV === 'production' 
+      ? 'https://mbfolio.netlify.app/' 
+      : ['http://localhost:3000', 'http://localhost:5173'], // Add Vite dev server ports
+    credentials: true
 }));
 app.use(express.json());
 

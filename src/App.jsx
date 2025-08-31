@@ -23,32 +23,64 @@ const Contact = lazy(() => import('./components/sections/Contact'))
 const BlogPost = lazy(() => import('./components/blog/BlogPost'))
 const NotFound = lazy(() => import('./components/pages/NotFound'))
 
+// Admin app (lazy-loaded)
+const AdminApp = lazy(() => import('./admin/AdminApp'))
+
 function App() {
   const location = useLocation()
   const [isLoading, setIsLoading] = useState(true)
 
-  // Simulate initial loading time
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+  // Check if current path is admin route
+  const isAdminRoute = location.pathname.startsWith('/admin')
 
-    return () => clearTimeout(timer)
-  }, [])
+  // Simulate initial loading time (only for non-admin routes)
+  useEffect(() => {
+    if (!isAdminRoute) {
+      const timer = setTimeout(() => {
+        setIsLoading(false)
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    } else {
+      setIsLoading(false)
+    }
+  }, [isAdminRoute])
 
   // Update page title based on route
   const getPageTitle = () => {
     const path = location.pathname
     if (path === '/') return 'Mayur Bhalgama - Software Engineer Portfolio'
     if (path.startsWith('/blog/')) return 'Blog Post - Mayur Bhalgama Portfolio'
+    if (path.startsWith('/admin')) return 'Admin Panel - Portfolio'
     return `${path.slice(1).charAt(0).toUpperCase() + path.slice(2)} - Mayur Bhalgama Portfolio`
   }
 
-  if (isLoading) {
+  // Handle loading state for non-admin routes
+  if (isLoading && !isAdminRoute) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingSpinner size="large" />
       </div>
+    )
+  }
+
+  // Render admin app for admin routes
+  if (isAdminRoute) {
+    return (
+      <>
+        <Helmet>
+          <title>{getPageTitle()}</title>
+        </Helmet>
+        <Suspense
+          fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <LoadingSpinner size="large" />
+            </div>
+          }
+        >
+          <AdminApp />
+        </Suspense>
+      </>
     )
   }
 
