@@ -12,16 +12,15 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? 'https://mbfolio.netlify.app/'
+        ? 'https://mbfolio.netlify.app'
         : [
-            'https://mbfolio.netlify.app/',
+            'https://mbfolio.netlify.app',
             'http://localhost:3000',
             'http://localhost:5173',
-          ], // Add Vite dev server ports
-    // credentials: true,
+          ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: false, // set true only if using cookies
+    credentials: false,
   })
 )
 app.use(express.json())
