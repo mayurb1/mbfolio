@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { checkAuth, resetAuth } from './store/authSlice'
 import AdminProvider from './store/AdminProvider'
+import ToastProvider from './contexts/ToastContext'
 import authService from './services/authService'
 import { startTokenExpiryCheck } from './utils/tokenManager'
 
@@ -35,6 +36,7 @@ const AdminContent = () => {
     const checkRegistrationStatus = async () => {
       try {
         const response = await authService.checkRegistrationStatus()
+        // response is already the parsed data from authService
         setRegistrationAllowed(response.data.isRegistrationAllowed)
       } catch (error) {
         console.error('Failed to check registration status:', error)
@@ -108,7 +110,9 @@ const AdminContent = () => {
 const AdminApp = () => {
   return (
     <AdminProvider>
-      <AdminContent />
+      <ToastProvider>
+        <AdminContent />
+      </ToastProvider>
     </AdminProvider>
   )
 }

@@ -48,13 +48,13 @@ class AuthService {
   async logout() {
     try {
       // Call logout endpoint to invalidate token on server
-      await api.post('/auth/logout')
+      const response = await api.post('/auth/logout')
       
       // Clear stored tokens after successful server logout
       localStorage.removeItem('admin_token')
       localStorage.removeItem('admin_user')
       
-      return true
+      return response.data // Return the complete response with message
     } catch (error) {
       // Even if API call fails, clear local storage for security
       localStorage.removeItem('admin_token')

@@ -1,11 +1,13 @@
 import { useDispatch } from 'react-redux'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
+import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import { createCategory, updateCategory, fetchCategories } from '../../store/categoriesSlice'
 
 const CategoryForm = ({ category = null, onCancel }) => {
   const dispatch = useDispatch()
+  const { handleApiResponse } = useToast()
   const isEditing = !!category
 
   const initialValues = {
@@ -23,14 +25,19 @@ const CategoryForm = ({ category = null, onCancel }) => {
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
+      let response
       if (isEditing) {
-        await dispatch(updateCategory({ id: category._id, categoryData: values })).unwrap()
+        response = await dispatch(updateCategory({ id: category._id, categoryData: values })).unwrap()
       } else {
-        await dispatch(createCategory(values)).unwrap()
+        response = await dispatch(createCategory(values)).unwrap()
       }
+      
+      // Show toast message based on API response status
+      handleApiResponse(response)
       
       // Refresh categories list
       dispatch(fetchCategories({ page: 1, limit: 50 }))
+      onCancel() // Close the modal
     } catch (error) {
       // Handle validation errors from the server
       if (error.includes('already exists')) {

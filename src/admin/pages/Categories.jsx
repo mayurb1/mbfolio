@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Plus, Edit, Trash2, Search } from 'lucide-react'
+import { useToast } from '../contexts/ToastContext'
 import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
@@ -21,12 +22,12 @@ import {
 
 const Categories = () => {
   const dispatch = useDispatch()
+  const { handleApiResponse, handleApiError } = useToast()
   
   const {
     categories,
     pagination,
     loading,
-    error,
     showAddModal,
     showEditModal,
     showDeleteModal,
@@ -101,9 +102,14 @@ const Categories = () => {
   }
 
   // Confirm delete category
-  const confirmDeleteCategory = () => {
+  const confirmDeleteCategory = async () => {
     if (deletingCategory) {
-      dispatch(deleteCategory(deletingCategory._id))
+      try {
+        const response = await dispatch(deleteCategory(deletingCategory._id)).unwrap()
+        handleApiResponse(response)
+      } catch (error) {
+        handleApiError({ message: error })
+      }
     }
   }
 
@@ -157,7 +163,7 @@ const Categories = () => {
     return pages
   }
 
-  // Clear error when component unmounts
+  // Clear error when component unmounts to prevent stale errors
   useEffect(() => {
     return () => {
       dispatch(clearError())
@@ -251,20 +257,6 @@ const Categories = () => {
           </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
-              <button
-                onClick={() => dispatch(clearError())}
-                className="text-red-500 hover:text-red-700"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Categories Table */}
         <div className="space-y-4">

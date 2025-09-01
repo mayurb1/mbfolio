@@ -1,5 +1,6 @@
 const express = require("express");
 const Skills = require("../models/Skills");
+const Category = require("../models/Category");
 const { authenticateToken } = require("../middleware/auth");
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
     const total = await Skills.countDocuments(filter);
 
     const skills = await Skills.find(filter)
-      .sort({ sortOrder: 1, createdAt: -1 })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
@@ -107,10 +108,7 @@ router.post("/", authenticateToken, async (req, res) => {
       proficiency,
       experience,
       description,
-      icon,
-      color,
-      isActive,
-      sortOrder
+      isActive
     } = req.body;
 
     // Check if skill with same name already exists
@@ -122,16 +120,22 @@ router.post("/", authenticateToken, async (req, res) => {
       });
     }
 
+    // Validate category exists and is active
+    const categoryExists = await Category.findOne({ name: category, isActive: true });
+    if (!categoryExists) {
+      return res.status(400).json({
+        message: "Invalid category. Category must exist and be active.",
+        status: 400
+      });
+    }
+
     const skill = new Skills({
       name,
       category,
       proficiency,
       experience,
       description,
-      icon,
-      color,
-      isActive,
-      sortOrder
+      isActive
     });
 
     await skill.save();
@@ -171,10 +175,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       proficiency,
       experience,
       description,
-      icon,
-      color,
-      isActive,
-      sortOrder
+      isActive
     } = req.body;
 
     // Check if skill exists
@@ -200,6 +201,17 @@ router.put("/:id", authenticateToken, async (req, res) => {
       }
     }
 
+    // Validate category exists and is active
+    if (category) {
+      const categoryExists = await Category.findOne({ name: category, isActive: true });
+      if (!categoryExists) {
+        return res.status(400).json({
+          message: "Invalid category. Category must exist and be active.",
+          status: 400
+        });
+      }
+    }
+
     const updatedSkill = await Skills.findByIdAndUpdate(
       req.params.id,
       {
@@ -208,10 +220,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
         proficiency,
         experience,
         description,
-        icon,
-        color,
-        isActive,
-        sortOrder
+        isActive
       },
       { new: true, runValidators: true }
     );
@@ -270,6 +279,17 @@ router.patch("/:id", authenticateToken, async (req, res) => {
         return res.status(409).json({
           message: "Skill with this name already exists",
           status: 409
+        });
+      }
+    }
+
+    // Validate category exists and is active
+    if (req.body.category) {
+      const categoryExists = await Category.findOne({ name: req.body.category, isActive: true });
+      if (!categoryExists) {
+        return res.status(400).json({
+          message: "Invalid category. Category must exist and be active.",
+          status: 400
         });
       }
     }

@@ -42,8 +42,8 @@ export const deleteCategory = createAsyncThunk(
   'categories/deleteCategory',
   async (id, { rejectWithValue }) => {
     try {
-      await categoriesService.deleteCategory(id)
-      return id
+      const response = await categoriesService.deleteCategory(id)
+      return { ...response, deletedId: id }
     } catch (error) {
       return rejectWithValue(error.message)
     }
@@ -172,7 +172,7 @@ const categoriesSlice = createSlice({
         state.showDeleteModal = false
         state.deletingCategory = null
         // Remove the category from the list
-        state.categories = state.categories.filter(category => category._id !== action.payload)
+        state.categories = state.categories.filter(category => category._id !== action.payload.deletedId)
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.loading = false

@@ -42,8 +42,8 @@ export const deleteSkill = createAsyncThunk(
   'skills/deleteSkill',
   async (id, { rejectWithValue }) => {
     try {
-      await skillsService.deleteSkill(id)
-      return id
+      const response = await skillsService.deleteSkill(id)
+      return { ...response, deletedId: id }
     } catch (error) {
       return rejectWithValue(error.message)
     }
@@ -204,7 +204,7 @@ const skillsSlice = createSlice({
         state.showDeleteModal = false
         state.deletingSkill = null
         // Remove the skill from the list
-        state.skills = state.skills.filter(skill => skill._id !== action.payload)
+        state.skills = state.skills.filter(skill => skill._id !== action.payload.deletedId)
       })
       .addCase(deleteSkill.rejected, (state, action) => {
         state.loading = false

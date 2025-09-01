@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Link, useNavigate } from 'react-router-dom'
 import { UserPlus, CheckCircle } from 'lucide-react'
+import { useToast } from '../contexts/ToastContext'
 import RegisterForm from '../components/forms/RegisterForm'
 import { registerAdmin, clearError } from '../store/authSlice'
 
 const Register = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { isAuthenticated, loading, error } = useSelector((state) => state.adminAuth)
+  const { handleApiResponse, handleApiError } = useToast()
+  const { isAuthenticated, loading } = useSelector((state) => state.adminAuth)
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
   // Clear any previous errors when component mounts
@@ -22,15 +24,19 @@ const Register = () => {
   }
 
   const handleRegister = async (userData) => {
-    const result = await dispatch(registerAdmin(userData))
-    if (registerAdmin.fulfilled.match(result)) {
+    try {
+      const result = await dispatch(registerAdmin(userData)).unwrap()
+      handleApiResponse(result)
       setRegistrationSuccess(true)
       // Redirect to login after 2 seconds
       setTimeout(() => {
         navigate('/admin/login', { 
-          state: { message: 'Account created successfully! Please sign in.' }
+          state: { message: result.message }
         })
       }, 2000)
+    } catch (error) {
+      // Handle registration error with toast message
+      handleApiError({ message: error })
     }
   }
 
@@ -71,7 +77,6 @@ const Register = () => {
               <RegisterForm 
                 onSubmit={handleRegister}
                 isLoading={loading}
-                error={error}
               />
 
               {/* Login Link */}

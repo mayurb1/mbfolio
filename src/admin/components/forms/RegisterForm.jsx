@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
-const RegisterForm = ({ onSubmit, isLoading = false, error = null }) => {
+const RegisterForm = ({ onSubmit, isLoading = false }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -35,27 +35,13 @@ const RegisterForm = ({ onSubmit, isLoading = false, error = null }) => {
     }),
     onSubmit: (values) => {
       // Don't send confirmPassword to backend
-      const { confirmPassword, ...submitData } = values
+      const { confirmPassword: _, ...submitData } = values
       onSubmit(submitData)
     }
   })
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle className="h-5 w-5 text-red-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-800 dark:text-red-200">
-                {error}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">

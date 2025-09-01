@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Link, useLocation } from 'react-router-dom'
-import { Shield, CheckCircle } from 'lucide-react'
+import { Shield } from 'lucide-react'
+import { useToast } from '../contexts/ToastContext'
 import LoginForm from '../components/forms/LoginForm'
 import { loginAdmin, clearError } from '../store/authSlice'
 import authService from '../services/authService'
@@ -9,16 +10,19 @@ import authService from '../services/authService'
 const Login = () => {
   const dispatch = useDispatch()
   const location = useLocation()
-  const { isAuthenticated, loading, error } = useSelector((state) => state.adminAuth)
+  const { showToastByStatus, handleApiResponse, handleApiError } = useToast()
+  const { isAuthenticated, loading } = useSelector(state => state.adminAuth)
   const [registrationAllowed, setRegistrationAllowed] = useState(false)
-  
-  // Get success message from navigation state
-  const successMessage = location.state?.message
 
-  // Clear any previous errors when component mounts and check registration status
+  // Show success message from navigation state and check registration status on mount
   useEffect(() => {
+    const successMessage = location.state?.message
+    if (successMessage) {
+      showToastByStatus(200, successMessage)
+    }
+
     dispatch(clearError())
-    
+
     // Check if registration is allowed
     const checkRegistrationStatus = async () => {
       try {
@@ -31,15 +35,21 @@ const Login = () => {
     }
 
     checkRegistrationStatus()
-  }, [dispatch])
+  }, [dispatch, location.state?.message, showToastByStatus])
 
   // Redirect if already authenticated
   if (isAuthenticated) {
     return <Navigate to="/admin/dashboard" replace />
   }
 
-  const handleLogin = (credentials) => {
-    dispatch(loginAdmin(credentials))
+  const handleLogin = async credentials => {
+    try {
+      const result = await dispatch(loginAdmin(credentials)).unwrap()
+      handleApiResponse(result)
+    } catch (error) {
+      // Handle login error with toast message
+      handleApiError({ message: error })
+    }
   }
 
   return (
@@ -60,37 +70,17 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Success Message */}
-        {successMessage && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <CheckCircle className="h-5 w-5 text-green-400" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-green-800 dark:text-green-200">
-                  {successMessage}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Login Form */}
         <div className="bg-white dark:bg-slate-800 py-8 px-6 shadow-lg rounded-lg border border-slate-200 dark:border-slate-700">
-          <LoginForm 
-            onSubmit={handleLogin}
-            isLoading={loading}
-            error={error}
-          />
+          <LoginForm onSubmit={handleLogin} isLoading={loading} />
 
           {/* Conditional Register Link */}
           {registrationAllowed && (
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Don't have an account?{' '}
-                <Link 
-                  to="/admin/register" 
+                Don&apos;t have an account?{' '}
+                <Link
+                  to="/admin/register"
                   className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                 >
                   Create one here

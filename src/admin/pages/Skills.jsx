@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react'
+import { useToast } from '../contexts/ToastContext'
 import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
@@ -24,6 +25,7 @@ import {
 
 const Skills = () => {
   const dispatch = useDispatch()
+  const { handleApiResponse, handleApiError } = useToast()
   
   const {
     skills,
@@ -31,8 +33,6 @@ const Skills = () => {
     pagination,
     filters,
     loading,
-    categoriesLoading,
-    error,
     showAddModal,
     showEditModal,
     showDeleteModal,
@@ -119,9 +119,14 @@ const Skills = () => {
   }
 
   // Confirm delete skill
-  const confirmDeleteSkill = () => {
+  const confirmDeleteSkill = async () => {
     if (deletingSkill) {
-      dispatch(deleteSkill(deletingSkill._id))
+      try {
+        const response = await dispatch(deleteSkill(deletingSkill._id)).unwrap()
+        handleApiResponse(response)
+      } catch (error) {
+        handleApiError({ message: error })
+      }
     }
   }
 
@@ -182,7 +187,7 @@ const Skills = () => {
     return pages
   }
 
-  // Clear error when component unmounts
+  // Clear error when component unmounts to prevent stale errors
   useEffect(() => {
     return () => {
       dispatch(clearError())
@@ -208,22 +213,15 @@ const Skills = () => {
       cell: ({ row }) => {
         const skill = row.original
         return (
-          <div className="flex items-center">
-            {skill.icon && (
-              <span className="w-8 h-8 flex items-center justify-center mr-3 text-lg">
-                {skill.icon}
-              </span>
-            )}
-            <div>
-              <div className="text-sm font-medium text-slate-900 dark:text-white">
-                {skill.name}
-              </div>
-              {skill.description && (
-                <div className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
-                  {skill.description}
-                </div>
-              )}
+          <div>
+            <div className="text-sm font-medium text-slate-900 dark:text-white">
+              {skill.name}
             </div>
+            {skill.description && (
+              <div className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
+                {skill.description}
+              </div>
+            )}
           </div>
         )
       }
@@ -358,20 +356,6 @@ const Skills = () => {
           </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
-              <button
-                onClick={() => dispatch(clearError())}
-                className="text-red-500 hover:text-red-700"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Skills Table */}
         <div className="space-y-4">
