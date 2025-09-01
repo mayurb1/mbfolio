@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+import api from '../../services/api'
 
 // Smooth animation variants for chips
 const chipsContainer = {
@@ -20,28 +22,37 @@ const chipItem = {
   },
 }
 
-const technologies = [
-  'ReactJs',
-  'NextJs',
-  'JavaScript',
-  'TypeScript',
-  'Redux',
-  'HTML5',
-  'CSS3',
-  'Sass',
-  'Bootstrap',
-  'Tailwind CSS',
-  'Node.js',
-  'Express',
-  'GraphQL',
-  'MongoDB',
-  'PostgreSQL',
-  'Git',
-  'GitHub',
-]
-
 const Skills = () => {
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
+  const [skills, setSkills] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch skills from API
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        setLoading(true)
+
+        const response = await api.get('/skills', {
+          params: {
+            isActive: true,
+            limit: 100, // Get all active skills
+          },
+        })
+
+        // Extract skill names from the response
+        const skillNames = response.data.data.skills.map(skill => skill.name)
+        setSkills(skillNames)
+      } catch (err) {
+        console.error('Error fetching skills:', err)
+        setSkills([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSkills()
+  }, [])
 
   return (
     <section id="skills" className="py-16 lg:py-24 bg-background" ref={ref}>
@@ -62,29 +73,39 @@ const Skills = () => {
           </motion.div>
 
           {/* Animated Chips */}
-          <motion.div
-            variants={chipsContainer}
-            initial="hidden"
-            animate={inView ? 'show' : 'hidden'}
-            className="flex flex-wrap gap-3 sm:gap-4 justify-center"
-          >
-            {technologies.map(tech => (
-              <motion.span
-                key={tech}
-                variants={chipItem}
-                className="px-4 py-2 bg-surface border border-border rounded-full text-text-secondary hover:text-background hover:bg-primary transition-colors duration-200 shadow-sm will-change-transform"
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-                style={{
-                  WebkitBackfaceVisibility: 'hidden',
-                  backfaceVisibility: 'hidden',
-                }}
-              >
-                {tech}
-              </motion.span>
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : skills.length > 0 ? (
+            <motion.div
+              variants={chipsContainer}
+              initial="hidden"
+              animate={inView ? 'show' : 'hidden'}
+              className="flex flex-wrap gap-3 sm:gap-4 justify-center"
+            >
+              {skills.map(tech => (
+                <motion.span
+                  key={tech}
+                  variants={chipItem}
+                  className="px-4 py-2 bg-surface border border-border rounded-full text-text-secondary hover:text-background hover:bg-primary transition-colors duration-200 shadow-sm will-change-transform"
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+                  style={{
+                    WebkitBackfaceVisibility: 'hidden',
+                    backfaceVisibility: 'hidden',
+                  }}
+                >
+                  {tech}
+                </motion.span>
+              ))}
+            </motion.div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-xl text-text-secondary">No skills found</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
