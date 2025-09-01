@@ -412,6 +412,39 @@ router.post("/bulk", authenticateToken, async (req, res) => {
   }
 });
 
+// PATCH /api/skills/:id/toggle-status - Toggle skill active status (protected)
+router.patch("/:id/toggle-status", authenticateToken, async (req, res) => {
+  try {
+    const skill = await Skills.findById(req.params.id);
+    if (!skill) {
+      return res.status(404).json({
+        message: "Skill not found",
+        status: 404
+      });
+    }
+
+    skill.isActive = !skill.isActive;
+    await skill.save();
+
+    res.status(200).json({
+      data: { skill },
+      message: `Skill ${skill.isActive ? 'activated' : 'deactivated'} successfully`,
+      status: 200
+    });
+  } catch (err) {
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({
+        message: "Skill not found",
+        status: 404
+      });
+    }
+    res.status(500).json({
+      message: err.message,
+      status: 500
+    });
+  }
+});
+
 // PATCH /api/skills/bulk/toggle - Bulk toggle active status (protected)
 router.patch("/bulk/toggle", authenticateToken, async (req, res) => {
   try {

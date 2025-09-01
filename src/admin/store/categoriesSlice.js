@@ -50,6 +50,18 @@ export const deleteCategory = createAsyncThunk(
   }
 )
 
+export const toggleCategoryStatus = createAsyncThunk(
+  'categories/toggleCategoryStatus',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await categoriesService.toggleCategoryStatus(id)
+      return response
+    } catch (error) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
 const initialState = {
   categories: [],
   pagination: {
@@ -175,6 +187,24 @@ const categoriesSlice = createSlice({
         state.categories = state.categories.filter(category => category._id !== action.payload.deletedId)
       })
       .addCase(deleteCategory.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+
+      // Toggle category status
+      .addCase(toggleCategoryStatus.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(toggleCategoryStatus.fulfilled, (state, action) => {
+        state.loading = false
+        // Update the category in the list
+        const index = state.categories.findIndex(category => category._id === action.payload.data.category._id)
+        if (index !== -1) {
+          state.categories[index] = action.payload.data.category
+        }
+      })
+      .addCase(toggleCategoryStatus.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

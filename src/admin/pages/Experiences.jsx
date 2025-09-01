@@ -1,19 +1,19 @@
 import { useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, Calendar, MapPin } from 'lucide-react'
 import { useToast } from '../contexts/ToastContext'
 import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
-import ToggleSwitch from '../components/ui/ToggleSwitch'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import DataTable from '../components/ui/DataTable'
-import SkillForm from '../components/forms/SkillForm'
+import ToggleSwitch from '../components/ui/ToggleSwitch'
+import ExperienceForm from '../components/forms/ExperienceForm'
 import {
+  fetchExperiences,
   fetchSkills,
-  fetchCategories,
-  deleteSkill,
-  toggleSkillStatus,
+  deleteExperience,
+  toggleExperienceStatus,
   openAddModal,
   closeAddModal,
   openEditModal,
@@ -21,124 +21,115 @@ import {
   openDeleteModal,
   closeDeleteModal,
   setSearchTerm,
-  setCategoryFilter,
   clearError
-} from '../store/skillsSlice'
+} from '../store/experiencesSlice'
 
-const Skills = () => {
+const Experiences = () => {
   const dispatch = useDispatch()
   const { handleApiResponse, handleApiError } = useToast()
   
   const {
+    experiences,
     skills,
-    categories,
     pagination,
     filters,
     loading,
     showAddModal,
     showEditModal,
     showDeleteModal,
-    editingSkill,
-    deletingSkill
-  } = useSelector(state => state.skills)
+    editingExperience,
+    deletingExperience
+  } = useSelector(state => state.experiences)
 
   // Debounced search function
-  const debouncedFetchSkills = useCallback(
+  const debouncedFetchExperiences = useCallback(
     (() => {
       let timeoutId
-      return (searchTerm, categoryFilter) => {
+      return (searchTerm) => {
         clearTimeout(timeoutId)
         timeoutId = setTimeout(() => {
           const params = {
             page: 1,
             limit: pagination.limit,
-            ...(categoryFilter && { category: categoryFilter }),
             ...(searchTerm && { search: searchTerm })
           }
-          dispatch(fetchSkills(params))
-        }, 300) // 300ms debounce delay
+          dispatch(fetchExperiences(params))
+        }, 300)
       }
     })(),
     [dispatch, pagination.limit]
   )
 
   const isInitialMount = useRef(true)
+  const searchRef = useRef('')
 
-  // Load skills and categories on component mount
+  // Load experiences and skills on component mount
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false
-      // Fetch categories on initial load
-      dispatch(fetchCategories())
-    }
-    
-    const params = {
-      page: 1,
-      limit: pagination.limit,
-      ...(filters.categoryFilter && { category: filters.categoryFilter })
-    }
-    dispatch(fetchSkills(params))
-  }, [dispatch, filters.categoryFilter, pagination.limit])
-
-  // Debounced search when search term changes (but not on category changes)
-  useEffect(() => {
-    if (!isInitialMount.current && filters.searchTerm) {
-      debouncedFetchSkills(filters.searchTerm, filters.categoryFilter)
-    } else if (!filters.searchTerm && !isInitialMount.current) {
-      // When search is cleared, fetch without search term
+      // Fetch skills on initial load for form use
+      dispatch(fetchSkills())
+      
       const params = {
         page: 1,
-        limit: pagination.limit,
-        ...(filters.categoryFilter && { category: filters.categoryFilter })
+        limit: pagination.limit
       }
-      dispatch(fetchSkills(params))
+      dispatch(fetchExperiences(params))
     }
-  }, [filters.searchTerm, debouncedFetchSkills, filters.categoryFilter, dispatch, pagination.limit])
+  }, [dispatch, pagination.limit])
 
   // Handle search input change
   const handleSearch = (e) => {
-    dispatch(setSearchTerm(e.target.value))
+    const searchTerm = e.target.value
+    searchRef.current = searchTerm
+    dispatch(setSearchTerm(searchTerm))
+    
+    if (!searchTerm) {
+      // When search is cleared, fetch without search term
+      const params = {
+        page: 1,
+        limit: pagination.limit
+      }
+      dispatch(fetchExperiences(params))
+    } else {
+      debouncedFetchExperiences(searchTerm)
+    }
   }
 
-  // Handle category filter change
-  const handleCategoryFilter = (e) => {
-    dispatch(setCategoryFilter(e.target.value))
-  }
-
-  // Handle add skill
-  const handleAddSkill = () => {
+  // Handle add experience
+  const handleAddExperience = () => {
     dispatch(openAddModal())
   }
 
-  // Handle edit skill
-  const handleEditSkill = (skill) => {
-    dispatch(openEditModal(skill))
+  // Handle edit experience
+  const handleEditExperience = (experience) => {
+    dispatch(openEditModal(experience))
   }
 
-  // Handle delete skill
-  const handleDeleteSkill = (skill) => {
-    dispatch(openDeleteModal(skill))
+  // Handle delete experience
+  const handleDeleteExperience = (experience) => {
+    dispatch(openDeleteModal(experience))
   }
 
-  // Confirm delete skill
-  const confirmDeleteSkill = async () => {
-    if (deletingSkill) {
+  // Handle toggle experience status
+  const handleToggleExperienceStatus = async (experience) => {
+    try {
+      const response = await dispatch(toggleExperienceStatus(experience._id)).unwrap()
+      handleApiResponse(response)
+    } catch (error) {
+      handleApiError({ message: error })
+    }
+  }
+
+  // Confirm delete experience
+  const confirmDeleteExperience = async () => {
+    if (deletingExperience) {
       try {
-        const response = await dispatch(deleteSkill(deletingSkill._id)).unwrap()
+        const response = await dispatch(deleteExperience(deletingExperience._id)).unwrap()
         handleApiResponse(response)
       } catch (error) {
         handleApiError({ message: error })
       }
-    }
-  }
-
-  // Handle toggle skill status
-  const handleToggleSkillStatus = async (skillId) => {
-    try {
-      const response = await dispatch(toggleSkillStatus(skillId)).unwrap()
-      handleApiResponse(response)
-    } catch (error) {
-      handleApiError({ message: error })
     }
   }
 
@@ -147,21 +138,19 @@ const Skills = () => {
     const params = {
       page: newPage,
       limit: pagination.limit,
-      ...(filters.categoryFilter && { category: filters.categoryFilter }),
-      ...(filters.searchTerm && { search: filters.searchTerm })
+      ...(searchRef.current && { search: searchRef.current })
     }
-    dispatch(fetchSkills(params))
+    dispatch(fetchExperiences(params))
   }
 
   // Handle limit change
   const handleLimitChange = (newLimit) => {
     const params = {
-      page: 1, // Reset to first page when changing limit
+      page: 1,
       limit: newLimit,
-      ...(filters.categoryFilter && { category: filters.categoryFilter }),
-      ...(filters.searchTerm && { search: filters.searchTerm })
+      ...(searchRef.current && { search: searchRef.current })
     }
-    dispatch(fetchSkills(params))
+    dispatch(fetchExperiences(params))
   }
 
   // Generate page numbers for pagination
@@ -170,24 +159,19 @@ const Skills = () => {
     const pages = []
     
     if (totalPages <= 7) {
-      // Show all pages if total is 7 or less
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i)
       }
     } else {
-      // Show smart pagination with ellipsis
       if (page <= 4) {
-        // Show first 5 pages + ellipsis + last page
         for (let i = 1; i <= 5; i++) pages.push(i)
         if (totalPages > 6) pages.push('...')
         pages.push(totalPages)
       } else if (page >= totalPages - 3) {
-        // Show first page + ellipsis + last 5 pages
         pages.push(1)
         if (totalPages > 6) pages.push('...')
         for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i)
       } else {
-        // Show first page + ellipsis + current-1, current, current+1 + ellipsis + last page
         pages.push(1)
         pages.push('...')
         for (let i = page - 1; i <= page + 1; i++) pages.push(i)
@@ -206,32 +190,65 @@ const Skills = () => {
     }
   }, [dispatch])
 
-  // Get proficiency badge color
-  const getProficiencyColor = (proficiency) => {
-    const colors = {
-      'Beginner': 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-      'Intermediate': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      'Advanced': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      'Expert': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+  // Format duration for display - parse duration string
+  const formatDuration = (durationString) => {
+    if (!durationString) return 'Not specified'
+    
+    // If it's already in the correct format, return as is
+    if (typeof durationString === 'string') {
+      return durationString
     }
-    return colors[proficiency] || 'bg-gray-100 text-gray-800'
+    
+    return 'Not specified'
   }
 
   // Define table columns
   const columns = useMemo(() => [
     {
-      accessorKey: 'name',
-      header: 'Skill',
-      cell: ({ row }) => {
-        const skill = row.original
+      accessorKey: 'company',
+      header: 'Company/Position',
+      cell: ({ getValue, row }) => {
+        const company = getValue()
+        const experience = row.original
         return (
-          <div>
-            <div className="text-sm font-medium text-slate-900 dark:text-white">
-              {skill.name}
+          <div className="flex items-center gap-3">
+            {experience.logo && (
+              <img
+                src={experience.logo}
+                alt={`${company} logo`}
+                className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                }}
+              />
+            )}
+            <div>
+              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                {company}
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                {experience.position}
+              </div>
             </div>
-            {skill.description && (
-              <div className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
-                {skill.description}
+          </div>
+        )
+      }
+    },
+    {
+      accessorKey: 'startDate',
+      header: 'Duration',
+      cell: ({ row }) => {
+        const experience = row.original
+        return (
+          <div className="text-sm">
+            <div className="flex items-center gap-1 text-slate-900 dark:text-white">
+              <Calendar size={12} />
+              {formatDuration(experience.duration)}
+            </div>
+            {experience.location && (
+              <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <MapPin size={12} />
+                {experience.location}
               </div>
             )}
           </div>
@@ -239,35 +256,54 @@ const Skills = () => {
       }
     },
     {
-      accessorKey: 'category',
-      header: 'Category',
-      cell: ({ getValue }) => (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-          {getValue()}
-        </span>
-      )
-    },
-    {
-      accessorKey: 'proficiency',
-      header: 'Proficiency',
+      accessorKey: 'type',
+      header: 'Type',
       cell: ({ getValue }) => {
-        const proficiency = getValue()
+        const type = getValue()
+        const colors = {
+          'Full-time': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+          'Part-time': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+          'Contract': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+          'Internship': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
+          'Freelance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
+        }
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProficiencyColor(proficiency)}`}>
-            {proficiency}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'}`}>
+            {type}
           </span>
         )
       }
     },
     {
-      accessorKey: 'experience',
-      header: 'Experience',
+      accessorKey: 'skills',
+      header: 'Skills',
       cell: ({ getValue }) => {
-        const experience = getValue()
+        const skills = getValue()
+        
+        if (!skills || skills.length === 0) {
+          return (
+            <span className="text-sm text-slate-400 dark:text-slate-500 italic">
+              No skills listed
+            </span>
+          )
+        }
+        
         return (
-          <span className="text-sm text-slate-900 dark:text-white">
-            {experience} {experience === 1 ? 'year' : 'years'}
-          </span>
+          <div className="flex flex-wrap gap-1">
+            {skills.slice(0, 3).map((skill, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+              >
+                {typeof skill === 'string' ? skill : skill.name}
+              </span>
+            ))}
+            {skills.length > 3 && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                +{skills.length - 3} more
+              </span>
+            )}
+          </div>
         )
       }
     },
@@ -291,26 +327,26 @@ const Skills = () => {
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => {
-        const skill = row.original
+        const experience = row.original
         return (
           <div className="flex items-center justify-end gap-2">
             <ToggleSwitch
-              checked={skill.isActive}
-              onChange={() => handleToggleSkillStatus(skill._id)}
+              checked={experience.isActive}
+              onChange={() => handleToggleExperienceStatus(experience)}
               size="sm"
               disabled={loading}
             />
             <button
-              onClick={() => handleEditSkill(skill)}
+              onClick={() => handleEditExperience(experience)}
               className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              title="Edit skill"
+              title="Edit experience"
             >
               <Edit className="w-4 h-4" />
             </button>
             <button
-              onClick={() => handleDeleteSkill(skill)}
+              onClick={() => handleDeleteExperience(experience)}
               className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-              title="Delete skill"
+              title="Delete experience"
               disabled={loading}
             >
               <Trash2 className="w-4 h-4" />
@@ -322,85 +358,62 @@ const Skills = () => {
   ], [loading])
 
   return (
-    <AdminLayout pageTitle="Skills Management">
+    <AdminLayout pageTitle="Experience Management">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Skills
+              Experience
             </h1>
             <p className="text-slate-600 dark:text-slate-400">
-              Manage your skills and proficiency levels
+              Manage your professional experience and work history
             </p>
           </div>
-          <Button onClick={handleAddSkill} className="flex items-center gap-2">
+          <Button onClick={handleAddExperience} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Add Skill
+            Add Experience
           </Button>
         </div>
 
-        {/* Filters */}
+        {/* Search */}
         <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search skills..."
-                value={filters.searchTerm}
-                onChange={handleSearch}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <select
-                value={filters.categoryFilter}
-                onChange={handleCategoryFilter}
-                className="pl-10 pr-8 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">All Categories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search experiences..."
+              value={filters.searchTerm}
+              onChange={handleSearch}
+              className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
         </div>
 
-
-        {/* Skills Table */}
+        {/* Experience Table */}
         <div className="space-y-4">
-          {/* DataTable */}
           <DataTable
-            data={skills}
+            data={experiences}
             columns={columns}
             loading={loading}
             pageCount={pagination.totalPages}
-            pageIndex={pagination.page - 1} // Convert to 0-based
+            pageIndex={pagination.page - 1}
             pageSize={pagination.limit}
             manualPagination={true}
             onPaginationChange={(updater) => {
               const newPagination = typeof updater === 'function' 
                 ? updater({ pageIndex: pagination.page - 1, pageSize: pagination.limit })
                 : updater
-              handlePageChange(newPagination.pageIndex + 1) // Convert back to 1-based
+              handlePageChange(newPagination.pageIndex + 1)
             }}
-            emptyMessage="No skills found"
-            showPagination={false} // We'll handle pagination manually with our custom UI
+            emptyMessage="No experiences found"
+            showPagination={false}
           />
 
           {/* Custom Pagination */}
           {pagination.totalPages > 1 && (
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 px-6 py-3">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                {/* Results info and limit selector */}
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <div className="text-sm text-slate-700 dark:text-slate-300">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
@@ -425,9 +438,7 @@ const Skills = () => {
                   </div>
                 </div>
 
-                {/* Pagination controls */}
                 <div className="flex items-center gap-1">
-                  {/* Previous button */}
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1 || loading}
@@ -436,7 +447,6 @@ const Skills = () => {
                     Previous
                   </button>
 
-                  {/* Page numbers */}
                   {getPageNumbers().map((pageNum, index) => {
                     if (pageNum === '...') {
                       return (
@@ -466,7 +476,6 @@ const Skills = () => {
                     )
                   })}
 
-                  {/* Next button */}
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page === pagination.totalPages || loading}
@@ -481,25 +490,25 @@ const Skills = () => {
         </div>
       </div>
 
-      {/* Add Skill Modal */}
+      {/* Add Experience Modal */}
       <Modal
         isOpen={showAddModal}
         onClose={() => dispatch(closeAddModal())}
-        title="Add New Skill"
-        size="lg"
+        title="Add New Experience"
+        size="xl"
       >
-        <SkillForm onCancel={() => dispatch(closeAddModal())} />
+        <ExperienceForm onCancel={() => dispatch(closeAddModal())} />
       </Modal>
 
-      {/* Edit Skill Modal */}
+      {/* Edit Experience Modal */}
       <Modal
         isOpen={showEditModal}
         onClose={() => dispatch(closeEditModal())}
-        title="Edit Skill"
-        size="lg"
+        title="Edit Experience"
+        size="xl"
       >
-        <SkillForm 
-          skill={editingSkill}
+        <ExperienceForm 
+          experience={editingExperience}
           onCancel={() => dispatch(closeEditModal())} 
         />
       </Modal>
@@ -508,9 +517,9 @@ const Skills = () => {
       <ConfirmModal
         isOpen={showDeleteModal}
         onClose={() => dispatch(closeDeleteModal())}
-        onConfirm={confirmDeleteSkill}
-        title="Delete Skill"
-        message={`Are you sure you want to delete "${deletingSkill?.name}"? This action cannot be undone.`}
+        onConfirm={confirmDeleteExperience}
+        title="Delete Experience"
+        message={`Are you sure you want to delete the experience at "${deletingExperience?.company}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
@@ -520,4 +529,4 @@ const Skills = () => {
   )
 }
 
-export default Skills
+export default Experiences

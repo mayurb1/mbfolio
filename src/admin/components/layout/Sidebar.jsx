@@ -7,6 +7,8 @@ import {
   Settings,
   Zap,
   Layers,
+  Briefcase,
+  GraduationCap,
   X
 } from 'lucide-react'
 
@@ -23,6 +25,18 @@ const Sidebar = ({ isOpen = true, onClose }) => {
       path: '/admin/projects', 
       icon: FolderOpen,
       description: 'Manage projects'
+    },
+    { 
+      name: 'Experience', 
+      path: '/admin/experiences', 
+      icon: Briefcase,
+      description: 'Work history'
+    },
+    { 
+      name: 'Education', 
+      path: '/admin/education', 
+      icon: GraduationCap,
+      description: 'Academic background'
     },
     { 
       name: 'Skills', 

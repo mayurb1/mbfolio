@@ -7,10 +7,12 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import DataTable from '../components/ui/DataTable'
+import ToggleSwitch from '../components/ui/ToggleSwitch'
 import CategoryForm from '../components/forms/CategoryForm'
 import {
   fetchCategories,
   deleteCategory,
+  toggleCategoryStatus,
   openAddModal,
   closeAddModal,
   openEditModal,
@@ -99,6 +101,16 @@ const Categories = () => {
   // Handle delete category
   const handleDeleteCategory = (category) => {
     dispatch(openDeleteModal(category))
+  }
+
+  // Handle toggle category status
+  const handleToggleCategoryStatus = async (category) => {
+    try {
+      const response = await dispatch(toggleCategoryStatus(category._id)).unwrap()
+      handleApiResponse(response)
+    } catch (error) {
+      handleApiError({ message: error })
+    }
   }
 
   // Confirm delete category
@@ -204,6 +216,12 @@ const Categories = () => {
         const category = row.original
         return (
           <div className="flex items-center justify-end gap-2">
+            <ToggleSwitch
+              checked={category.isActive}
+              onChange={() => handleToggleCategoryStatus(category)}
+              size="sm"
+              disabled={loading}
+            />
             <button
               onClick={() => handleEditCategory(category)}
               className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"

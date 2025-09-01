@@ -13,6 +13,8 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Skills from './pages/Skills'
 import Categories from './pages/Categories'
+import Experiences from './pages/Experiences'
+import Education from './pages/Education'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 const AdminContent = () => {
@@ -94,6 +96,22 @@ const AdminContent = () => {
         element={
           <ProtectedRoute>
             <Categories />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/experiences"
+        element={
+          <ProtectedRoute>
+            <Experiences />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/education"
+        element={
+          <ProtectedRoute>
+            <Education />
           </ProtectedRoute>
         }
       />

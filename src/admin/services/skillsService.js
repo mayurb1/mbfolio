@@ -90,6 +90,20 @@ class SkillsService {
     }
   }
 
+  // Toggle skill status
+  async toggleSkillStatus(id) {
+    try {
+      const response = await api.patch(`/skills/${id}/toggle-status`)
+      return response.data
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to toggle skill status'
+      )
+    }
+  }
+
 }
 
 export default new SkillsService()

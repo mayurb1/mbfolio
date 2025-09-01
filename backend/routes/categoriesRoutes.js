@@ -230,4 +230,37 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// PATCH /api/categories/:id/toggle-status - Toggle category active status (protected)
+router.patch("/:id/toggle-status", authenticateToken, async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found",
+        status: 404
+      });
+    }
+
+    category.isActive = !category.isActive;
+    await category.save();
+
+    res.status(200).json({
+      data: { category },
+      message: `Category ${category.isActive ? 'activated' : 'deactivated'} successfully`,
+      status: 200
+    });
+  } catch (err) {
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({
+        message: "Category not found",
+        status: 404
+      });
+    }
+    res.status(500).json({
+      message: err.message,
+      status: 500
+    });
+  }
+});
+
 module.exports = router;
