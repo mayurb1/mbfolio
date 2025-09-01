@@ -1,11 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
+import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import { createSkill, updateSkill, fetchSkills } from '../../store/skillsSlice'
 
 const SkillForm = ({ skill = null, onCancel }) => {
   const dispatch = useDispatch()
+  const { handleApiResponse } = useToast()
   const { categories } = useSelector(state => state.skills)
   const isEditing = !!skill
 
@@ -25,10 +27,7 @@ const SkillForm = ({ skill = null, onCancel }) => {
     proficiency: skill?.proficiency || '',
     experience: skill?.experience || 0,
     description: skill?.description || '',
-    icon: skill?.icon || '',
-    color: skill?.color || '#3B82F6',
-    isActive: skill?.isActive !== false,
-    sortOrder: skill?.sortOrder || 0
+    isActive: skill?.isActive !== false
   }
 
   const validationSchema = Yup.object({
@@ -47,24 +46,24 @@ const SkillForm = ({ skill = null, onCancel }) => {
       .max(50, 'Experience cannot exceed 50 years'),
     description: Yup.string()
       .max(500, 'Description cannot exceed 500 characters'),
-    icon: Yup.string(),
-    color: Yup.string()
-      .matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Color must be a valid hex color code'),
-    isActive: Yup.boolean(),
-    sortOrder: Yup.number()
-      .integer('Sort order must be a whole number')
+    isActive: Yup.boolean()
   })
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
+      let response
       if (isEditing) {
-        await dispatch(updateSkill({ id: skill._id, skillData: values })).unwrap()
+        response = await dispatch(updateSkill({ id: skill._id, skillData: values })).unwrap()
       } else {
-        await dispatch(createSkill(values)).unwrap()
+        response = await dispatch(createSkill(values)).unwrap()
       }
+      
+      // Show toast message based on API response status
+      handleApiResponse(response)
       
       // Refresh skills list
       dispatch(fetchSkills({ page: 1, limit: 10 }))
+      onCancel() // Close the modal
     } catch (error) {
       // Handle validation errors from the server
       if (error.includes('already exists')) {
@@ -84,7 +83,7 @@ const SkillForm = ({ skill = null, onCancel }) => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ isSubmitting, errors, touched, values, setFieldValue }) => (
+      {({ isSubmitting, errors, touched }) => (
         <Form className="space-y-6">
           {/* General Error */}
           {errors.general && (
@@ -181,66 +180,6 @@ const SkillForm = ({ skill = null, onCancel }) => {
               <ErrorMessage name="experience" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
             </div>
 
-            {/* Color */}
-            <div>
-              <label htmlFor="color" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Color
-              </label>
-              <div className="flex items-center gap-2">
-                <Field
-                  type="color"
-                  name="color"
-                  className="w-12 h-10 border border-slate-300 dark:border-slate-600 rounded-md cursor-pointer"
-                />
-                <Field
-                  type="text"
-                  name="color"
-                  className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.color && touched.color
-                      ? 'border-red-300 dark:border-red-600'
-                      : 'border-slate-300 dark:border-slate-600'
-                  } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                  placeholder="#3B82F6"
-                />
-              </div>
-              <ErrorMessage name="color" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
-
-            {/* Icon */}
-            <div>
-              <label htmlFor="icon" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Icon (Emoji or Unicode)
-              </label>
-              <Field
-                type="text"
-                name="icon"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.icon && touched.icon
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="⚛️ 🚀 💻"
-              />
-              <ErrorMessage name="icon" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
-
-            {/* Sort Order */}
-            <div>
-              <label htmlFor="sortOrder" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Sort Order
-              </label>
-              <Field
-                type="number"
-                name="sortOrder"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.sortOrder && touched.sortOrder
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="0"
-              />
-              <ErrorMessage name="sortOrder" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
 
             {/* Description */}
             <div className="md:col-span-2">

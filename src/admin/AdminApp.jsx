@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { checkAuth, resetAuth } from './store/authSlice'
 import AdminProvider from './store/AdminProvider'
+import ToastProvider from './contexts/ToastContext'
 import authService from './services/authService'
 import { startTokenExpiryCheck } from './utils/tokenManager'
 
@@ -12,6 +13,8 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Skills from './pages/Skills'
 import Categories from './pages/Categories'
+import Experiences from './pages/Experiences'
+import Education from './pages/Education'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 const AdminContent = () => {
@@ -35,6 +38,7 @@ const AdminContent = () => {
     const checkRegistrationStatus = async () => {
       try {
         const response = await authService.checkRegistrationStatus()
+        // response is already the parsed data from authService
         setRegistrationAllowed(response.data.isRegistrationAllowed)
       } catch (error) {
         console.error('Failed to check registration status:', error)
@@ -95,6 +99,22 @@ const AdminContent = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/experiences"
+        element={
+          <ProtectedRoute>
+            <Experiences />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/education"
+        element={
+          <ProtectedRoute>
+            <Education />
+          </ProtectedRoute>
+        }
+      />
       
       {/* Redirect /admin to /admin/dashboard */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -108,7 +128,9 @@ const AdminContent = () => {
 const AdminApp = () => {
   return (
     <AdminProvider>
-      <AdminContent />
+      <ToastProvider>
+        <AdminContent />
+      </ToastProvider>
     </AdminProvider>
   )
 }

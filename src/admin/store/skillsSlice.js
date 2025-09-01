@@ -42,8 +42,20 @@ export const deleteSkill = createAsyncThunk(
   'skills/deleteSkill',
   async (id, { rejectWithValue }) => {
     try {
-      await skillsService.deleteSkill(id)
-      return id
+      const response = await skillsService.deleteSkill(id)
+      return { ...response, deletedId: id }
+    } catch (error) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+export const toggleSkillStatus = createAsyncThunk(
+  'skills/toggleSkillStatus',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await skillsService.toggleSkillStatus(id)
+      return response
     } catch (error) {
       return rejectWithValue(error.message)
     }
@@ -204,7 +216,7 @@ const skillsSlice = createSlice({
         state.showDeleteModal = false
         state.deletingSkill = null
         // Remove the skill from the list
-        state.skills = state.skills.filter(skill => skill._id !== action.payload)
+        state.skills = state.skills.filter(skill => skill._id !== action.payload.deletedId)
       })
       .addCase(deleteSkill.rejected, (state, action) => {
         state.loading = false
@@ -221,6 +233,24 @@ const skillsSlice = createSlice({
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.categoriesLoading = false
+        state.error = action.payload
+      })
+
+      // Toggle skill status
+      .addCase(toggleSkillStatus.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(toggleSkillStatus.fulfilled, (state, action) => {
+        state.loading = false
+        // Update the skill in the list
+        const index = state.skills.findIndex(skill => skill._id === action.payload.data.skill._id)
+        if (index !== -1) {
+          state.skills[index] = action.payload.data.skill
+        }
+      })
+      .addCase(toggleSkillStatus.rejected, (state, action) => {
+        state.loading = false
         state.error = action.payload
       })
   }

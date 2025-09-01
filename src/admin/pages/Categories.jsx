@@ -1,15 +1,18 @@
 import { useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Plus, Edit, Trash2, Search } from 'lucide-react'
+import { useToast } from '../contexts/ToastContext'
 import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import DataTable from '../components/ui/DataTable'
+import ToggleSwitch from '../components/ui/ToggleSwitch'
 import CategoryForm from '../components/forms/CategoryForm'
 import {
   fetchCategories,
   deleteCategory,
+  toggleCategoryStatus,
   openAddModal,
   closeAddModal,
   openEditModal,
@@ -21,12 +24,12 @@ import {
 
 const Categories = () => {
   const dispatch = useDispatch()
+  const { handleApiResponse, handleApiError } = useToast()
   
   const {
     categories,
     pagination,
     loading,
-    error,
     showAddModal,
     showEditModal,
     showDeleteModal,
@@ -100,10 +103,25 @@ const Categories = () => {
     dispatch(openDeleteModal(category))
   }
 
+  // Handle toggle category status
+  const handleToggleCategoryStatus = async (category) => {
+    try {
+      const response = await dispatch(toggleCategoryStatus(category._id)).unwrap()
+      handleApiResponse(response)
+    } catch (error) {
+      handleApiError({ message: error })
+    }
+  }
+
   // Confirm delete category
-  const confirmDeleteCategory = () => {
+  const confirmDeleteCategory = async () => {
     if (deletingCategory) {
-      dispatch(deleteCategory(deletingCategory._id))
+      try {
+        const response = await dispatch(deleteCategory(deletingCategory._id)).unwrap()
+        handleApiResponse(response)
+      } catch (error) {
+        handleApiError({ message: error })
+      }
     }
   }
 
@@ -157,7 +175,7 @@ const Categories = () => {
     return pages
   }
 
-  // Clear error when component unmounts
+  // Clear error when component unmounts to prevent stale errors
   useEffect(() => {
     return () => {
       dispatch(clearError())
@@ -198,6 +216,12 @@ const Categories = () => {
         const category = row.original
         return (
           <div className="flex items-center justify-end gap-2">
+            <ToggleSwitch
+              checked={category.isActive}
+              onChange={() => handleToggleCategoryStatus(category)}
+              size="sm"
+              disabled={loading}
+            />
             <button
               onClick={() => handleEditCategory(category)}
               className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
@@ -251,20 +275,6 @@ const Categories = () => {
           </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
-              <button
-                onClick={() => dispatch(clearError())}
-                className="text-red-500 hover:text-red-700"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Categories Table */}
         <div className="space-y-4">

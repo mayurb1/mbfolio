@@ -4,24 +4,24 @@ import { Helmet } from 'react-helmet-async'
 import { AnimatePresence } from 'framer-motion'
 
 // Core components - loaded immediately
-import Header from './components/layout/Header'
-import Footer from './components/layout/Footer'
-import LoadingSpinner from './components/ui/LoadingSpinner'
-import ScrollToTop from './components/ui/ScrollToTop'
-import ThemeToggle from './components/ui/ThemeToggle'
+import Header from './web/layout/Header'
+import Footer from './web/layout/Footer'
+import LoadingSpinner from './web/ui/LoadingSpinner'
+import ScrollToTop from './web/ui/ScrollToTop'
+import ThemeToggle from './web/ui/ThemeToggle'
 
 // Lazy-loaded components for code splitting
-const Hero = lazy(() => import('./components/sections/Hero'))
-const About = lazy(() => import('./components/sections/About'))
-const Skills = lazy(() => import('./components/sections/Skills'))
-const Experience = lazy(() => import('./components/sections/Experience'))
-const Projects = lazy(() => import('./components/sections/Projects'))
-// const Blog = lazy(() => import('./components/sections/Blog'))
+const Hero = lazy(() => import('./web/sections/Hero'))
+const About = lazy(() => import('./web/sections/About'))
+const Skills = lazy(() => import('./web/sections/Skills'))
+const Experience = lazy(() => import('./web/sections/Experience'))
+const Projects = lazy(() => import('./web/sections/Projects'))
+// const Blog = lazy(() => import('./web/sections/Blog'))
 
-// const Testimonials = lazy(() => import('./components/sections/Testimonials'))
-const Contact = lazy(() => import('./components/sections/Contact'))
-const BlogPost = lazy(() => import('./components/blog/BlogPost'))
-const NotFound = lazy(() => import('./components/pages/NotFound'))
+// const Testimonials = lazy(() => import('./web/sections/Testimonials'))
+const Contact = lazy(() => import('./web/sections/Contact'))
+const BlogPost = lazy(() => import('./web/blog/BlogPost'))
+const NotFound = lazy(() => import('./web/pages/NotFound'))
 
 // Admin app (lazy-loaded)
 const AdminApp = lazy(() => import('./admin/AdminApp'))

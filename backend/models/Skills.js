@@ -10,10 +10,7 @@ const skillSchema = new mongoose.Schema({
   category: { 
     type: String, 
     required: [true, "Skill category is required"],
-    enum: {
-      values: ["Frontend", "Backend", "Database", "DevOps", "Mobile", "Design", "Tools", "Other"],
-      message: "Category must be one of: Frontend, Backend, Database, DevOps, Mobile, Design, Tools, Other"
-    }
+    trim: true
   },
   proficiency: { 
     type: String, 
@@ -34,22 +31,9 @@ const skillSchema = new mongoose.Schema({
     maxLength: [500, "Description cannot exceed 500 characters"],
     trim: true
   },
-  icon: {
-    type: String,
-    trim: true
-  },
-  color: {
-    type: String,
-    default: "#3B82F6",
-    match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Color must be a valid hex color code"]
-  },
   isActive: {
     type: Boolean,
     default: true
-  },
-  sortOrder: {
-    type: Number,
-    default: 0
   }
 }, { 
   timestamps: true,
@@ -59,6 +43,5 @@ const skillSchema = new mongoose.Schema({
 
 // Index for efficient querying
 skillSchema.index({ category: 1, isActive: 1 });
-skillSchema.index({ sortOrder: 1 });
 
 module.exports = mongoose.model("Skills", skillSchema);

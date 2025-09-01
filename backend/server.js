@@ -5,6 +5,8 @@ const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
 const skillsRoutes = require('./routes/skillsRoutes')
 const categoriesRoutes = require('./routes/categoriesRoutes')
+const experienceRoutes = require('./routes/experienceRoutes')
+const educationRoutes = require('./routes/educationRoutes')
 
 dotenv.config()
 connectDB()
@@ -15,10 +17,7 @@ app.use(
     origin:
       process.env.NODE_ENV === 'production'
         ? 'https://mbfolio.netlify.app'
-        : [
-            'http://localhost:3000',
-            'http://localhost:5173',
-          ],
+        : true, // Allow all origins in development
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: false,
@@ -33,6 +32,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/skills', skillsRoutes)
 app.use('/api/categories', categoriesRoutes)
+app.use('/api/experience', experienceRoutes)
+app.use('/api/education', educationRoutes)
 
 // Start server
 const PORT = process.env.PORT || 5000

@@ -71,6 +71,20 @@ class CategoriesService {
       )
     }
   }
+
+  // Toggle category status
+  async toggleCategoryStatus(id) {
+    try {
+      const response = await api.patch(`/categories/${id}/toggle-status`)
+      return response.data
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to toggle category status'
+      )
+    }
+  }
 }
 
 export default new CategoriesService()

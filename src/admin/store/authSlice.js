@@ -25,7 +25,8 @@ export const loginAdmin = createAsyncThunk(
       // Store auth data using service
       authService.storeAuth(token, user)
       
-      return { token, user }
+      // Return the complete response so handleApiResponse can access the message
+      return { ...response, authData: { token, user } }
     } catch (error) {
       return rejectWithValue(error.message)
     }
@@ -37,8 +38,8 @@ export const logoutAdmin = createAsyncThunk(
   'adminAuth/logoutAdmin',
   async (_, { rejectWithValue }) => {
     try {
-      await authService.logout()
-      return null
+      const response = await authService.logout()
+      return response
     } catch (error) {
       return rejectWithValue(error.message)
     }
@@ -151,8 +152,8 @@ const authSlice = createSlice({
       })
       .addCase(loginAdmin.fulfilled, (state, action) => {
         state.loading = false
-        state.user = action.payload.user
-        state.token = action.payload.token
+        state.user = action.payload.authData.user
+        state.token = action.payload.authData.token
         state.isAuthenticated = true
         state.error = null
       })

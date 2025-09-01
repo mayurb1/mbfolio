@@ -3,14 +3,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Menu, Moon, Sun, User, LogOut, ChevronDown } from 'lucide-react'
 import { logoutAdmin } from '../../store/authSlice'
 import { useTheme } from '../../../contexts/ThemeContext'
+import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 
 const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
   const dispatch = useDispatch()
-  const { user } = useSelector((state) => state.adminAuth)
+  const { handleApiError, handleApiResponse } = useToast()
+  const { user } = useSelector(state => state.adminAuth)
   const { currentTheme, changeTheme } = useTheme()
-  
+
   // Admin-specific theme toggle (only light/dark)
   const toggleAdminTheme = () => {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
@@ -23,10 +25,11 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
   const handleLogout = async () => {
     setIsLoggingOut(true)
     try {
-      await dispatch(logoutAdmin()).unwrap()
+      const result = await dispatch(logoutAdmin()).unwrap()
+      handleApiResponse(result)
       // Navigation will happen automatically via the auth slice
     } catch (error) {
-      console.error('Logout failed:', error)
+      handleApiError(error)
     } finally {
       setIsLoggingOut(false)
       setShowLogoutModal(false)
@@ -107,7 +110,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
                       {user?.email || 'admin@example.com'}
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={() => {
                       setShowUserMenu(false)
@@ -118,7 +121,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
                     <User className="w-4 h-4 mr-2" />
                     Profile Settings
                   </button>
-                  
+
                   <button
                     onClick={confirmLogout}
                     className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -144,15 +147,16 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
           <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 mb-4">
             <LogOut className="w-6 h-6 text-red-600 dark:text-red-400" />
           </div>
-          
+
           <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
             Sign out of admin panel?
           </h3>
-          
+
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            You will be redirected to the login page and will need to sign in again to access the admin panel.
+            You will be redirected to the login page and will need to sign in
+            again to access the admin panel.
           </p>
-          
+
           <div className="flex space-x-3 justify-center">
             <Button
               variant="secondary"

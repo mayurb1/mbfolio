@@ -5,7 +5,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import App from './App.jsx'
 import './index.css'
 import { ThemeProvider } from './contexts/ThemeContext.jsx'
-import ErrorBoundary from './components/ErrorBoundary.jsx'
+import ErrorBoundary from './web/components/ErrorBoundary.jsx'
 
 // Initialize Google Analytics if GA_ID is provided
 if (import.meta.env.VITE_GA_ID) {
