@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { Calendar, MapPin, ExternalLink, Award, TrendingUp } from 'lucide-react'
+import api from '../../services/api'
 
 const Experience = () => {
   const { ref, inView } = useInView({
@@ -8,92 +10,81 @@ const Experience = () => {
     triggerOnce: true,
   })
 
-  const experiences = [
-    {
-      id: 1,
-      company: 'IndiaNIC Infotech Limited',
-      position: 'Software Engineer',
-      duration: 'June 2024 – Present',
-      location: 'Ahmedabad, India',
-      type: 'Full-time',
-      logo: '/logos/indianic.png',
-      website: 'https://www.indianic.com/',
-      description:
-        'Contributed to Cybuild (construction completions and permit system) with form builder modules, analytics dashboards using Chart.js, and multi-role access. Maintained direct client communication to gather requirements and refine UX.',
-      achievements: [
-        'Built analytics dashboards and role-based access modules',
-        'Led client discussions for requirements and UX iterations',
-        'Delivered reusable, responsive React components with API integration',
-      ],
-      technologies: ['React', 'Chart.js', 'REST APIs', 'Tailwind CSS'],
-      highlights: [
-        { metric: 'Multi-role', description: 'Access management' },
-        { metric: 'Dashboards', description: 'Analytics reporting' },
-        { metric: 'UX', description: 'Client feedback driven' },
-      ],
-    },
-    {
-      id: 2,
-      company: 'Brainvire Infotech',
-      position: 'UI Developer',
-      duration: 'March 2023 – June 2024',
-      location: 'Ahmedabad, India',
-      type: 'Full-time',
-      logo: '/logos/brainvire.png',
-      website: 'https://www.brainvire.com/',
-      description:
-        'Built a browser-based PDF editor with annotations and collaborative features. Developed an online exam platform with role management and analytics. Led redesign of company website with modern responsive layouts and performance optimizations.',
-      achievements: [
-        'Implemented collaborative PDF annotation editor',
-        'Shipped exam platform with roles, scheduling, and analytics',
-        'Led responsive redesign with improved Lighthouse scores',
-      ],
-      technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Redux'],
-      highlights: [
-        { metric: 'Redesign', description: 'Website modernization' },
-        { metric: 'Platform', description: 'Exam system launch' },
-        { metric: 'Perf', description: 'Optimized UX' },
-      ],
-    },
-    {
-      id: 3,
-      company: 'Virtual Height IT Services Pvt. Ltd.',
-      position: 'React Developer',
-      duration: 'Feb 2022 – Feb 2023',
-      location: 'Ahmedabad, India',
-      type: 'Full-time',
-      logo: '/logos/virtual-height.png',
-      website: 'https://www.virtualheight.com/',
-      description:
-        'Developed a B2B jewelry e-commerce platform with React, Redux-Saga, and MUI. Contributed to restaurant delivery app with geo search and order placement. Refactored legacy code and improved performance via lazy loading and code splitting.',
-      achievements: [
-        'Shipped B2B e-commerce features (catalog, cart, payments)',
-        'Improved performance using code splitting and lazy loading',
-        'Built responsive UIs from Figma/XD designs',
-      ],
-      technologies: ['React', 'Redux-Saga', 'Material UI', 'Tailwind CSS'],
-      highlights: [
-        { metric: 'E‑commerce', description: 'B2B platform' },
-        { metric: 'Refactor', description: 'Reusable components' },
-        { metric: 'UX', description: 'Responsive design' },
-      ],
-    },
-  ]
+  // State for API data
+  const [experiences, setExperiences] = useState([])
+  const [education, setEducation] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const education = [
-    {
-      id: 1,
-      institution: 'Silver Oak College of Engineering and Technology',
-      degree: 'B.Tech in Computer Science',
-      duration: '2018 – 2022',
-      location: 'Ahmedabad, India',
-      gpa: 'CGPA: 8.00/10',
-      logo: '/logos/socet.png',
-      description:
-        'Focused on core CS fundamentals and web development. Final year project: RTO applicant portal.',
-      achievements: ['Built RTO applicant portal as final year project'],
-    },
-  ]
+  // Fetch both experiences and education data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Fetch both experiences and education in parallel
+        const [experienceResponse, educationResponse] = await Promise.all([
+          api.get('/experience', {
+            params: {
+              isActive: true,
+              limit: 50, // Get all active experiences
+            },
+          }),
+          api.get('/education', {
+            params: {
+              isActive: true,
+              limit: 50, // Get all active education records
+            },
+          })
+        ])
+
+        // Transform experience data to match existing component structure
+        const experienceData = experienceResponse.data.data.experiences.map(exp => ({
+          id: exp._id,
+          company: exp.company,
+          position: exp.position,
+          duration: exp.duration,
+          location: exp.location,
+          type: exp.type,
+          logo: exp.logo,
+          website: exp.website,
+          description: exp.description,
+          achievements: exp.achievements || [],
+          technologies: exp.skills?.map(skill => typeof skill === 'object' ? skill.name : skill) || [],
+          highlights: exp.highlights || [],
+        }))
+
+        // Transform education data to match existing component structure
+        const educationData = educationResponse.data.data.education.map(edu => ({
+          id: edu._id,
+          institution: edu.institution,
+          degree: edu.degree,
+          duration: edu.duration,
+          location: edu.location,
+          gpa: edu.gpa,
+          logo: edu.logo,
+          website: edu.website,
+          description: edu.description,
+          achievements: edu.achievements || [],
+        }))
+
+        setExperiences(experienceData)
+        setEducation(educationData)
+      } catch (err) {
+        console.error('Error fetching data:', err)
+        setError('Failed to load experience and education data')
+        // Fallback to empty arrays on error
+        setExperiences([])
+        setEducation([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
 
   const TimelineItem = ({ item, index, isLast, type = 'experience' }) => {
     return (
@@ -188,7 +179,7 @@ const Experience = () => {
               )}
               {item.gpa && (
                 <span className="text-text-secondary text-xs sm:text-sm mt-1">
-                  GPA: {item.gpa}
+                  CGPA: {item.gpa}/10
                 </span>
               )}
             </div>
@@ -293,17 +284,38 @@ const Experience = () => {
               Professional Experience
             </motion.h3>
 
-            <div className="space-y-0">
-              {experiences.map((experience, index) => (
-                <TimelineItem
-                  key={experience.id}
-                  item={experience}
-                  index={index}
-                  isLast={index === experiences.length - 1}
-                  type="experience"
-                />
-              ))}
-            </div>
+            {/* Loading state for experiences */}
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-text-secondary text-lg mb-4">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="text-primary hover:text-secondary transition-colors duration-200"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : experiences.length > 0 ? (
+              <div className="space-y-0">
+                {experiences.map((experience, index) => (
+                  <TimelineItem
+                    key={experience.id}
+                    item={experience}
+                    index={index}
+                    isLast={index === experiences.length - 1}
+                    type="experience"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-text-secondary text-lg">No experience records found.</p>
+              </div>
+            )}
           </div>
 
           {/* Education Timeline */}
@@ -318,17 +330,38 @@ const Experience = () => {
               Education
             </motion.h3>
 
-            <div className="space-y-0">
-              {education.map((edu, index) => (
-                <TimelineItem
-                  key={edu.id}
-                  item={edu}
-                  index={index}
-                  isLast={true}
-                  type="education"
-                />
-              ))}
-            </div>
+            {/* Loading state */}
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-text-secondary text-lg mb-4">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="text-primary hover:text-secondary transition-colors duration-200"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : education.length > 0 ? (
+              <div className="space-y-0">
+                {education.map((edu, index) => (
+                  <TimelineItem
+                    key={edu.id}
+                    item={edu}
+                    index={index}
+                    isLast={index === education.length - 1}
+                    type="education"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-text-secondary text-lg">No education records found.</p>
+              </div>
+            )}
           </div>
 
           {/* Call to Action */}

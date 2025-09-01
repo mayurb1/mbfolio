@@ -4,6 +4,7 @@ import skillsReducer from './skillsSlice'
 import categoriesReducer from './categoriesSlice'
 import experiencesReducer from './experiencesSlice'
 import educationReducer from './educationSlice'
+import projectsReducer from './projectSlice'
 
 // Separate admin store - completely isolated from main web store
 export const adminStore = configureStore({
@@ -13,6 +14,7 @@ export const adminStore = configureStore({
     categories: categoriesReducer,
     experiences: experiencesReducer,
     education: educationReducer,
+    projects: projectsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

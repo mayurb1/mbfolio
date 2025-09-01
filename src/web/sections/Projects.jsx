@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback, memo } from 'react'
+import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { ExternalLink, Github, Calendar, Users, Star, X } from 'lucide-react'
 import { LINKS } from '../../data/links'
 import Select from '../ui/Select'
 import Carousel from '../ui/Carousel'
+import api from '../../services/api'
 
 const GITHUB_PROFILE = LINKS.github
 
@@ -409,48 +410,121 @@ const Projects = () => {
     triggerOnce: true,
   })
 
+  // API state
+  const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  
+  // UI state
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedProject, setSelectedProject] = useState(null)
 
-  // Ensure every project has a main image and multiple images (dummy placeholders for now)
-  const projects = useMemo(() => {
-    return PROJECTS_DATA.map(p => {
-      const placeholders = makePlaceholders(p.id)
-      const images =
-        p.images && p.images.length > 0 ? [...p.images] : placeholders
-      const mainImage = p.mainImage || images[0]
-      return { ...p, images, mainImage }
-    })
+  // Fetch projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const response = await api.get('/projects', {
+          params: {
+            isActive: true,
+            limit: 50, // Get all active projects
+          },
+        })
+
+        // Transform API data to match existing component structure
+        const projectsData = response.data.data.projects.map(project => {
+          const images = project.images && project.images.length > 0 
+            ? [...project.images] 
+            : []
+          const mainImage = project.mainImage || (images.length > 0 ? images[0] : null)
+          
+          return {
+            id: project._id || project.id,
+            title: project.title,
+            description: project.description,
+            fullDescription: project.fullDescription,
+            category: project.category,
+            status: project.status,
+            type: project.type,
+            technologies: project.technologies || [],
+            highlights: project.highlights || [],
+            images,
+            mainImage,
+            github: project.github,
+            demo: project.demo,
+            duration: project.duration,
+            team: project.team,
+            featured: project.featured || false,
+            // For backward compatibility
+            metrics: null,
+            screenshots: []
+          }
+        })
+
+        setProjects(projectsData)
+      } catch (err) {
+        console.error('Error fetching projects:', err)
+        setError('Failed to load projects')
+        // Fallback to static data on error
+        const fallbackProjects = PROJECTS_DATA.map(p => {
+          const images = p.images && p.images.length > 0 ? [...p.images] : []
+          const mainImage = p.mainImage || (images.length > 0 ? images[0] : null)
+          return { ...p, images, mainImage }
+        })
+        setProjects(fallbackProjects)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProjects()
   }, [])
 
-  const categories = [
-    { id: 'all', label: 'All Projects', count: projects.length },
+  // Memoize processed projects
+  const processedProjects = useMemo(() => {
+    return projects
+  }, [projects])
+
+  const categories = useMemo(() => [
+    { id: 'all', label: 'All Projects', count: processedProjects.length },
     {
       id: 'Full-Stack',
       label: 'Full-Stack',
-      count: projects.filter(p => p.category === 'Full-Stack').length,
+      count: processedProjects.filter(p => p.category === 'Full-Stack').length,
     },
     {
       id: 'Frontend',
       label: 'Frontend',
-      count: projects.filter(p => p.category === 'Frontend').length,
+      count: processedProjects.filter(p => p.category === 'Frontend').length,
     },
     {
       id: 'Backend',
       label: 'Backend',
-      count: projects.filter(p => p.category === 'Backend').length,
+      count: processedProjects.filter(p => p.category === 'Backend').length,
     },
     {
       id: 'Data Science',
       label: 'Data Science',
-      count: projects.filter(p => p.category === 'Data Science').length,
+      count: processedProjects.filter(p => p.category === 'Data Science').length,
     },
-  ]
+    {
+      id: 'Mobile',
+      label: 'Mobile',
+      count: processedProjects.filter(p => p.category === 'Mobile').length,
+    },
+    {
+      id: 'DevOps',
+      label: 'DevOps',
+      count: processedProjects.filter(p => p.category === 'DevOps').length,
+    },
+  ].filter(category => category.count > 0), [processedProjects])
 
   const filteredProjects = useMemo(() => {
-    if (selectedCategory === 'all') return projects
-    return projects.filter(project => project.category === selectedCategory)
-  }, [selectedCategory, projects])
+    if (selectedCategory === 'all') return processedProjects
+    return processedProjects.filter(project => project.category === selectedCategory)
+  }, [selectedCategory, processedProjects])
 
   const handleSelectProject = useCallback(
     project => setSelectedProject(project),
@@ -472,19 +546,33 @@ const Projects = () => {
       >
         {/* Project Image */}
         <div className="relative w-full aspect-[16/10] overflow-hidden rounded-t-xl">
-          <img
-            src={project.mainImage || (project.images && project.images[0])}
-            alt={project.title}
-            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-            onError={e => {
-              e.target.src = `data:image/svg+xml,${encodeURIComponent(`
-                <svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="100%" height="100%" fill="#e2e8f0"/>
-                  <text x="50%" y="50%" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="16" fill="#64748b">Project Image</text>
-                </svg>
-              `)}`
-            }}
-          />
+          {project.mainImage ? (
+            <img
+              src={project.mainImage}
+              alt={project.title}
+              className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+              onError={e => {
+                e.target.style.display = 'none'
+                e.target.parentElement.innerHTML = `
+                  <div class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                    <div class="text-center text-gray-500 dark:text-gray-400">
+                      <div class="text-2xl mb-2">📷</div>
+                      <div class="text-sm font-medium">Project Image</div>
+                      <div class="text-xs">Not Available</div>
+                    </div>
+                  </div>
+                `
+              }}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+              <div className="text-center text-gray-500 dark:text-gray-400">
+                <div className="text-2xl mb-2">📷</div>
+                <div className="text-sm font-medium">Project Image</div>
+                <div className="text-xs">Not Available</div>
+              </div>
+            </div>
+          )}
 
           {/* Overlay removed as requested */}
 
@@ -648,9 +736,19 @@ const Projects = () => {
             {/* Content */}
             <div className="p-6">
               {/* Media Carousel */}
-              {project.images && project.images.length > 0 && (
+              {project.images && project.images.length > 0 ? (
                 <div className="mb-6">
                   <Carousel images={project.images} altPrefix={project.title} />
+                </div>
+              ) : (
+                <div className="mb-6">
+                  <div className="w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-gray-500 dark:text-gray-400">
+                      <div className="text-4xl mb-2">📷</div>
+                      <div className="text-lg font-medium">Project Images</div>
+                      <div className="text-sm">Not Available</div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -734,13 +832,32 @@ const Projects = () => {
     <section id="projects" className="py-20 lg:py-32 bg-background" ref={ref}>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-text">Projects</h2>
-              <p className="text-text-secondary">
-                Selected personal and organization projects.
-              </p>
+          {/* Loading state */}
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-text-secondary text-lg mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-primary hover:text-secondary transition-colors duration-200"
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-text">Projects</h2>
+                  <p className="text-text-secondary">
+                    {processedProjects.length > 0 
+                      ? `${processedProjects.length} projects showcasing my work` 
+                      : 'Selected personal and organization projects.'}
+                  </p>
+                </div>
 
             {/* Filter Select */}
             <div className="w-48">
@@ -758,16 +875,30 @@ const Projects = () => {
             </div>
           </div>
 
-          {/* Project Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {filteredProjects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
+              {/* Project Grid */}
+              {filteredProjects.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {filteredProjects.map((project, index) => (
+                    <ProjectCard key={project.id} project={project} index={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-text-secondary text-lg">
+                    {selectedCategory === 'all' 
+                      ? 'No projects found.' 
+                      : `No projects found in ${selectedCategory} category.`}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Modal */}
-        <ProjectModal project={selectedProject} onClose={handleCloseModal} />
+        {!loading && (
+          <ProjectModal project={selectedProject} onClose={handleCloseModal} />
+        )}
       </div>
     </section>
   )
