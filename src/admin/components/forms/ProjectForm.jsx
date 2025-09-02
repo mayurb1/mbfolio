@@ -106,13 +106,11 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     title: project?.title || '',
     description: project?.description || '',
     fullDescription: project?.fullDescription || '',
-    category: project?.category || (categories.length > 0 ? categories[0].name : ''),
+    category: project?.category?._id || project?.category || '',  // Handle both populated and non-populated category
     status: project?.status || 'completed',
     type: project?.type || 'personal',
     technologies: project?.technologies?.map(tech => 
-      typeof tech === 'string' ? 
-        skills.find(skill => skill.name === tech)?._id || tech : 
-        tech._id || tech
+      typeof tech === 'object' && tech._id ? tech._id : tech  // Handle both populated objects and IDs
     ) || [],
     highlights: project?.highlights || [''],
     images: project?.images || [],
@@ -166,18 +164,15 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
         }
       }
 
-      // Convert skill IDs to skill names for storage
-      const technologyNames = values.technologies.map(techId => {
-        const skill = skills.find(skill => skill._id === techId)
-        return skill ? skill.name : techId
-      })
+      // Keep technology IDs as they are (no conversion needed)
+      const technologyIds = values.technologies
 
       // Filter out empty strings from arrays
       const cleanedValues = {
         ...values,
         mainImage: uploadedMainImage,
         images: uploadedImages.filter(img => img && img.trim()),
-        technologies: technologyNames,
+        technologies: technologyIds,
         highlights: values.highlights.filter(highlight => highlight.trim())
       }
 
@@ -277,7 +272,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                   <>
                     <option value="">Select a category</option>
                     {categories.map(category => (
-                      <option key={category._id} value={category.name}>
+                      <option key={category._id} value={category._id}>
                         {category.name}
                       </option>
                     ))}

@@ -20,12 +20,9 @@ const projectSchema = new mongoose.Schema({
     maxLength: [2000, "Full description cannot exceed 2000 characters"]
   },
   category: {
-    type: String,
-    required: [true, "Category is required"],
-    enum: {
-      values: ["Full-Stack", "Frontend", "Backend", "Mobile", "Data Science", "DevOps", "Other"],
-      message: "Category must be one of: Full-Stack, Frontend, Backend, Mobile, Data Science, DevOps, Other"
-    }
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: [true, "Category is required"]
   },
   status: {
     type: String,
@@ -44,9 +41,8 @@ const projectSchema = new mongoose.Schema({
     default: "personal"
   },
   technologies: [{
-    type: String,
-    trim: true,
-    maxLength: [50, "Technology name cannot exceed 50 characters"]
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Skills"
   }],
   highlights: [{
     type: String,

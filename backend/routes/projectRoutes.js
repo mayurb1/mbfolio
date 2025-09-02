@@ -16,23 +16,58 @@ router.get("/", async (req, res) => {
     if (type) filter.type = type;
     if (featured !== undefined) filter.featured = featured === 'true';
     
-    // Add search functionality
-    if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { technologies: { $in: [new RegExp(search, 'i')] } }
-      ];
-    }
-
     // Calculate pagination
     const skip = (page - 1) * limit;
-    const total = await Project.countDocuments(filter);
+    let projects, total;
 
-    const projects = await Project.find(filter)
-      .sort({ featured: -1, order: 1, createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+    if (search) {
+      // Use aggregation pipeline for search with populated fields
+      const pipeline = [
+        { $match: filter },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category'
+          }
+        },
+        {
+          $lookup: {
+            from: 'skills',
+            localField: 'technologies',
+            foreignField: '_id',
+            as: 'technologies'
+          }
+        },
+        {
+          $match: {
+            $or: [
+              { title: { $regex: search, $options: 'i' } },
+              { description: { $regex: search, $options: 'i' } },
+              { 'technologies.name': { $regex: search, $options: 'i' } }
+            ]
+          }
+        },
+        { $sort: { featured: -1, order: 1, createdAt: -1 } }
+      ];
+
+      const countPipeline = [...pipeline, { $count: "total" }];
+      const totalResult = await Project.aggregate(countPipeline);
+      total = totalResult.length > 0 ? totalResult[0].total : 0;
+
+      const dataPipeline = [...pipeline, { $skip: skip }, { $limit: parseInt(limit) }];
+      projects = await Project.aggregate(dataPipeline);
+    } else {
+      // Regular query without search
+      total = await Project.countDocuments(filter);
+      projects = await Project.find(filter)
+        .populate('category', 'name')
+        .populate('technologies', 'name')
+        .sort({ featured: -1, order: 1, createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+    }
 
     res.status(200).json({
       data: {
@@ -58,7 +93,9 @@ router.get("/", async (req, res) => {
 // GET /api/projects/:id - Get project by ID (public)
 router.get("/:id", async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+      .populate('category', 'name')
+      .populate('technologies', 'name');
     
     if (!project) {
       return res.status(404).json({
@@ -141,6 +178,8 @@ router.post("/", authenticateToken, async (req, res) => {
     });
 
     await project.save();
+    await project.populate('category', 'name');
+    await project.populate('technologies', 'name');
 
     res.status(201).json({
       data: { project },
@@ -236,7 +275,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
         order
       },
       { new: true, runValidators: true }
-    );
+    ).populate('category', 'name').populate('technologies', 'name');
 
     res.status(200).json({
       data: { project: updatedProject },
@@ -300,7 +339,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       req.params.id,
       { $set: req.body },
       { new: true, runValidators: true }
-    );
+    ).populate('category', 'name').populate('technologies', 'name');
 
     res.status(200).json({
       data: { project: updatedProject },
@@ -460,6 +499,8 @@ router.patch("/:id/toggle-status", authenticateToken, async (req, res) => {
 
     project.isActive = !project.isActive;
     await project.save();
+    await project.populate('category', 'name');
+    await project.populate('technologies', 'name');
 
     res.status(200).json({
       data: { project },
@@ -493,6 +534,8 @@ router.patch("/:id/toggle-featured", authenticateToken, async (req, res) => {
 
     project.featured = !project.featured;
     await project.save();
+    await project.populate('category', 'name');
+    await project.populate('technologies', 'name');
 
     res.status(200).json({
       data: { project },

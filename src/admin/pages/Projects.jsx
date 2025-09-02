@@ -198,11 +198,14 @@ const Projects = () => {
       {
         header: 'Category',
         accessorKey: 'category',
-        cell: ({ getValue }) => (
-          <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-            {getValue()}
-          </span>
-        )
+        cell: ({ getValue }) => {
+          const category = getValue();
+          return (
+            <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+              {category?.name || category}
+            </span>
+          )
+        }
       },
       {
         header: 'Type',

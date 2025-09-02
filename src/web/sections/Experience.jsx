@@ -51,7 +51,7 @@ const Experience = () => {
           website: exp.website,
           description: exp.description,
           achievements: exp.achievements || [],
-          technologies: exp.skills?.map(skill => typeof skill === 'object' ? skill.name : skill) || [],
+          technologies: exp.skills?.map(skill => skill?.name || skill) || [],
           highlights: exp.highlights || [],
         }))
 

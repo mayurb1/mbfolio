@@ -492,38 +492,38 @@ const Projects = () => {
     {
       id: 'Full-Stack',
       label: 'Full-Stack',
-      count: processedProjects.filter(p => p.category === 'Full-Stack').length,
+      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Full-Stack').length,
     },
     {
       id: 'Frontend',
       label: 'Frontend',
-      count: processedProjects.filter(p => p.category === 'Frontend').length,
+      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Frontend').length,
     },
     {
       id: 'Backend',
       label: 'Backend',
-      count: processedProjects.filter(p => p.category === 'Backend').length,
+      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Backend').length,
     },
     {
       id: 'Data Science',
       label: 'Data Science',
-      count: processedProjects.filter(p => p.category === 'Data Science').length,
+      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Data Science').length,
     },
     {
       id: 'Mobile',
       label: 'Mobile',
-      count: processedProjects.filter(p => p.category === 'Mobile').length,
+      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Mobile').length,
     },
     {
       id: 'DevOps',
       label: 'DevOps',
-      count: processedProjects.filter(p => p.category === 'DevOps').length,
+      count: processedProjects.filter(p => (p.category?.name || p.category) === 'DevOps').length,
     },
   ].filter(category => category.count > 0), [processedProjects])
 
   const filteredProjects = useMemo(() => {
     if (selectedCategory === 'all') return processedProjects
-    return processedProjects.filter(project => project.category === selectedCategory)
+    return processedProjects.filter(project => (project.category?.name || project.category) === selectedCategory)
   }, [selectedCategory, processedProjects])
 
   const handleSelectProject = useCallback(
@@ -610,7 +610,7 @@ const Projects = () => {
             </h3>
             <div className="mt-2 flex items-center gap-2 flex-wrap">
               <span className="px-2 py-1 bg-background border border-border rounded text-xs text-text-secondary">
-                {project.category}
+                {project.category?.name || project.category}
               </span>
               <span className="px-2 py-1 bg-background border border-border rounded text-xs text-text-secondary">
                 {project.type === 'organization' ? 'Organization' : 'Personal'}
@@ -629,7 +629,7 @@ const Projects = () => {
                 key={i}
                 className="px-2 py-1 bg-background border border-border rounded text-xs text-text-secondary"
               >
-                {tech}
+                {tech?.name || tech}
               </span>
             ))}
             {project.technologies.length > 3 && (
@@ -716,7 +716,7 @@ const Projects = () => {
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="px-2 py-1 bg-background border border-border rounded text-xs text-text-secondary">
-                    {project.category}
+                    {project.category?.name || project.category}
                   </span>
                   <span className="px-2 py-1 bg-background border border-border rounded text-xs text-text-secondary">
                     {project.type === 'organization'
@@ -791,7 +791,7 @@ const Projects = () => {
                       key={index}
                       className="px-3 py-1 bg-surface border border-border rounded-full text-sm text-text-secondary"
                     >
-                      {tech}
+                      {tech?.name || tech}
                     </span>
                   ))}
                 </div>
