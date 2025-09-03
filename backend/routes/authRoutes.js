@@ -96,7 +96,7 @@ router.post("/login", async (req, res) => {
     });
 
     // Sign token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
     // Return both token and user data (without password)
     const userResponse = {

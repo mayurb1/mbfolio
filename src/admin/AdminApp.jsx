@@ -15,6 +15,7 @@ import Skills from './pages/Skills'
 import Categories from './pages/Categories'
 import Experiences from './pages/Experiences'
 import Education from './pages/Education'
+import Projects from './pages/Projects'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 const AdminContent = () => {
@@ -115,11 +116,19 @@ const AdminContent = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/projects"
+        element={
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        }
+      />
       
       {/* Redirect /admin to /admin/dashboard */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       
-      {/* Catch all admin routes */}
+      {/* Catch all unmatched admin routes */}
       <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
     </Routes>
   )
