@@ -222,15 +222,15 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
       enableReinitialize
     >
       {({ isSubmitting, errors, touched, values, setFieldValue }) => (
-        <Form className="space-y-6">
+        <Form className="space-y-4 sm:space-y-6">
           {/* General Error */}
           {errors.general && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-red-600 dark:text-red-400">{errors.general}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4">
+              <p className="text-red-600 dark:text-red-400 text-sm sm:text-base">{errors.general}</p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -397,7 +397,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Main Image Upload */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Main Project Image
               </label>
@@ -414,7 +414,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Short Description */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Short Description *
               </label>
@@ -433,14 +433,14 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Full Description */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label htmlFor="fullDescription" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Full Description *
               </label>
               <Field
                 as="textarea"
                 name="fullDescription"
-                rows={6}
+                rows={5}
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.fullDescription && touched.fullDescription
                     ? 'border-red-300 dark:border-red-600'
@@ -452,7 +452,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Technologies */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Technologies *
               </label>
@@ -475,7 +475,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Highlights */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Key Highlights
               </label>
@@ -497,7 +497,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                             variant="outline"
                             size="sm"
                             onClick={() => remove(index)}
-                            className="p-2"
+                            className="p-2 flex-shrink-0"
                           >
                             <X size={16} />
                           </Button>
@@ -509,10 +509,10 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                       variant="outline"
                       size="sm"
                       onClick={() => push('')}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 w-full sm:w-auto justify-center"
                     >
                       <Plus size={16} />
-                      Add Highlight
+                      <span>Add Highlight</span>
                     </Button>
                   </div>
                 )}
@@ -520,7 +520,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Additional Images */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <MultiImageUpload
                 images={values.images}
                 onImagesChange={(file, index, action = 'add', newImages = null) => {
@@ -571,28 +571,31 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-700">
             <Button
               type="button"
               variant="outline"
               onClick={onCancel}
               disabled={isSubmitting}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto order-1 sm:order-2"
             >
               {isSubmitting && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white flex-shrink-0"></div>
               )}
-              {isSubmitting 
-                ? 'Saving & Uploading Images...' 
-                : isEditing 
-                  ? 'Update Project' 
-                  : 'Add Project'}
+              <span>
+                {isSubmitting 
+                  ? 'Saving & Uploading...' 
+                  : isEditing 
+                    ? 'Update Project' 
+                    : 'Add Project'}
+              </span>
             </Button>
           </div>
         </Form>

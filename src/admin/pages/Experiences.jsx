@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useRef } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Plus, Edit, Trash2, Search, Calendar, MapPin } from 'lucide-react'
 import { useToast } from '../contexts/ToastContext'
@@ -6,7 +6,6 @@ import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
-import DataTable from '../components/ui/DataTable'
 import ToggleSwitch from '../components/ui/ToggleSwitch'
 import ExperienceForm from '../components/forms/ExperienceForm'
 import {
@@ -202,160 +201,17 @@ const Experiences = () => {
     return 'Not specified'
   }
 
-  // Define table columns
-  const columns = useMemo(() => [
-    {
-      accessorKey: 'company',
-      header: 'Company/Position',
-      cell: ({ getValue, row }) => {
-        const company = getValue()
-        const experience = row.original
-        return (
-          <div className="flex items-center gap-3">
-            {experience.logo && (
-              <img
-                src={experience.logo}
-                alt={`${company} logo`}
-                className="w-8 h-8 rounded-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none'
-                }}
-              />
-            )}
-            <div>
-              <div className="text-sm font-medium text-slate-900 dark:text-white">
-                {company}
-              </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                {experience.position}
-              </div>
-            </div>
-          </div>
-        )
-      }
-    },
-    {
-      accessorKey: 'startDate',
-      header: 'Duration',
-      cell: ({ row }) => {
-        const experience = row.original
-        return (
-          <div className="text-sm">
-            <div className="flex items-center gap-1 text-slate-900 dark:text-white">
-              <Calendar size={12} />
-              {formatDuration(experience.duration)}
-            </div>
-            {experience.location && (
-              <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-1">
-                <MapPin size={12} />
-                {experience.location}
-              </div>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      accessorKey: 'type',
-      header: 'Type',
-      cell: ({ getValue }) => {
-        const type = getValue()
-        const colors = {
-          'Full-time': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-          'Part-time': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-          'Contract': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-          'Internship': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-          'Freelance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
-        }
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'}`}>
-            {type}
-          </span>
-        )
-      }
-    },
-    {
-      accessorKey: 'skills',
-      header: 'Skills',
-      cell: ({ getValue }) => {
-        const skills = getValue()
-        
-        if (!skills || skills.length === 0) {
-          return (
-            <span className="text-sm text-slate-400 dark:text-slate-500 italic">
-              No skills listed
-            </span>
-          )
-        }
-        
-        return (
-          <div className="flex flex-wrap gap-1">
-            {skills.slice(0, 3).map((skill, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
-              >
-                {typeof skill === 'string' ? skill : skill.name}
-              </span>
-            ))}
-            {skills.length > 3 && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                +{skills.length - 3} more
-              </span>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      accessorKey: 'isActive',
-      header: 'Status',
-      cell: ({ getValue }) => {
-        const isActive = getValue()
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            isActive 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
-              : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-          }`}>
-            {isActive ? 'Active' : 'Inactive'}
-          </span>
-        )
-      }
-    },
-    {
-      id: 'actions',
-      header: 'Actions',
-      cell: ({ row }) => {
-        const experience = row.original
-        return (
-          <div className="flex items-center justify-end gap-2">
-            <ToggleSwitch
-              checked={experience.isActive}
-              onChange={() => handleToggleExperienceStatus(experience)}
-              size="sm"
-              disabled={loading}
-            />
-            <button
-              onClick={() => handleEditExperience(experience)}
-              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              title="Edit experience"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDeleteExperience(experience)}
-              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-              title="Delete experience"
-              disabled={loading}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        )
-      }
+  // Get type colors for badges
+  const getTypeColors = (type) => {
+    const colors = {
+      'Full-time': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+      'Part-time': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+      'Contract': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+      'Internship': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
+      'Freelance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
     }
-  ], [loading])
+    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+  }
 
   return (
     <AdminLayout pageTitle="Experience Management">
@@ -390,32 +246,152 @@ const Experiences = () => {
           </div>
         </div>
 
-        {/* Experience Table */}
+        {/* Experience Cards */}
         <div className="space-y-4">
-          <DataTable
-            data={experiences}
-            columns={columns}
-            loading={loading}
-            pageCount={pagination.totalPages}
-            pageIndex={pagination.page - 1}
-            pageSize={pagination.limit}
-            manualPagination={true}
-            onPaginationChange={(updater) => {
-              const newPagination = typeof updater === 'function' 
-                ? updater({ pageIndex: pagination.page - 1, pageSize: pagination.limit })
-                : updater
-              handlePageChange(newPagination.pageIndex + 1)
-            }}
-            emptyMessage="No experiences found"
-            showPagination={false}
-          />
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="bg-surface border border-border rounded-xl p-6 animate-pulse">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
+                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : experiences.length === 0 ? (
+            <div className="bg-surface border border-border rounded-xl p-8 text-center">
+              <div className="text-slate-400 dark:text-slate-500 mb-2">
+                <Search className="w-12 h-12 mx-auto mb-4" />
+                <p className="text-lg font-medium">No experiences found</p>
+                <p className="text-sm">Start by adding your first professional experience.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {experiences.map((experience) => (
+                <div key={experience._id} className="bg-surface border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-200 group">
+                  {/* Header */}
+                  <div className="flex items-start gap-4 mb-4">
+                    {experience.logo && (
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-border flex-shrink-0">
+                        <img
+                          src={experience.logo}
+                          alt={`${experience.company} logo`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none'
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-text group-hover:text-primary transition-colors truncate">
+                        {experience.company}
+                      </h3>
+                      <p className="text-text-secondary text-sm font-medium truncate">
+                        {experience.position}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <ToggleSwitch
+                        checked={experience.isActive}
+                        onChange={() => handleToggleExperienceStatus(experience)}
+                        size="sm"
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
 
-          {/* Custom Pagination */}
+                  {/* Duration and Location */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span>{formatDuration(experience.duration)}</span>
+                    </div>
+                    {experience.location && (
+                      <div className="flex items-center gap-2 text-sm text-text-secondary">
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">{experience.location}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Type Badge */}
+                  {experience.type && (
+                    <div className="mb-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColors(experience.type)}`}>
+                        {experience.type}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Skills */}
+                  {experience.skills && experience.skills.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {experience.skills.slice(0, 3).map((skill, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                          >
+                            {typeof skill === 'string' ? skill : skill.name}
+                          </span>
+                        ))}
+                        {experience.skills.length > 3 && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                            +{experience.skills.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Status and Actions */}
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      experience.isActive 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
+                        : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                    }`}>
+                      {experience.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditExperience(experience)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation"
+                        title="Edit experience"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteExperience(experience)}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation"
+                        title="Delete experience"
+                        disabled={loading}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 px-6 py-3">
+            <div className="bg-surface border border-border rounded-lg px-6 py-3">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="text-sm text-slate-700 dark:text-slate-300">
+                  <div className="text-xs sm:text-sm text-text-secondary">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                     {pagination.total} results
@@ -442,7 +418,7 @@ const Experiences = () => {
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1 || loading}
-                    className="px-3 py-1 text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
@@ -467,8 +443,8 @@ const Experiences = () => {
                         disabled={loading}
                         className={`px-3 py-1 text-sm font-medium rounded-md ${
                           isCurrentPage
-                            ? 'bg-blue-600 text-white'
-                            : 'text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+                            ? 'bg-primary text-white'
+                            : 'text-text-secondary border border-border hover:bg-surface'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         {pageNum}
@@ -479,7 +455,7 @@ const Experiences = () => {
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page === pagination.totalPages || loading}
-                    className="px-3 py-1 text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>

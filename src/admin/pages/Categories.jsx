@@ -212,31 +212,36 @@ const Categories = () => {
     {
       id: 'actions',
       header: 'Actions',
+      size: 180, // Fixed width for actions column
       cell: ({ row }) => {
         const category = row.original
         return (
-          <div className="flex items-center justify-end gap-2">
-            <ToggleSwitch
-              checked={category.isActive}
-              onChange={() => handleToggleCategoryStatus(category)}
-              size="sm"
-              disabled={loading}
-            />
-            <button
-              onClick={() => handleEditCategory(category)}
-              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              title="Edit category"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDeleteCategory(category)}
-              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-              title="Delete category"
-              disabled={loading}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+          <div className="flex items-center justify-end gap-1 min-w-[160px]">
+            <div className="flex-shrink-0">
+              <ToggleSwitch
+                checked={category.isActive}
+                onChange={() => handleToggleCategoryStatus(category)}
+                size="sm"
+                disabled={loading}
+              />
+            </div>
+            <div className="flex items-center gap-1 ml-2">
+              <button
+                onClick={() => handleEditCategory(category)}
+                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation flex-shrink-0"
+                title="Edit category"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDeleteCategory(category)}
+                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation flex-shrink-0"
+                title="Delete category"
+                disabled={loading}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )
       }

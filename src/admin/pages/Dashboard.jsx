@@ -119,31 +119,33 @@ const Dashboard = () => {
     <AdminLayout pageTitle="Dashboard">
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
                 Welcome back, Admin! 👋
               </h2>
-              <p className="text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm sm:text-base">
                 Here's what's happening with your portfolio today.
               </p>
             </div>
-            <div className="hidden sm:flex items-center space-x-3">
-              <Button variant="secondary" size="small">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap sm:flex-nowrap">
+              <Button variant="secondary" size="small" className="flex-1 sm:flex-initial">
                 <Eye className="w-4 h-4 mr-2" />
-                View Site
+                <span className="hidden xs:inline">View Site</span>
+                <span className="xs:hidden">Site</span>
               </Button>
-              <Button size="small">
+              <Button size="small" className="flex-1 sm:flex-initial">
                 <FolderOpen className="w-4 h-4 mr-2" />
-                Add Project
+                <span className="hidden xs:inline">Add Project</span>
+                <span className="xs:hidden">Add</span>
               </Button>
             </div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatsCard
             title="Total Projects"
             value={stats.projects.total}
@@ -174,11 +176,11 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
           {/* Recent Activity */}
-          <div className="lg:col-span-3">
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-              <div className="flex items-center justify-between mb-6">
+          <div className="xl:col-span-3">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                   Recent Activity
                 </h3>
@@ -187,31 +189,31 @@ const Dashboard = () => {
                 </Button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {recentActivity.map((activity) => {
                   const Icon = getActivityIcon(activity.type, activity.status)
                   return (
                     <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                       <div className="flex-shrink-0">
-                        <div className="w-10 h-10 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                          <Icon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                             {activity.title}
                           </p>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(activity.status)}`}>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full self-start sm:self-auto ${getStatusColor(activity.status)}`}>
                             {activity.status}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                           {activity.description}
                         </p>
                         <div className="flex items-center mt-2 text-xs text-slate-400 dark:text-slate-500">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {activity.time}
+                          <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+                          <span>{activity.time}</span>
                         </div>
                       </div>
                     </div>
@@ -222,77 +224,77 @@ const Dashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
+          <div className="xl:col-span-2">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 p-4 sm:p-6">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 sm:mb-6">
                 Quick Actions
               </h3>
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <Button 
                   variant="primary" 
                   size="medium"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-sm sm:text-base"
                   onClick={() => {
                     // Navigate to add project page
                     console.log('Navigate to add project')
                   }}
                 >
-                  <FolderOpen className="w-4 h-4 mr-3" />
-                  Add New Project
+                  <FolderOpen className="w-4 h-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <span>Add New Project</span>
                 </Button>
                 
                 <Button 
                   variant="secondary" 
                   size="medium"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-sm sm:text-base"
                   onClick={() => {
                     // Navigate to contact forms
                     console.log('Navigate to contact forms')
                   }}
                 >
-                  <Mail className="w-4 h-4 mr-3" />
-                  View Messages
+                  <Mail className="w-4 h-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <span>View Messages</span>
                 </Button>
                 
                 <Button 
                   variant="secondary" 
                   size="medium"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-sm sm:text-base"
                   onClick={() => {
                     // Navigate to media management
                     console.log('Navigate to media')
                   }}
                 >
-                  <Image className="w-4 h-4 mr-3" />
-                  Manage Media
+                  <Image className="w-4 h-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <span>Manage Media</span>
                 </Button>
                 
                 <Button 
                   variant="ghost" 
                   size="medium"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-sm sm:text-base"
                   onClick={() => {
                     // Open site in new tab
                     window.open('/', '_blank')
                   }}
                 >
-                  <Eye className="w-4 h-4 mr-3" />
-                  View Portfolio
+                  <Eye className="w-4 h-4 mr-2 sm:mr-3 flex-shrink-0" />
+                  <span>View Portfolio</span>
                 </Button>
               </div>
 
               {/* User info */}
-              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-600">
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-600">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                       Admin User
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                       Last login: Today at 2:30 PM
                     </p>
                   </div>

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useRef } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Plus,
@@ -14,7 +14,6 @@ import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
-import DataTable from '../components/ui/DataTable'
 import ToggleSwitch from '../components/ui/ToggleSwitch'
 import EducationForm from '../components/forms/EducationForm'
 import {
@@ -230,135 +229,6 @@ const Education = () => {
     return 'Not specified'
   }
 
-
-  // Define table columns
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: 'institution',
-        header: 'Institution/Degree',
-        cell: ({ row }) => {
-          const education = row.original
-          return (
-            <div className="flex items-center gap-3">
-              {education.logo && (
-                <img
-                  src={education.logo}
-                  alt={`${education.institution} logo`}
-                  className="w-8 h-8 rounded-full object-cover"
-                  onError={e => {
-                    e.target.style.display = 'none'
-                  }}
-                />
-              )}
-              <div>
-                <div className="text-sm font-medium text-slate-900 dark:text-white">
-                  {education.institution}
-                </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">
-                  {education.degree}
-                </div>
-              </div>
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: 'startDate',
-        header: 'Duration',
-        cell: ({ row }) => {
-          const education = row.original
-          return (
-            <div className="text-sm">
-              <div className="flex items-center gap-1 text-slate-900 dark:text-white">
-                <Calendar size={12} />
-                {formatDuration(education.duration)}
-              </div>
-              {education.location && (
-                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {education.location}
-                </div>
-              )}
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: 'gpa',
-        header: 'Grade/Score',
-        cell: ({ getValue }) => {
-          const grade = getValue()
-          if (!grade) {
-            return (
-              <span className="text-sm text-slate-400 dark:text-slate-500 italic">
-                Not specified
-              </span>
-            )
-          }
-          return (
-            <div className="flex items-center gap-1">
-              <Award size={12} className="text-yellow-500" />
-              <span className="text-sm text-slate-900 dark:text-white font-medium">
-                {grade}
-              </span>
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: 'isActive',
-        header: 'Status',
-        cell: ({ getValue }) => {
-          const isActive = getValue()
-          return (
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                isActive
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                  : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-              }`}
-            >
-              {isActive ? 'Active' : 'Inactive'}
-            </span>
-          )
-        },
-      },
-      {
-        id: 'actions',
-        header: 'Actions',
-        cell: ({ row }) => {
-          const education = row.original
-          return (
-            <div className="flex items-center justify-end gap-2">
-              <ToggleSwitch
-                checked={education.isActive}
-                onChange={() => handleToggleEducationStatus(education)}
-                size="sm"
-                disabled={loading}
-              />
-              <button
-                onClick={() => handleEditEducation(education)}
-                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                title="Edit education"
-              >
-                <Edit className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDeleteEducation(education)}
-                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-                title="Delete education"
-                disabled={loading}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          )
-        },
-      },
-    ],
-    [loading]
-  )
-
   return (
     <AdminLayout pageTitle="Education Management">
       <div className="space-y-6">
@@ -415,36 +285,151 @@ const Education = () => {
           </div>
         </div>
 
-        {/* Education Table */}
+        {/* Education Cards */}
         <div className="space-y-4">
-          <DataTable
-            data={education}
-            columns={columns}
-            loading={loading}
-            pageCount={pagination.totalPages}
-            pageIndex={pagination.page - 1}
-            pageSize={pagination.limit}
-            manualPagination={true}
-            onPaginationChange={updater => {
-              const newPagination =
-                typeof updater === 'function'
-                  ? updater({
-                      pageIndex: pagination.page - 1,
-                      pageSize: pagination.limit,
-                    })
-                  : updater
-              handlePageChange(newPagination.pageIndex + 1)
-            }}
-            emptyMessage="No education found"
-            showPagination={false}
-          />
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="bg-surface border border-border rounded-xl p-6 animate-pulse">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
+                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : education.length === 0 ? (
+            <div className="bg-surface border border-border rounded-xl p-8 text-center">
+              <div className="text-slate-400 dark:text-slate-500 mb-2">
+                <Search className="w-12 h-12 mx-auto mb-4" />
+                <p className="text-lg font-medium">No education records found</p>
+                <p className="text-sm">Start by adding your first educational qualification.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {education.map((educationRecord) => (
+                <div key={educationRecord._id} className="bg-surface border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-200 group">
+                  {/* Header */}
+                  <div className="flex items-start gap-4 mb-4">
+                    {educationRecord.logo && (
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-border flex-shrink-0">
+                        <img
+                          src={educationRecord.logo}
+                          alt={`${educationRecord.institution} logo`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none'
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-text group-hover:text-primary transition-colors truncate">
+                        {educationRecord.institution}
+                      </h3>
+                      <p className="text-text-secondary text-sm font-medium truncate">
+                        {educationRecord.degree}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <ToggleSwitch
+                        checked={educationRecord.isActive}
+                        onChange={() => handleToggleEducationStatus(educationRecord)}
+                        size="sm"
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
 
-          {/* Custom Pagination */}
+                  {/* Duration and Location */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span>{formatDuration(educationRecord.duration)}</span>
+                    </div>
+                    {educationRecord.location && (
+                      <div className="flex items-center gap-2 text-sm text-text-secondary">
+                        <span className="truncate">{educationRecord.location}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Grade/GPA */}
+                  {educationRecord.gpa && (
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                        <span className="text-sm font-medium text-text">
+                          Grade: {educationRecord.gpa}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Field of Study */}
+                  {educationRecord.fieldOfStudy && (
+                    <div className="mb-4">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                        {educationRecord.fieldOfStudy}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {educationRecord.description && (
+                    <div className="mb-4">
+                      <p className="text-sm text-text-secondary line-clamp-2">
+                        {educationRecord.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Status and Actions */}
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      educationRecord.isActive 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
+                        : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                    }`}>
+                      {educationRecord.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditEducation(educationRecord)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation"
+                        title="Edit education"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEducation(educationRecord)}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation"
+                        title="Delete education"
+                        disabled={loading}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 px-6 py-3">
+            <div className="bg-surface border border-border rounded-lg px-6 py-3">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="text-sm text-slate-700 dark:text-slate-300">
+                  <div className="text-xs sm:text-sm text-text-secondary">
                     Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                     {Math.min(
                       pagination.page * pagination.limit,
@@ -453,7 +438,7 @@ const Education = () => {
                     of {pagination.total} results
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                    <span className="text-sm text-text-secondary">
                       Show:
                     </span>
                     <select
@@ -461,7 +446,7 @@ const Education = () => {
                       onChange={e =>
                         handleLimitChange(parseInt(e.target.value))
                       }
-                      className="text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="text-sm border border-border rounded-md bg-background text-text px-2 py-1 focus:ring-2 focus:ring-primary focus:border-transparent"
                       disabled={loading}
                     >
                       <option value={5}>5</option>
@@ -470,7 +455,7 @@ const Education = () => {
                       <option value={50}>50</option>
                       <option value={100}>100</option>
                     </select>
-                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                    <span className="text-sm text-text-secondary">
                       entries
                     </span>
                   </div>
@@ -480,7 +465,7 @@ const Education = () => {
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1 || loading}
-                    className="px-3 py-1 text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
@@ -490,7 +475,7 @@ const Education = () => {
                       return (
                         <span
                           key={`ellipsis-${index}`}
-                          className="px-3 py-1 text-sm text-slate-400 dark:text-slate-500"
+                          className="px-3 py-1 text-sm text-text-secondary"
                         >
                           ...
                         </span>
@@ -505,8 +490,8 @@ const Education = () => {
                         disabled={loading}
                         className={`px-3 py-1 text-sm font-medium rounded-md ${
                           isCurrentPage
-                            ? 'bg-blue-600 text-white'
-                            : 'text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+                            ? 'bg-primary text-white'
+                            : 'text-text-secondary border border-border hover:bg-surface'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         {pageNum}
@@ -519,7 +504,7 @@ const Education = () => {
                     disabled={
                       pagination.page === pagination.totalPages || loading
                     }
-                    className="px-3 py-1 text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>

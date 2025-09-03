@@ -29,25 +29,26 @@ const Modal = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black opacity-50"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      <div className="flex items-center justify-center min-h-screen px-4 text-center">
+      {/* Mobile-first responsive container */}
+      <div className="flex items-center justify-center min-h-full px-2 py-4 sm:px-4 sm:py-6">
         {/* Modal */}
-        <div className={`relative inline-block w-full ${sizes[size]} p-6 my-8 overflow-hidden text-left align-middle bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-slate-200 dark:border-slate-600 z-10`}>
+        <div className={`relative inline-block w-full ${sizes[size]} bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-slate-200 dark:border-slate-600 z-10 max-h-[90vh] sm:max-h-[85vh] overflow-hidden`}>
           {/* Header */}
           {(title || showCloseButton) && (
-            <div className="flex items-center justify-between mb-4">
+            <div className="sticky top-0 z-10 flex items-center justify-between p-4 sm:p-6 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
               {title && (
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white pr-2">
                   {title}
                 </h3>
               )}
               {showCloseButton && (
                 <button
                   onClick={onClose}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  className="flex-shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors touch-manipulation"
                   aria-label="Close modal"
                 >
                   <X className="w-5 h-5" />
@@ -57,8 +58,10 @@ const Modal = ({
           )}
           
           {/* Content */}
-          <div className="mt-4">
-            {children}
+          <div className="overflow-y-auto max-h-[calc(90vh-80px)] sm:max-h-[calc(85vh-80px)]">
+            <div className="p-4 sm:p-6">
+              {children}
+            </div>
           </div>
         </div>
       </div>

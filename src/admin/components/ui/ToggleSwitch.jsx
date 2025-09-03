@@ -27,21 +27,21 @@ const ToggleSwitch = ({
     switch (size) {
       case 'sm':
         return {
-          switch: 'h-4 w-7',
+          switch: 'h-5 w-9 min-w-[36px]',
           toggle: 'h-3 w-3',
-          translate: checked ? 'translate-x-3' : 'translate-x-0.5'
+          translate: checked ? 'translate-x-4' : 'translate-x-1'
         }
       case 'lg':
         return {
-          switch: 'h-7 w-12',
+          switch: 'h-8 w-14 min-w-[56px]',
           toggle: 'h-6 w-6',
-          translate: checked ? 'translate-x-5' : 'translate-x-0.5'
+          translate: checked ? 'translate-x-6' : 'translate-x-1'
         }
       default: // md
         return {
-          switch: 'h-5 w-9',
+          switch: 'h-6 w-11 min-w-[44px]',
           toggle: 'h-4 w-4',
-          translate: checked ? 'translate-x-4' : 'translate-x-0.5'
+          translate: checked ? 'translate-x-5' : 'translate-x-1'
         }
     }
   }
@@ -54,10 +54,10 @@ const ToggleSwitch = ({
       onClick={handleToggle}
       disabled={disabled || loading || isToggling}
       className={`
-        relative inline-flex items-center ${switchClass} rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800
+        relative inline-flex items-center ${switchClass} rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 touch-manipulation
         ${disabled || loading || isToggling 
           ? 'cursor-not-allowed opacity-50' 
-          : 'cursor-pointer'
+          : 'cursor-pointer active:scale-95'
         }
         ${checked 
           ? 'bg-blue-600 dark:bg-blue-500' 
