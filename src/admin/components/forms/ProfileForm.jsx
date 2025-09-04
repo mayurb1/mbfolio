@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUserData } from '../../store/authSlice'
-import { useState } from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 import { useToast } from '../../contexts/ToastContext'
@@ -9,12 +8,13 @@ import ImageUpload from '../ui/ImageUpload'
 import { useImageUpload } from '../../hooks/useImageUpload'
 import userService from '../../services/userService'
 import authService from '../../services/authService'
+import { FILE_SIZE_LIMITS_MB } from '../../../constants/fileConstants'
 
 const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
   const dispatch = useDispatch()
   const { user: currentUser, token } = useSelector(state => state.adminAuth)
-  const { handleApiResponse, showError } = useToast()
-  const { uploadImage, uploadingImages, isAnyUploading, isUploading } = useImageUpload('profile')
+  const { handleApiResponse } = useToast()
+  const { uploadImage, isAnyUploading, isUploading } = useImageUpload('profile')
 
   // Use profile data or fallback to current user
   const userData = profile || currentUser
@@ -28,11 +28,12 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     email: Yup.string()
       .required('Email is required')
       .email('Must be a valid email address'),
-    phone: Yup.string()
-      .matches(/^[\+]?[1-9][\d]{0,15}$/, 'Must be a valid phone number'),
-    bio: Yup.string()
-      .max(500, 'Bio cannot exceed 500 characters'),
-    profileImage: Yup.string()
+    phone: Yup.string().matches(
+      /^[\+]?[1-9][\d]{0,15}$/,
+      'Must be a valid phone number'
+    ),
+    bio: Yup.string().max(500, 'Bio cannot exceed 500 characters'),
+    profileImage: Yup.string(),
   })
 
   // Initial form values
@@ -41,20 +42,26 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     email: userData?.email || '',
     phone: userData?.phone || '',
     bio: userData?.bio || '',
-    profileImage: userData?.profileImage || ''
+    profileImage: userData?.profileImage || '',
   }
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
       // Check if any images are still uploading
       if (isAnyUploading()) {
-        setFieldError('general', 'Please wait for profile image upload to complete')
+        setFieldError(
+          'general',
+          'Please wait for profile image upload to complete'
+        )
         return
       }
 
       // Check for any File objects that failed to upload
       if (values.profileImage instanceof File) {
-        setFieldError('profileImage', 'Profile image upload failed. Please try uploading again.')
+        setFieldError(
+          'profileImage',
+          'Profile image upload failed. Please try uploading again.'
+        )
         return
       }
 
@@ -64,7 +71,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         email: values.email.trim(),
         phone: values.phone.trim(),
         bio: values.bio.trim(),
-        profileImage: values.profileImage
+        profileImage: values.profileImage,
       }
 
       // Remove empty fields (except profileImage which needs to be explicitly set to empty for removal)
@@ -76,15 +83,15 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
 
       // Update profile
       const response = await userService.updateProfile(profileData)
-      
+
       // Update Redux store with new user data
       dispatch(updateUserData(response.data.user))
-      
+
       // Update localStorage with new user data (keep existing token)
       authService.storeAuth(token, response.data.user)
-      
+
       handleApiResponse(response)
-      
+
       // Call onSuccess callback
       if (onSuccess) {
         onSuccess()
@@ -100,7 +107,6 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     }
   }
 
-
   return (
     <Formik
       initialValues={initialValues}
@@ -113,7 +119,9 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
           {/* General Error */}
           {errors.general && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4">
-              <p className="text-red-600 dark:text-red-400 text-sm sm:text-base">{errors.general}</p>
+              <p className="text-red-600 dark:text-red-400 text-sm sm:text-base">
+                {errors.general}
+              </p>
             </div>
           )}
 
@@ -126,11 +134,14 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
               <div className="max-w-xs">
                 <ImageUpload
                   value={values.profileImage}
-                  onChange={async (file) => {
+                  onChange={async file => {
                     if (file) {
                       setFieldValue('profileImage', file)
                       try {
-                        const uploadedUrl = await uploadImage(file, 'profileImage')
+                        const uploadedUrl = await uploadImage(
+                          file,
+                          'profileImage'
+                        )
                         if (uploadedUrl) {
                           setFieldValue('profileImage', uploadedUrl)
                         }
@@ -142,15 +153,22 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                   onRemove={() => setFieldValue('profileImage', '')}
                   isUploading={isUploading('profileImage')}
                   placeholder="Select profile image"
-                  maxSize="5MB"
+                  maxSize={FILE_SIZE_LIMITS_MB.PROFILE_IMAGE}
                 />
               </div>
-              <ErrorMessage name="profileImage" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="profileImage"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Name */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Full Name *
               </label>
               <Field
@@ -163,12 +181,19 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="Enter your full name"
               />
-              <ErrorMessage name="name" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="name"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Email Address *
               </label>
               <Field
@@ -181,12 +206,19 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="Enter your email address"
               />
-              <ErrorMessage name="email" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="email"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Phone */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Phone Number
               </label>
               <Field
@@ -199,12 +231,19 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="Enter your phone number"
               />
-              <ErrorMessage name="phone" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="phone"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Bio */}
             <div className="lg:col-span-2">
-              <label htmlFor="bio" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="bio"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Bio
               </label>
               <Field
@@ -218,7 +257,11 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
                 placeholder="Tell us about yourself (max 500 characters)"
               />
-              <ErrorMessage name="bio" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="bio"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
           </div>
 
@@ -242,8 +285,8 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white flex-shrink-0"></div>
               )}
               <span>
-                {isSubmitting 
-                  ? 'Updating...' 
+                {isSubmitting
+                  ? 'Updating...'
                   : isAnyUploading()
                     ? 'Update Profile (Uploading...)'
                     : 'Update Profile'}

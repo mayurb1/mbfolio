@@ -1,4 +1,5 @@
 import api from '../../services/api'
+import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType } from '../../constants/fileConstants'
 
 // Project service for project management APIs
 class ProjectService {
@@ -86,6 +87,20 @@ class ProjectService {
     }
   }
 
+  // Toggle project featured status
+  async toggleProjectFeatured(id) {
+    try {
+      const response = await api.patch(`/projects/${id}/toggle-featured`)
+      return response.data
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to toggle project featured status'
+      )
+    }
+  }
+
   // Get all categories for projects
   async getCategories() {
     try {
@@ -104,22 +119,21 @@ class ProjectService {
   async uploadImage(file) {
     try {
       // Validate file
-      if (!file || !file.type.startsWith('image/')) {
+      if (!file || !isValidImageType(file.type)) {
         throw new Error('Please select a valid image file')
       }
 
-      // Check file size (10MB limit)
-      const maxSize = 10 * 1024 * 1024 // 10MB
-      if (file.size > maxSize) {
-        throw new Error('File size must be less than 10MB')
+      // Check file size using constants
+      if (file.size > FILE_SIZE_LIMITS.PROJECT_IMAGE) {
+        throw new Error(`File size must be less than ${FILE_SIZE_LIMITS_MB.PROJECT_IMAGE}`)
       }
 
       const formData = new FormData()
       formData.append('file', file)
       formData.append('upload_preset', 'project_images')
       formData.append('folder', 'portfolio/projects')
-      formData.append('unique_filename', 'false')
-      
+      // formData.append('unique_filename', 'true')
+
       const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
       if (!cloudName) {
         throw new Error('Cloudinary configuration missing')
@@ -129,35 +143,38 @@ class ProjectService {
         `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
         {
           method: 'POST',
-          body: formData
+          body: formData,
         }
       )
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        
+
         if (response.status === 400) {
-          throw new Error(errorData.error?.message || 'Invalid upload parameters.')
+          throw new Error(
+            errorData.error?.message || 'Invalid upload parameters.'
+          )
         } else if (response.status === 401) {
           throw new Error('Upload preset not found or not configured.')
         } else if (response.status === 413) {
-          throw new Error('File too large. Maximum size is 10MB.')
+          throw new Error(`File too large. Maximum size is ${FILE_SIZE_LIMITS_MB.PROJECT_IMAGE}.`)
         } else {
-          throw new Error(errorData.error?.message || `Upload failed with status ${response.status}`)
+          throw new Error(
+            errorData.error?.message ||
+              `Upload failed with status ${response.status}`
+          )
         }
       }
-      
+
       const data = await response.json()
-      
+
       if (!data.secure_url) {
         throw new Error('Upload completed but no URL returned')
       }
-      
+
       return data.secure_url
     } catch (error) {
-      throw new Error(
-        error.message || 'Failed to upload image'
-      )
+      throw new Error(error.message || 'Failed to upload image')
     }
   }
 

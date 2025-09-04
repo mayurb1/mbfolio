@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useToast } from '../contexts/ToastContext'
 import projectService from '../services/projectService'
 import userService from '../services/userService'
+import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType } from '../../constants/fileConstants'
 
 export const useImageUpload = (serviceType = 'project') => {
   const [uploadingImages, setUploadingImages] = useState({})
@@ -11,15 +12,16 @@ export const useImageUpload = (serviceType = 'project') => {
     if (!file) return null
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    if (!isValidImageType(file.type)) {
       showError('Invalid file type', 'Please select an image file')
       return null
     }
 
-    // Validate file size (10MB limit for projects, 5MB for profiles)
-    const maxSize = serviceType === 'profile' ? 5 * 1024 * 1024 : 10 * 1024 * 1024
+    // Validate file size using constants
+    const sizeType = serviceType === 'profile' ? 'PROFILE_IMAGE' : 'PROJECT_IMAGE'
+    const maxSize = FILE_SIZE_LIMITS[sizeType]
     if (file.size > maxSize) {
-      const maxSizeMB = serviceType === 'profile' ? '5MB' : '10MB'
+      const maxSizeMB = FILE_SIZE_LIMITS_MB[sizeType]
       showError('File too large', `Please select an image smaller than ${maxSizeMB}`)
       return null
     }
