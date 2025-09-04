@@ -8,6 +8,7 @@ const categoriesRoutes = require('./routes/categoriesRoutes')
 const experienceRoutes = require('./routes/experienceRoutes')
 const educationRoutes = require('./routes/educationRoutes')
 const projectRoutes = require('./routes/projectRoutes')
+const masterRoutes = require('./routes/masterRoutes')
 
 dotenv.config()
 connectDB()
@@ -36,6 +37,7 @@ app.use('/api/categories', categoriesRoutes)
 app.use('/api/experience', experienceRoutes)
 app.use('/api/education', educationRoutes)
 app.use('/api/projects', projectRoutes)
+app.use('/api/master', masterRoutes)
 
 // Start server
 const PORT = process.env.PORT || 5000
