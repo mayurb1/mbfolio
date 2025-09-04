@@ -39,12 +39,35 @@ const Experience = () => {
           })
         ])
 
+        // Helper function to generate duration from dates
+        const generateDuration = (startDate, endDate, isOngoing) => {
+          if (!startDate) return 'Not specified'
+          
+          const start = new Date(startDate)
+          const startStr = start.toLocaleDateString('en-US', { 
+            month: 'long', 
+            year: 'numeric' 
+          })
+          
+          if (isOngoing || !endDate) {
+            return `${startStr} – Present`
+          }
+          
+          const end = new Date(endDate)
+          const endStr = end.toLocaleDateString('en-US', { 
+            month: 'long', 
+            year: 'numeric' 
+          })
+          
+          return `${startStr} – ${endStr}`
+        }
+
         // Transform experience data to match existing component structure
         const experienceData = experienceResponse.data.data.experiences.map(exp => ({
           id: exp._id,
           company: exp.company,
           position: exp.position,
-          duration: exp.duration,
+          duration: generateDuration(exp.startDate, exp.endDate, exp.isOngoing),
           location: exp.location,
           type: exp.type,
           logo: exp.logo,
@@ -60,7 +83,7 @@ const Experience = () => {
           id: edu._id,
           institution: edu.institution,
           degree: edu.degree,
-          duration: edu.duration,
+          duration: generateDuration(edu.startDate, edu.endDate, edu.isOngoing),
           location: edu.location,
           gpa: edu.gpa,
           logo: edu.logo,

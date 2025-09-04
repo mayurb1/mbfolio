@@ -217,16 +217,25 @@ const Education = () => {
     }
   }, [dispatch])
 
-  // Format duration for display - parse duration string
-  const formatDuration = durationString => {
-    if (!durationString) return 'Not specified'
-
-    // If it's already in the correct format, return as is
-    if (typeof durationString === 'string') {
-      return durationString
+  // Format date range for display
+  const formatDateRange = (startDate, endDate, isOngoing) => {
+    if (!startDate) return 'No dates specified'
+    
+    const start = new Date(startDate).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short' 
+    })
+    
+    if (isOngoing || !endDate) {
+      return `${start} – Present`
     }
-
-    return 'Not specified'
+    
+    const end = new Date(endDate).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short' 
+    })
+    
+    return `${start} – ${end}`
   }
 
   return (
@@ -353,7 +362,7 @@ const Education = () => {
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-2 text-sm text-text-secondary">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span>{formatDuration(educationRecord.duration)}</span>
+                      <span>{formatDateRange(educationRecord.startDate, educationRecord.endDate, educationRecord.isOngoing)}</span>
                     </div>
                     {educationRecord.location && (
                       <div className="flex items-center gap-2 text-sm text-text-secondary">

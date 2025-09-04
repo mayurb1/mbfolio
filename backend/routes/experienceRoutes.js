@@ -91,7 +91,9 @@ router.post("/", authenticateToken, async (req, res) => {
     const {
       company,
       position,
-      duration,
+      startDate,
+      endDate,
+      isOngoing,
       location,
       type,
       logo,
@@ -119,7 +121,9 @@ router.post("/", authenticateToken, async (req, res) => {
     const experience = new Experience({
       company,
       position,
-      duration,
+      startDate,
+      endDate,
+      isOngoing,
       location,
       type,
       logo,
@@ -168,7 +172,9 @@ router.put("/:id", authenticateToken, async (req, res) => {
     const {
       company,
       position,
-      duration,
+      startDate,
+      endDate,
+      isOngoing,
       location,
       type,
       logo,
@@ -211,7 +217,9 @@ router.put("/:id", authenticateToken, async (req, res) => {
       {
         company,
         position,
-        duration,
+        startDate,
+      endDate,
+      isOngoing,
         location,
         type,
         logo,
