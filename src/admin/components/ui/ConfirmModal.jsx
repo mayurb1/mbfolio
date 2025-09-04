@@ -50,29 +50,29 @@ const ConfirmModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xs" showCloseButton={false}>
-      <div className="p-4">
-        <div className="flex items-start space-x-3">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
           {/* Icon */}
-          <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${styles.iconBg}`}>
-            <AlertTriangle className={`w-5 h-5 ${styles.icon}`} />
+          <div className={`flex-shrink-0 w-12 h-12 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mx-auto sm:mx-0 ${styles.iconBg}`}>
+            <AlertTriangle className={`w-6 h-6 sm:w-5 sm:h-5 ${styles.icon}`} />
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            <h3 className="text-lg sm:text-base font-semibold text-slate-900 dark:text-white mb-2 sm:mb-1">
               {title}
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 sm:mb-4">
               {message}
             </p>
 
             {/* Actions */}
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="flex flex-col-reverse sm:flex-row justify-center sm:justify-end space-y-reverse space-y-3 sm:space-y-0 sm:space-x-3">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
               >
                 {cancelText}
               </button>
@@ -80,10 +80,10 @@ const ConfirmModal = ({
                 type="button"
                 onClick={handleConfirm}
                 disabled={loading}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${styles.confirmBtn}`}
+                className={`w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-white rounded-md focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation ${styles.confirmBtn}`}
               >
                 {loading && (
-                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2 inline-block"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 sm:h-3 sm:w-3 border-b-2 border-white mr-2 inline-block"></div>
                 )}
                 {confirmText}
               </button>

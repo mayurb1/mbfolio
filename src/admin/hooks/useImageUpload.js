@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react'
 import { useToast } from '../contexts/ToastContext'
 import projectService from '../services/projectService'
+import userService from '../services/userService'
+import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType } from '../../constants/fileConstants'
 
-export const useImageUpload = () => {
+export const useImageUpload = (serviceType = 'project') => {
   const [uploadingImages, setUploadingImages] = useState({})
   const { showError, showSuccess } = useToast()
 
@@ -10,22 +12,26 @@ export const useImageUpload = () => {
     if (!file) return null
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    if (!isValidImageType(file.type)) {
       showError('Invalid file type', 'Please select an image file')
       return null
     }
 
-    // Validate file size (10MB limit)
-    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+    // Validate file size using constants
+    const sizeType = serviceType === 'profile' ? 'PROFILE_IMAGE' : 'PROJECT_IMAGE'
+    const maxSize = FILE_SIZE_LIMITS[sizeType]
     if (file.size > maxSize) {
-      showError('File too large', 'Please select an image smaller than 10MB')
+      const maxSizeMB = FILE_SIZE_LIMITS_MB[sizeType]
+      showError('File too large', `Please select an image smaller than ${maxSizeMB}`)
       return null
     }
 
     try {
       setUploadingImages(prev => ({ ...prev, [identifier]: true }))
       
-      const imageUrl = await projectService.uploadImage(file)
+      const imageUrl = serviceType === 'profile' 
+        ? await userService.uploadProfileImage(file)
+        : await projectService.uploadImage(file)
       
       showSuccess('Image uploaded successfully')
       
@@ -37,7 +43,7 @@ export const useImageUpload = () => {
     } finally {
       setUploadingImages(prev => ({ ...prev, [identifier]: false }))
     }
-  }, [showError, showSuccess])
+  }, [showError, showSuccess, serviceType])
 
   const uploadMultipleImages = useCallback(async (files, identifierPrefix = 'image') => {
     if (!files || files.length === 0) return []

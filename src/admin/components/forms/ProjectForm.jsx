@@ -7,7 +7,11 @@ import Button from '../ui/Button'
 import ImageUpload from '../ui/ImageUpload'
 import MultiImageUpload from '../ui/MultiImageUpload'
 import MultiSelect from '../ui/MultiSelect'
-import { createProject, updateProject, fetchProjects } from '../../store/projectSlice'
+import {
+  createProject,
+  updateProject,
+  fetchProjects,
+} from '../../store/projectSlice'
 import { useImageUpload } from '../../hooks/useImageUpload'
 import categoriesService from '../../services/categoriesService'
 import skillsService from '../../services/skillsService'
@@ -16,7 +20,8 @@ import { Plus, X } from 'lucide-react'
 const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
   const dispatch = useDispatch()
   const { handleApiResponse, showError } = useToast()
-  const { uploadImage, uploadingImages, isAnyUploading } = useImageUpload()
+  const { uploadImage, uploadingImages, isAnyUploading, isUploading } =
+    useImageUpload()
   const isEditing = !!project
 
   // State for dynamic data
@@ -30,21 +35,16 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     const fetchCategories = async () => {
       try {
         setLoadingCategories(true)
-        const response = await categoriesService.getAllCategories({ isActive: true, limit: 1000 })
+        const response = await categoriesService.getAllCategories({
+          isActive: true,
+          limit: 1000,
+        })
         setCategories(response.data.categories || [])
       } catch (error) {
         console.error('Error fetching categories:', error)
         showError('Failed to load categories', error.message)
         // Fallback to hardcoded categories if API fails
-        setCategories([
-          { _id: '1', name: 'Full-Stack' },
-          { _id: '2', name: 'Frontend' },
-          { _id: '3', name: 'Backend' },
-          { _id: '4', name: 'Mobile' },
-          { _id: '5', name: 'Data Science' },
-          { _id: '6', name: 'DevOps' },
-          { _id: '7', name: 'Other' }
-        ])
+        setCategories([])
       } finally {
         setLoadingCategories(false)
       }
@@ -58,7 +58,10 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     const fetchSkills = async () => {
       try {
         setLoadingSkills(true)
-        const response = await skillsService.getAllSkills({ isActive: true, limit: 100 })
+        const response = await skillsService.getAllSkills({
+          isActive: true,
+          limit: 100,
+        })
         setSkills(response.data.skills || [])
       } catch (error) {
         console.error('Error fetching skills:', error)
@@ -83,8 +86,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     fullDescription: Yup.string()
       .required('Full description is required')
       .max(2000, 'Full description cannot exceed 2000 characters'),
-    category: Yup.string()
-      .required('Category is required'),
+    category: Yup.string().required('Category is required'),
     status: Yup.string()
       .oneOf(['completed', 'ongoing', 'planned', 'archived'])
       .default('completed'),
@@ -98,7 +100,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     github: Yup.string().url('Must be a valid URL'),
     demo: Yup.string().url('Must be a valid URL'),
     duration: Yup.string().max(50, 'Duration too long'),
-    team: Yup.string().max(100, 'Team info too long')
+    team: Yup.string().max(100, 'Team info too long'),
   })
 
   // Initial form values
@@ -106,12 +108,13 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     title: project?.title || '',
     description: project?.description || '',
     fullDescription: project?.fullDescription || '',
-    category: project?.category?._id || project?.category || '',  // Handle both populated and non-populated category
+    category: project?.category?._id || project?.category || '', // Handle both populated and non-populated category
     status: project?.status || 'completed',
     type: project?.type || 'personal',
-    technologies: project?.technologies?.map(tech => 
-      typeof tech === 'object' && tech._id ? tech._id : tech  // Handle both populated objects and IDs
-    ) || [],
+    technologies:
+      project?.technologies?.map(
+        tech => (typeof tech === 'object' && tech._id ? tech._id : tech) // Handle both populated objects and IDs
+      ) || [],
     highlights: project?.highlights || [''],
     images: project?.images || [],
     mainImage: project?.mainImage || '',
@@ -120,7 +123,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
     duration: project?.duration || '',
     team: project?.team || '',
     featured: project?.featured || false,
-    isActive: project?.isActive !== false
+    isActive: project?.isActive !== false,
   }
 
   // Static options
@@ -129,38 +132,28 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
-      // Upload images first
-      let uploadedMainImage = values.mainImage
-      let uploadedImages = [...values.images]
-
-      // Upload main image if it's a File object
-      if (values.mainImage instanceof File) {
-        try {
-          uploadedMainImage = await uploadImage(values.mainImage, 'mainImage')
-          if (!uploadedMainImage) {
-            setFieldError('mainImage', 'Failed to upload main image')
-            return
-          }
-        } catch (error) {
-          setFieldError('mainImage', `Failed to upload main image: ${error.message}`)
-          return
-        }
+      // Check if any images are still uploading
+      if (isAnyUploading()) {
+        setFieldError('general', 'Please wait for image uploads to complete')
+        return
       }
 
-      // Upload additional images if they are File objects
+      // Check for any File objects that failed to upload
+      if (values.mainImage instanceof File) {
+        setFieldError(
+          'mainImage',
+          'Main image upload failed. Please try uploading again.'
+        )
+        return
+      }
+
       for (let i = 0; i < values.images.length; i++) {
         if (values.images[i] instanceof File) {
-          try {
-            const uploadedUrl = await uploadImage(values.images[i], `image_${i}`)
-            if (!uploadedUrl) {
-              setFieldError('images', `Failed to upload image ${i + 1}`)
-              return
-            }
-            uploadedImages[i] = uploadedUrl
-          } catch (error) {
-            setFieldError('images', `Failed to upload image ${i + 1}: ${error.message}`)
-            return
-          }
+          setFieldError(
+            'images',
+            `Image ${i + 1} upload failed. Please try uploading again.`
+          )
+          return
         }
       }
 
@@ -170,10 +163,12 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
       // Filter out empty strings from arrays
       const cleanedValues = {
         ...values,
-        mainImage: uploadedMainImage,
-        images: uploadedImages.filter(img => img && img.trim()),
+        mainImage: values.mainImage,
+        images: values.images.filter(
+          img => img && img.trim() && typeof img === 'string'
+        ),
         technologies: technologyIds,
-        highlights: values.highlights.filter(highlight => highlight.trim())
+        highlights: values.highlights.filter(highlight => highlight.trim()),
       }
 
       // Validate that at least one technology is provided
@@ -184,13 +179,15 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
 
       let response
       if (isEditing) {
-        response = await dispatch(updateProject({ id: project._id, projectData: cleanedValues })).unwrap()
+        response = await dispatch(
+          updateProject({ id: project._id, projectData: cleanedValues })
+        ).unwrap()
       } else {
         response = await dispatch(createProject(cleanedValues)).unwrap()
       }
-      
+
       handleApiResponse(response)
-      
+
       // Call onSuccess callback to refresh project list
       if (onSuccess) {
         onSuccess()
@@ -198,7 +195,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
         // Fallback: dispatch fetchProjects if onSuccess not provided
         dispatch(fetchProjects({ page: 1, limit: 10 }))
       }
-      
+
       // Always call onCancel to close the modal
       if (onCancel) {
         onCancel()
@@ -222,18 +219,23 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
       enableReinitialize
     >
       {({ isSubmitting, errors, touched, values, setFieldValue }) => (
-        <Form className="space-y-6">
+        <Form className="space-y-4 sm:space-y-6">
           {/* General Error */}
           {errors.general && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-red-600 dark:text-red-400">{errors.general}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4">
+              <p className="text-red-600 dark:text-red-400 text-sm sm:text-base">
+                {errors.general}
+              </p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Project Title *
               </label>
               <Field
@@ -246,12 +248,19 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="Enter project title"
               />
-              <ErrorMessage name="title" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="title"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Category */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Category *
               </label>
               <Field
@@ -279,12 +288,19 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                   </>
                 )}
               </Field>
-              <ErrorMessage name="category" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="category"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Status */}
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Status
               </label>
               <Field
@@ -297,15 +313,24 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
               >
                 {statuses.map(status => (
-                  <option key={status} value={status} className="capitalize">{status}</option>
+                  <option key={status} value={status} className="capitalize">
+                    {status}
+                  </option>
                 ))}
               </Field>
-              <ErrorMessage name="status" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="status"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Type */}
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="type"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Type
               </label>
               <Field
@@ -318,15 +343,24 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
               >
                 {types.map(type => (
-                  <option key={type} value={type} className="capitalize">{type}</option>
+                  <option key={type} value={type} className="capitalize">
+                    {type}
+                  </option>
                 ))}
               </Field>
-              <ErrorMessage name="type" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="type"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Duration */}
             <div>
-              <label htmlFor="duration" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="duration"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Duration
               </label>
               <Field
@@ -339,12 +373,19 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="e.g., 3 months, 2 weeks"
               />
-              <ErrorMessage name="duration" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="duration"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Team */}
             <div>
-              <label htmlFor="team" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="team"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Team
               </label>
               <Field
@@ -357,12 +398,19 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="e.g., Solo, Team of 4"
               />
-              <ErrorMessage name="team" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="team"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* GitHub URL */}
             <div>
-              <label htmlFor="github" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="github"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 GitHub URL
               </label>
               <Field
@@ -375,12 +423,19 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="https://github.com/username/repo"
               />
-              <ErrorMessage name="github" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="github"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Demo URL */}
             <div>
-              <label htmlFor="demo" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label
+                htmlFor="demo"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Demo URL
               </label>
               <Field
@@ -393,29 +448,50 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
                 placeholder="https://demo.example.com"
               />
-              <ErrorMessage name="demo" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="demo"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Main Image Upload */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Main Project Image
               </label>
               <ImageUpload
                 value={values.mainImage}
-                onChange={(file) => {
-                  setFieldValue('mainImage', file)
+                onChange={async file => {
+                  if (file) {
+                    setFieldValue('mainImage', file)
+                    try {
+                      const uploadedUrl = await uploadImage(file, 'mainImage')
+                      if (uploadedUrl) {
+                        setFieldValue('mainImage', uploadedUrl)
+                      }
+                    } catch (error) {
+                      console.error('Background upload failed:', error)
+                    }
+                  }
                 }}
                 onRemove={() => setFieldValue('mainImage', '')}
-                isUploading={false}
+                isUploading={isUploading('mainImage')}
                 placeholder="Select main project image"
               />
-              <ErrorMessage name="mainImage" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="mainImage"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Short Description */}
-            <div className="md:col-span-2">
-              <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <div className="lg:col-span-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Short Description *
               </label>
               <Field
@@ -429,18 +505,25 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
                 placeholder="Brief project description (max 500 characters)"
               />
-              <ErrorMessage name="description" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="description"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Full Description */}
-            <div className="md:col-span-2">
-              <label htmlFor="fullDescription" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <div className="lg:col-span-2">
+              <label
+                htmlFor="fullDescription"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
                 Full Description *
               </label>
               <Field
                 as="textarea"
                 name="fullDescription"
-                rows={6}
+                rows={5}
                 className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.fullDescription && touched.fullDescription
                     ? 'border-red-300 dark:border-red-600'
@@ -448,11 +531,15 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
                 placeholder="Detailed project description (max 2000 characters)"
               />
-              <ErrorMessage name="fullDescription" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="fullDescription"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Technologies */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Technologies *
               </label>
@@ -461,21 +548,29 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                   <MultiSelect
                     options={skills}
                     value={field.value}
-                    onChange={(selectedValues) => form.setFieldValue('technologies', selectedValues)}
+                    onChange={selectedValues =>
+                      form.setFieldValue('technologies', selectedValues)
+                    }
                     placeholder="Select technologies used in this project..."
                     loading={loadingSkills}
-                    error={form.errors.technologies && form.touched.technologies}
+                    error={
+                      form.errors.technologies && form.touched.technologies
+                    }
                     searchable={true}
-                    getOptionLabel={(skill) => skill.name}
-                    getOptionValue={(skill) => skill._id}
+                    getOptionLabel={skill => skill.name}
+                    getOptionValue={skill => skill._id}
                   />
                 )}
               </Field>
-              <ErrorMessage name="technologies" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+              <ErrorMessage
+                name="technologies"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
             </div>
 
             {/* Highlights */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Key Highlights
               </label>
@@ -497,7 +592,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                             variant="outline"
                             size="sm"
                             onClick={() => remove(index)}
-                            className="p-2"
+                            className="p-2 flex-shrink-0"
                           >
                             <X size={16} />
                           </Button>
@@ -509,10 +604,10 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                       variant="outline"
                       size="sm"
                       onClick={() => push('')}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 w-full sm:w-auto justify-center"
                     >
                       <Plus size={16} />
-                      Add Highlight
+                      <span>Add Highlight</span>
                     </Button>
                   </div>
                 )}
@@ -520,10 +615,15 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Additional Images */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
               <MultiImageUpload
                 images={values.images}
-                onImagesChange={(file, index, action = 'add', newImages = null) => {
+                onImagesChange={async (
+                  file,
+                  index,
+                  action = 'add',
+                  newImages = null
+                ) => {
                   if (action === 'remove') {
                     setFieldValue('images', newImages || [])
                   } else if (file) {
@@ -534,9 +634,24 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                       updatedImages[index] = file
                     }
                     setFieldValue('images', updatedImages)
+
+                    // Upload in background
+                    try {
+                      const uploadedUrl = await uploadImage(
+                        file,
+                        `image_${index}`
+                      )
+                      if (uploadedUrl) {
+                        const finalImages = [...updatedImages]
+                        finalImages[index] = uploadedUrl
+                        setFieldValue('images', finalImages)
+                      }
+                    } catch (error) {
+                      console.error('Background upload failed:', error)
+                    }
                   }
                 }}
-                isUploading={{}}
+                isUploading={uploadingImages}
                 maxImages={5}
               />
             </div>
@@ -571,28 +686,33 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-700">
             <Button
               type="button"
               variant="outline"
               onClick={onCancel}
               disabled={isSubmitting}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto order-1 sm:order-2"
             >
               {isSubmitting && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white flex-shrink-0"></div>
               )}
-              {isSubmitting 
-                ? 'Saving & Uploading Images...' 
-                : isEditing 
-                  ? 'Update Project' 
-                  : 'Add Project'}
+              <span>
+                {isSubmitting
+                  ? 'Saving...'
+                  : isAnyUploading()
+                    ? `${isEditing ? 'Update' : 'Add'} Project (Uploading...)`
+                    : isEditing
+                      ? 'Update Project'
+                      : 'Add Project'}
+              </span>
             </Button>
           </div>
         </Form>

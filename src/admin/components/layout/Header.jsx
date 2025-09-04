@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Menu, Moon, Sun, User, LogOut, ChevronDown } from 'lucide-react'
 import { logoutAdmin } from '../../store/authSlice'
 import { useTheme } from '../../../contexts/ThemeContext'
@@ -9,6 +10,7 @@ import Modal from '../ui/Modal'
 
 const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { handleApiError, handleApiResponse } = useToast()
   const { user } = useSelector(state => state.adminAuth)
   const { currentTheme, changeTheme } = useTheme()
@@ -85,8 +87,16 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center space-x-2 p-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
               >
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center overflow-hidden">
+                  {user?.profileImage ? (
+                    <img 
+                      src={user.profileImage} 
+                      alt={user.name || 'Profile'} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-4 h-4 text-white" />
+                  )}
                 </div>
                 <div className="hidden sm:block text-left">
                   <div className="text-sm font-medium">
@@ -101,7 +111,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
 
               {/* Dropdown menu */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
+                <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
                   <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
                     <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
                       {user?.name || 'Admin'}
@@ -114,20 +124,20 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
                   <button
                     onClick={() => {
                       setShowUserMenu(false)
-                      // Add profile/settings navigation here
+                      navigate('/admin/profile')
                     }}
-                    className="flex items-center w-full px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    className="flex items-center w-full px-4 py-3 sm:py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 touch-manipulation"
                   >
-                    <User className="w-4 h-4 mr-2" />
-                    Profile Settings
+                    <User className="w-4 h-4 mr-3 sm:mr-2 flex-shrink-0" />
+                    <span>Profile Settings</span>
                   </button>
 
                   <button
                     onClick={confirmLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="flex items-center w-full px-4 py-3 sm:py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation"
                   >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign out
+                    <LogOut className="w-4 h-4 mr-3 sm:mr-2 flex-shrink-0" />
+                    <span>Sign out</span>
                   </button>
                 </div>
               )}
