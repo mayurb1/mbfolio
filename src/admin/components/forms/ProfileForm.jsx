@@ -32,8 +32,30 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
       /^[\+]?[1-9][\d]{0,15}$/,
       'Must be a valid phone number'
     ),
-    bio: Yup.string().max(500, 'Bio cannot exceed 500 characters'),
+    bio: Yup.string().max(1000, 'Bio cannot exceed 1000 characters'),
     profileImage: Yup.string(),
+    linkedUrl: Yup.string().url('Must be a valid URL'),
+    githubUrl: Yup.string()
+      .url('Must be a valid URL')
+      .matches(
+        /^https?:\/\/(www\.)?github\.com\/.+/,
+        'Must be a valid GitHub URL'
+      ),
+    location: Yup.object().shape({
+      coordinates: Yup.object().shape({
+        latitude: Yup.number()
+          .min(-90, 'Latitude must be between -90 and 90')
+          .max(90, 'Latitude must be between -90 and 90'),
+        longitude: Yup.number()
+          .min(-180, 'Longitude must be between -180 and 180')
+          .max(180, 'Longitude must be between -180 and 180'),
+      }),
+      address: Yup.string().max(200, 'Address cannot exceed 200 characters'),
+      city: Yup.string().max(100, 'City cannot exceed 100 characters'),
+      state: Yup.string().max(100, 'State cannot exceed 100 characters'),
+      country: Yup.string().max(100, 'Country cannot exceed 100 characters'),
+      zipCode: Yup.string().max(20, 'Zip code cannot exceed 20 characters'),
+    }),
   })
 
   // Initial form values
@@ -43,6 +65,19 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     phone: userData?.phone || '',
     bio: userData?.bio || '',
     profileImage: userData?.profileImage || '',
+    linkedUrl: userData?.linkedUrl || '',
+    githubUrl: userData?.githubUrl || '',
+    location: {
+      coordinates: {
+        latitude: userData?.location?.coordinates?.latitude || '',
+        longitude: userData?.location?.coordinates?.longitude || '',
+      },
+      address: userData?.location?.address || '',
+      city: userData?.location?.city || '',
+      state: userData?.location?.state || '',
+      country: userData?.location?.country || '',
+      zipCode: userData?.location?.zipCode || '',
+    },
   }
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
@@ -72,6 +107,23 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         phone: values.phone.trim(),
         bio: values.bio.trim(),
         profileImage: values.profileImage,
+        linkedUrl: values.linkedUrl.trim(),
+        githubUrl: values.githubUrl.trim(),
+        location: {
+          coordinates: {
+            latitude: values.location.coordinates.latitude
+              ? parseFloat(values.location.coordinates.latitude)
+              : undefined,
+            longitude: values.location.coordinates.longitude
+              ? parseFloat(values.location.coordinates.longitude)
+              : undefined,
+          },
+          address: values.location.address.trim(),
+          city: values.location.city.trim(),
+          state: values.location.state.trim(),
+          country: values.location.country.trim(),
+          zipCode: values.location.zipCode.trim(),
+        },
       }
 
       // Remove empty fields (except profileImage which needs to be explicitly set to empty for removal)
@@ -262,6 +314,241 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 component="div"
                 className="mt-1 text-sm text-red-600 dark:text-red-400"
               />
+            </div>
+
+            {/* LinkedIn URL */}
+            <div>
+              <label
+                htmlFor="linkedUrl"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
+                LinkedIn URL
+              </label>
+              <Field
+                type="url"
+                name="linkedUrl"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.linkedUrl && touched.linkedUrl
+                    ? 'border-red-300 dark:border-red-600'
+                    : 'border-slate-300 dark:border-slate-600'
+                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                placeholder="https://linkedin.com/in/yourprofile"
+              />
+              <ErrorMessage
+                name="linkedUrl"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
+            </div>
+
+            {/* GitHub URL */}
+            <div>
+              <label
+                htmlFor="githubUrl"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
+                GitHub URL
+              </label>
+              <Field
+                type="url"
+                name="githubUrl"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.githubUrl && touched.githubUrl
+                    ? 'border-red-300 dark:border-red-600'
+                    : 'border-slate-300 dark:border-slate-600'
+                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                placeholder="https://github.com/yourusername"
+              />
+              <ErrorMessage
+                name="githubUrl"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
+            </div>
+
+            {/* Location Section */}
+            <div className="lg:col-span-2">
+              <h4 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-4">
+                Location Information
+              </h4>
+
+              {/* Coordinates */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    htmlFor="location.coordinates.latitude"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    Latitude
+                  </label>
+                  <Field
+                    type="number"
+                    name="location.coordinates.latitude"
+                    step="any"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.coordinates?.latitude &&
+                      touched.location?.coordinates?.latitude
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="40.7128"
+                  />
+                  <ErrorMessage
+                    name="location.coordinates.latitude"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="location.coordinates.longitude"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    Longitude
+                  </label>
+                  <Field
+                    type="number"
+                    name="location.coordinates.longitude"
+                    step="any"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.coordinates?.longitude &&
+                      touched.location?.coordinates?.longitude
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="-74.0060"
+                  />
+                  <ErrorMessage
+                    name="location.coordinates.longitude"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+              </div>
+
+              {/* Address Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="location.address"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    Address
+                  </label>
+                  <Field
+                    type="text"
+                    name="location.address"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.address && touched.location?.address
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="123 Main Street"
+                  />
+                  <ErrorMessage
+                    name="location.address"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="location.city"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    City
+                  </label>
+                  <Field
+                    type="text"
+                    name="location.city"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.city && touched.location?.city
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="New York"
+                  />
+                  <ErrorMessage
+                    name="location.city"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="location.state"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    State/Province
+                  </label>
+                  <Field
+                    type="text"
+                    name="location.state"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.state && touched.location?.state
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="NY"
+                  />
+                  <ErrorMessage
+                    name="location.state"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="location.country"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    Country
+                  </label>
+                  <Field
+                    type="text"
+                    name="location.country"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.country && touched.location?.country
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="United States"
+                  />
+                  <ErrorMessage
+                    name="location.country"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="location.zipCode"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
+                    Zip/Postal Code
+                  </label>
+                  <Field
+                    type="text"
+                    name="location.zipCode"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.location?.zipCode && touched.location?.zipCode
+                        ? 'border-red-300 dark:border-red-600'
+                        : 'border-slate-300 dark:border-slate-600'
+                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    placeholder="10001"
+                  />
+                  <ErrorMessage
+                    name="location.zipCode"
+                    component="div"
+                    className="mt-1 text-sm text-red-600 dark:text-red-400"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

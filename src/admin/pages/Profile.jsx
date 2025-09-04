@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { User, Mail, Calendar, Shield } from 'lucide-react'
+import { User, Mail, Calendar, Shield, Github, Linkedin, MapPin } from 'lucide-react'
 import AdminLayout from '../components/layout/AdminLayout'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
@@ -138,6 +138,28 @@ const Profile = () => {
                     Member since {new Date(profile.createdAt).toLocaleDateString()}
                   </p>
                 )}
+                {profile?.linkedUrl && (
+                  <p className="text-text-secondary flex items-center gap-2 mt-1">
+                    <Linkedin className="w-4 h-4" />
+                    <a href={profile.linkedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                      LinkedIn Profile
+                    </a>
+                  </p>
+                )}
+                {profile?.githubUrl && (
+                  <p className="text-text-secondary flex items-center gap-2 mt-1">
+                    <Github className="w-4 h-4" />
+                    <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                      GitHub Profile
+                    </a>
+                  </p>
+                )}
+                {(profile?.location?.city || profile?.location?.country) && (
+                  <p className="text-text-secondary flex items-center gap-2 mt-1">
+                    <MapPin className="w-4 h-4" />
+                    {[profile?.location?.city, profile?.location?.state, profile?.location?.country].filter(Boolean).join(', ')}
+                  </p>
+                )}
               </div>
 
               {/* Action Buttons */}
@@ -178,10 +200,75 @@ const Profile = () => {
                   <p className="text-text">{profile.phone}</p>
                 </div>
               )}
+              {profile.linkedUrl && (
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">LinkedIn URL</label>
+                  <a href={profile.linkedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 break-all">
+                    {profile.linkedUrl}
+                  </a>
+                </div>
+              )}
+              {profile.githubUrl && (
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">GitHub URL</label>
+                  <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 break-all">
+                    {profile.githubUrl}
+                  </a>
+                </div>
+              )}
               {profile.bio && (
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-text-secondary mb-1">Bio</label>
                   <p className="text-text">{profile.bio}</p>
+                </div>
+              )}
+              
+              {/* Location Information */}
+              {(profile.location?.coordinates?.latitude || profile.location?.address || profile.location?.city) && (
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-text-secondary mb-2">Location Information</label>
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {(profile.location?.coordinates?.latitude && profile.location?.coordinates?.longitude) && (
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-medium text-text-secondary mb-1">Coordinates</label>
+                          <p className="text-sm text-text">
+                            {profile.location.coordinates.latitude}°, {profile.location.coordinates.longitude}°
+                          </p>
+                        </div>
+                      )}
+                      {profile.location?.address && (
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-medium text-text-secondary mb-1">Address</label>
+                          <p className="text-sm text-text">{profile.location.address}</p>
+                        </div>
+                      )}
+                      {profile.location?.city && (
+                        <div>
+                          <label className="block text-xs font-medium text-text-secondary mb-1">City</label>
+                          <p className="text-sm text-text">{profile.location.city}</p>
+                        </div>
+                      )}
+                      {profile.location?.state && (
+                        <div>
+                          <label className="block text-xs font-medium text-text-secondary mb-1">State</label>
+                          <p className="text-sm text-text">{profile.location.state}</p>
+                        </div>
+                      )}
+                      {profile.location?.country && (
+                        <div>
+                          <label className="block text-xs font-medium text-text-secondary mb-1">Country</label>
+                          <p className="text-sm text-text">{profile.location.country}</p>
+                        </div>
+                      )}
+                      {profile.location?.zipCode && (
+                        <div>
+                          <label className="block text-xs font-medium text-text-secondary mb-1">Zip Code</label>
+                          <p className="text-sm text-text">{profile.location.zipCode}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
