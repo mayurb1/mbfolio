@@ -16,6 +16,7 @@ import Categories from './pages/Categories'
 import Experiences from './pages/Experiences'
 import Education from './pages/Education'
 import Projects from './pages/Projects'
+import Profile from './pages/Profile'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 const AdminContent = () => {
@@ -121,6 +122,14 @@ const AdminContent = () => {
         element={
           <ProtectedRoute>
             <Projects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         }
       />

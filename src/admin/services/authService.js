@@ -99,9 +99,24 @@ class AuthService {
   // Change password
   async changePassword(passwordData) {
     try {
-      const response = await api.put('/auth/change-password', passwordData)
+      // Try the standard change-password endpoint first
+      const response = await api.patch('/auth/change-password', passwordData)
       return response.data
     } catch (error) {
+      // If the endpoint doesn't exist (404), try updating via /auth/me
+      if (error.response?.status === 404) {
+        try {
+          const response = await api.patch('/auth/me', passwordData)
+          return response.data
+        } catch (fallbackError) {
+          throw new Error(
+            fallbackError.response?.data?.message || 
+            fallbackError.message || 
+            'Password change failed'
+          )
+        }
+      }
+      
       throw new Error(
         error.response?.data?.message || 
         error.message || 

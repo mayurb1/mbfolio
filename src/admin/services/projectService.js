@@ -58,20 +58,6 @@ class ProjectService {
     }
   }
 
-  // Partial update project
-  async patchProject(id, projectData) {
-    try {
-      const response = await api.patch(`/projects/${id}`, projectData)
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message ||
-          error.message ||
-          'Failed to update project'
-      )
-    }
-  }
-
   // Delete project
   async deleteProject(id) {
     try {
@@ -82,33 +68,6 @@ class ProjectService {
         error.response?.data?.message ||
           error.message ||
           'Failed to delete project'
-      )
-    }
-  }
-
-  // Bulk operations
-  async bulkCreateProjects(projectData) {
-    try {
-      const response = await api.post('/projects/bulk', { projects: projectData })
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message ||
-          error.message ||
-          'Failed to bulk create projects'
-      )
-    }
-  }
-
-  async bulkToggleActive(projectIds, isActive) {
-    try {
-      const response = await api.patch('/projects/bulk/toggle', { projectIds, isActive })
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message ||
-          error.message ||
-          'Failed to toggle project status'
       )
     }
   }
@@ -127,83 +86,21 @@ class ProjectService {
     }
   }
 
-  // Toggle project featured status
-  async toggleProjectFeatured(id) {
+  // Get all categories for projects
+  async getCategories() {
     try {
-      const response = await api.patch(`/projects/${id}/toggle-featured`)
+      const response = await api.get('/categories')
       return response.data
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
           error.message ||
-          'Failed to toggle project featured status'
+          'Failed to fetch categories'
       )
     }
   }
 
-  // Generate file hash for deduplication
-  async generateFileHash(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        try {
-          const buffer = e.target.result
-          const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
-          const hashArray = Array.from(new Uint8Array(hashBuffer))
-          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-          resolve(hashHex)
-        } catch (error) {
-          reject(error)
-        }
-      }
-      reader.onerror = () => reject(new Error('Failed to read file'))
-      reader.readAsArrayBuffer(file)
-    })
-  }
-
-  // Check if image with same hash exists in uploaded images cache
-  checkImageCache(fileHash) {
-    const imageCache = JSON.parse(localStorage.getItem('uploadedImagesCache') || '{}')
-    return imageCache[fileHash] || null
-  }
-
-  // Save uploaded image hash and URL to cache
-  saveToImageCache(fileHash, imageUrl, fileName) {
-    const imageCache = JSON.parse(localStorage.getItem('uploadedImagesCache') || '{}')
-    imageCache[fileHash] = {
-      url: imageUrl,
-      fileName,
-      uploadedAt: new Date().toISOString()
-    }
-    // Keep only last 100 entries to prevent localStorage bloat
-    const entries = Object.entries(imageCache)
-    if (entries.length > 100) {
-      const sortedEntries = entries.sort((a, b) => new Date(b[1].uploadedAt) - new Date(a[1].uploadedAt))
-      const limitedCache = Object.fromEntries(sortedEntries.slice(0, 100))
-      localStorage.setItem('uploadedImagesCache', JSON.stringify(limitedCache))
-    } else {
-      localStorage.setItem('uploadedImagesCache', JSON.stringify(imageCache))
-    }
-  }
-
-  // Clear image cache (useful for testing or when needed)
-  clearImageCache() {
-    localStorage.removeItem('uploadedImagesCache')
-  }
-
-  // Get cache statistics for debugging
-  getImageCacheStats() {
-    const imageCache = JSON.parse(localStorage.getItem('uploadedImagesCache') || '{}')
-    return {
-      totalEntries: Object.keys(imageCache).length,
-      oldestEntry: Object.values(imageCache).reduce((oldest, current) => 
-        !oldest || new Date(current.uploadedAt) < new Date(oldest.uploadedAt) ? current : oldest, null),
-      newestEntry: Object.values(imageCache).reduce((newest, current) => 
-        !newest || new Date(current.uploadedAt) > new Date(newest.uploadedAt) ? current : newest, null)
-    }
-  }
-
-  // Upload project image to Cloudinary with deduplication
+  // Upload project image to Cloudinary
   async uploadImage(file) {
     try {
       // Validate file
@@ -217,20 +114,11 @@ class ProjectService {
         throw new Error('File size must be less than 10MB')
       }
 
-      // Generate file hash for deduplication
-      const fileHash = await this.generateFileHash(file)
-      
-      // Check if this exact file has been uploaded before
-      const cachedImage = this.checkImageCache(fileHash)
-      if (cachedImage) {
-        console.log('Image already exists, using cached URL:', cachedImage.url)
-        return cachedImage.url
-      }
-
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', 'project_images') // Upload preset name
-      formData.append('folder', 'portfolio/projects') // Optional: organize in folders
+      formData.append('upload_preset', 'project_images')
+      formData.append('folder', 'portfolio/projects')
+      formData.append('unique_filename', 'false')
       
       const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
       if (!cloudName) {
@@ -249,9 +137,9 @@ class ProjectService {
         const errorData = await response.json().catch(() => ({}))
         
         if (response.status === 400) {
-          throw new Error(errorData.error?.message || 'Invalid upload parameters. Please check your Cloudinary configuration.')
+          throw new Error(errorData.error?.message || 'Invalid upload parameters.')
         } else if (response.status === 401) {
-          throw new Error('Upload preset "project_images" not found or not configured. Please create it in Cloudinary dashboard.')
+          throw new Error('Upload preset not found or not configured.')
         } else if (response.status === 413) {
           throw new Error('File too large. Maximum size is 10MB.')
         } else {
@@ -264,15 +152,11 @@ class ProjectService {
       if (!data.secure_url) {
         throw new Error('Upload completed but no URL returned')
       }
-
-      // Cache the uploaded image to prevent future duplicates
-      this.saveToImageCache(fileHash, data.secure_url, file.name)
       
       return data.secure_url
     } catch (error) {
-      console.error('Cloudinary upload error:', error)
       throw new Error(
-        error.message || 'Failed to upload image to Cloudinary'
+        error.message || 'Failed to upload image'
       )
     }
   }
@@ -288,19 +172,6 @@ class ProjectService {
           error.message ||
           'Failed to delete image'
       )
-    }
-  }
-
-  // Remove image URL from cache (when image is deleted)
-  removeFromImageCache(imageUrl) {
-    const imageCache = JSON.parse(localStorage.getItem('uploadedImagesCache') || '{}')
-    // Find and remove the entry with matching URL
-    for (const [hash, data] of Object.entries(imageCache)) {
-      if (data.url === imageUrl) {
-        delete imageCache[hash]
-        localStorage.setItem('uploadedImagesCache', JSON.stringify(imageCache))
-        break
-      }
     }
   }
 }

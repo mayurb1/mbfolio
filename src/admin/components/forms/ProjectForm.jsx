@@ -16,7 +16,7 @@ import { Plus, X } from 'lucide-react'
 const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
   const dispatch = useDispatch()
   const { handleApiResponse, showError } = useToast()
-  const { uploadImage, uploadingImages, isAnyUploading } = useImageUpload()
+  const { uploadImage, uploadingImages, isAnyUploading, isUploading } = useImageUpload()
   const isEditing = !!project
 
   // State for dynamic data
@@ -129,38 +129,22 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
-      // Upload images first
-      let uploadedMainImage = values.mainImage
-      let uploadedImages = [...values.images]
-
-      // Upload main image if it's a File object
-      if (values.mainImage instanceof File) {
-        try {
-          uploadedMainImage = await uploadImage(values.mainImage, 'mainImage')
-          if (!uploadedMainImage) {
-            setFieldError('mainImage', 'Failed to upload main image')
-            return
-          }
-        } catch (error) {
-          setFieldError('mainImage', `Failed to upload main image: ${error.message}`)
-          return
-        }
+      // Check if any images are still uploading
+      if (isAnyUploading()) {
+        setFieldError('general', 'Please wait for image uploads to complete')
+        return
       }
 
-      // Upload additional images if they are File objects
+      // Check for any File objects that failed to upload
+      if (values.mainImage instanceof File) {
+        setFieldError('mainImage', 'Main image upload failed. Please try uploading again.')
+        return
+      }
+
       for (let i = 0; i < values.images.length; i++) {
         if (values.images[i] instanceof File) {
-          try {
-            const uploadedUrl = await uploadImage(values.images[i], `image_${i}`)
-            if (!uploadedUrl) {
-              setFieldError('images', `Failed to upload image ${i + 1}`)
-              return
-            }
-            uploadedImages[i] = uploadedUrl
-          } catch (error) {
-            setFieldError('images', `Failed to upload image ${i + 1}: ${error.message}`)
-            return
-          }
+          setFieldError('images', `Image ${i + 1} upload failed. Please try uploading again.`)
+          return
         }
       }
 
@@ -170,8 +154,8 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
       // Filter out empty strings from arrays
       const cleanedValues = {
         ...values,
-        mainImage: uploadedMainImage,
-        images: uploadedImages.filter(img => img && img.trim()),
+        mainImage: values.mainImage,
+        images: values.images.filter(img => img && img.trim() && typeof img === 'string'),
         technologies: technologyIds,
         highlights: values.highlights.filter(highlight => highlight.trim())
       }
@@ -403,11 +387,21 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
               </label>
               <ImageUpload
                 value={values.mainImage}
-                onChange={(file) => {
-                  setFieldValue('mainImage', file)
+                onChange={async (file) => {
+                  if (file) {
+                    setFieldValue('mainImage', file)
+                    try {
+                      const uploadedUrl = await uploadImage(file, 'mainImage')
+                      if (uploadedUrl) {
+                        setFieldValue('mainImage', uploadedUrl)
+                      }
+                    } catch (error) {
+                      console.error('Background upload failed:', error)
+                    }
+                  }
                 }}
                 onRemove={() => setFieldValue('mainImage', '')}
-                isUploading={false}
+                isUploading={isUploading('mainImage')}
                 placeholder="Select main project image"
               />
               <ErrorMessage name="mainImage" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
@@ -523,7 +517,7 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             <div className="lg:col-span-2">
               <MultiImageUpload
                 images={values.images}
-                onImagesChange={(file, index, action = 'add', newImages = null) => {
+                onImagesChange={async (file, index, action = 'add', newImages = null) => {
                   if (action === 'remove') {
                     setFieldValue('images', newImages || [])
                   } else if (file) {
@@ -534,9 +528,21 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
                       updatedImages[index] = file
                     }
                     setFieldValue('images', updatedImages)
+                    
+                    // Upload in background
+                    try {
+                      const uploadedUrl = await uploadImage(file, `image_${index}`)
+                      if (uploadedUrl) {
+                        const finalImages = [...updatedImages]
+                        finalImages[index] = uploadedUrl
+                        setFieldValue('images', finalImages)
+                      }
+                    } catch (error) {
+                      console.error('Background upload failed:', error)
+                    }
                   }
                 }}
-                isUploading={{}}
+                isUploading={uploadingImages}
                 maxImages={5}
               />
             </div>
@@ -591,10 +597,12 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
               )}
               <span>
                 {isSubmitting 
-                  ? 'Saving & Uploading...' 
-                  : isEditing 
-                    ? 'Update Project' 
-                    : 'Add Project'}
+                  ? 'Saving...' 
+                  : isAnyUploading()
+                    ? `${isEditing ? 'Update' : 'Add'} Project (Uploading...)`
+                    : isEditing 
+                      ? 'Update Project' 
+                      : 'Add Project'}
               </span>
             </Button>
           </div>

@@ -114,6 +114,7 @@ const authSlice = createSlice({
     token: null,
     isAuthenticated: false,
     loading: true,
+    authLoading: true, // For authentication checks only
     error: null
   },
   reducers: {
@@ -126,6 +127,10 @@ const authSlice = createSlice({
       state.isAuthenticated = false
       state.error = null
       state.loading = false
+      state.authLoading = false
+    },
+    updateUserData: (state, action) => {
+      state.user = { ...state.user, ...action.payload }
     }
   },
   extraReducers: (builder) => {
@@ -187,9 +192,10 @@ const authSlice = createSlice({
       
       // Check auth cases
       .addCase(checkAuth.pending, (state) => {
-        state.loading = true
+        state.authLoading = true
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
+        state.authLoading = false
         state.loading = false
         if (action.payload) {
           state.user = action.payload.user
@@ -200,6 +206,7 @@ const authSlice = createSlice({
         }
       })
       .addCase(checkAuth.rejected, (state) => {
+        state.authLoading = false
         state.loading = false
         state.isAuthenticated = false
         state.user = null
@@ -253,5 +260,5 @@ const authSlice = createSlice({
   }
 })
 
-export const { clearError, resetAuth } = authSlice.actions
+export const { clearError, resetAuth, updateUserData } = authSlice.actions
 export default authSlice.reducer

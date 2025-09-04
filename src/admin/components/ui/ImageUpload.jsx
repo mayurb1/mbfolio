@@ -1,5 +1,5 @@
 import { useState, useId } from 'react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Trash2 } from 'lucide-react'
 import Button from './Button'
 
 const ImageUpload = ({
@@ -60,20 +60,20 @@ const ImageUpload = ({
             alt="Uploaded image"
             className="w-full h-48 object-cover rounded-lg border border-slate-300 dark:border-slate-600"
           />
-          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center space-x-3">
+          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center space-x-2">
             <label
               htmlFor={`image-upload-${uploadId}`}
-              className="px-4 py-2 bg-white text-black rounded-lg cursor-pointer text-sm font-medium hover:bg-gray-100 transition-colors"
+              className="p-2 bg-white text-black rounded cursor-pointer hover:bg-gray-100 transition-colors"
             >
-              Change
+              <ImageIcon size={16} />
             </label>
             {onRemove && (
               <button
                 type="button"
                 onClick={onRemove}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
               >
-                Remove
+                <Trash2 size={16} />
               </button>
             )}
           </div>
