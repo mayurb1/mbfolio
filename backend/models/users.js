@@ -69,6 +69,18 @@ const userSchema = new mongoose.Schema(
         maxLength: [20, 'Zip code cannot exceed 20 characters'],
       },
     },
+    headline: {
+      type: String,
+      trim: true,
+      maxLength: [200, 'Headline cannot exceed 200 characters'],
+    },
+    availability: {
+      type: Boolean,
+      default: true,
+    },
+    resume: {
+      type: String,
+    },
   },
   { timestamps: true }
 )

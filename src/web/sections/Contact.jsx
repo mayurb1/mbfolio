@@ -410,20 +410,31 @@ const Contact = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.8 }}
-                className="p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl"
+                className={`p-4 sm:p-6 bg-gradient-to-r border rounded-xl ${
+                  user.availability !== false 
+                    ? 'from-primary/10 to-secondary/10 border-primary/20' 
+                    : 'from-yellow-500/10 to-orange-500/10 border-yellow-500/20'
+                }`}
               >
                 <h3 className="font-semibold text-text mb-4 flex items-center text-sm sm:text-base">
                   <Calendar
                     size={18}
-                    className="sm:w-5 sm:h-5 mr-2 text-primary"
+                    className={`sm:w-5 sm:h-5 mr-2 ${
+                      user.availability !== false ? 'text-primary' : 'text-yellow-500'
+                    }`}
                   />
                   Availability
                 </h3>
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                      user.availability !== false ? 'bg-green-500' : 'bg-yellow-500'
+                    }`}></div>
                     <span className="text-text">
-                      Available for new projects
+                      {user.availability !== false 
+                        ? 'Available for new projects' 
+                        : 'Currently unavailable for new projects'
+                      }
                     </span>
                   </div>
                   <div className="flex items-center space-x-2 text-text-secondary">

@@ -41,7 +41,7 @@ const Footer = () => {
 
   // Dynamic resources with fallback to static LINKS
   const resources = [
-    { name: 'Resume', href: LINKS.resume, external: true },
+    { name: 'Resume', href: user.resume || LINKS.resume, external: true },
     { name: 'GitHub', href: contactInfo.githubUrl || LINKS.github, external: true },
     { name: 'LinkedIn', href: contactInfo.linkedinUrl || LINKS.linkedin, external: true },
   ]

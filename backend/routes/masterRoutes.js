@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
   try {
     // Get complete user data
     const user = await Users.findOne({}).select(
-      'bio profileImage name email phone linkedUrl githubUrl location'
+      'bio profileImage name email phone linkedUrl githubUrl location headline availability resume'
     )
 
     if (!user) {
@@ -100,6 +100,9 @@ router.get('/', async (req, res) => {
           address: user.location?.address || null,
           coordinates: user.location?.coordinates || null,
         },
+        headline: user.headline || null,
+        availability: user.availability !== undefined ? user.availability : null,
+        resume: user.resume || null,
       },
       stats: {
         experience: {

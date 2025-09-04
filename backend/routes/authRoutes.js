@@ -188,7 +188,7 @@ router.put("/me", async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { name, email, phone, bio, profileImage, linkedUrl, githubUrl, location } = req.body;
+    const { name, email, phone, bio, profileImage, linkedUrl, githubUrl, location, headline, availability, resume } = req.body;
 
     // Check if email is being changed and if it's already taken
     if (email) {
@@ -211,6 +211,9 @@ router.put("/me", async (req, res) => {
     if (linkedUrl !== undefined) updateData.linkedUrl = linkedUrl;
     if (githubUrl !== undefined) updateData.githubUrl = githubUrl;
     if (location !== undefined) updateData.location = location;
+    if (headline !== undefined) updateData.headline = headline;
+    if (availability !== undefined) updateData.availability = availability;
+    if (resume !== undefined) updateData.resume = resume;
 
     // Update user
     const user = await Users.findByIdAndUpdate(

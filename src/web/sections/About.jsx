@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Download, MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 import CodeEditor from '../ui/CodeEditor'
+import { LINKS } from '../../data/links'
 import {
   fetchMasterData,
   selectUser,
@@ -130,6 +131,9 @@ const About = () => {
   }
 
   const handleDownloadResume = () => {
+    // Use dynamic resume URL if available, fallback to static
+    const resumeUrl = user.resume || LINKS.resume
+
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
@@ -141,8 +145,11 @@ const About = () => {
 
     // Create download link
     const link = document.createElement('a')
-    link.href = '/resume.pdf'
-    link.download = 'Mayur_Bhalgama_Resume.pdf'
+    link.href = resumeUrl
+    link.download = 'Resume.pdf'
+    if (resumeUrl.startsWith('http')) {
+      link.target = '_blank'
+    }
     link.click()
   }
 

@@ -1,5 +1,5 @@
 import api from '../../services/api'
-import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType } from '../../constants/fileConstants'
+import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType, isValidPDFType } from '../../constants/fileConstants'
 
 class UserService {
   // Get current user profile
@@ -92,6 +92,69 @@ class UserService {
       return data.secure_url
     } catch (error) {
       throw new Error(error.message || 'Failed to upload profile image')
+    }
+  }
+
+  // Upload resume PDF to Cloudinary
+  async uploadResume(file) {
+    try {
+      // Validate file
+      if (!file || !isValidPDFType(file.type)) {
+        throw new Error('Please select a valid PDF file')
+      }
+
+      // Check file size using constants
+      if (file.size > FILE_SIZE_LIMITS.RESUME_PDF) {
+        throw new Error(`File size must be less than ${FILE_SIZE_LIMITS_MB.RESUME_PDF}`)
+      }
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('upload_preset', 'project_images')
+      formData.append('folder', 'portfolio/resumes')
+      formData.append('resource_type', 'raw')
+
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+      if (!cloudName) {
+        throw new Error('Cloudinary configuration missing')
+      }
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+
+        if (response.status === 400) {
+          throw new Error(
+            errorData.error?.message || 'Invalid upload parameters.'
+          )
+        } else if (response.status === 401) {
+          throw new Error('Upload preset not found or not configured.')
+        } else if (response.status === 413) {
+          throw new Error(`File too large. Maximum size is ${FILE_SIZE_LIMITS_MB.RESUME_PDF}.`)
+        } else {
+          throw new Error(
+            errorData.error?.message ||
+              `Upload failed with status ${response.status}`
+          )
+        }
+      }
+
+      const data = await response.json()
+
+      if (!data.secure_url) {
+        throw new Error('Upload completed but no URL returned')
+      }
+
+      return data.secure_url
+    } catch (error) {
+      throw new Error(error.message || 'Failed to upload resume')
     }
   }
 

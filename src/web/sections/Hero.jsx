@@ -129,6 +129,9 @@ const Hero = () => {
   }
 
   const handleDownloadResume = () => {
+    // Use dynamic resume URL if available, fallback to static
+    const resumeUrl = user.resume || LINKS.resume
+
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
@@ -138,14 +141,17 @@ const Hero = () => {
     }
 
     const link = document.createElement('a')
-    link.href = LINKS.resume
-    link.download = 'Mayur_Bhalgama_Resume.pdf'
+    link.href = resumeUrl
+    link.download = 'Resume.pdf'
+    if (resumeUrl.startsWith('http')) {
+      link.target = '_blank'
+    }
     link.click()
   }
 
   // Get contact info from Redux store
   const contactInfo = getContactInfo()
-  
+
   // Dynamic social links with fallback to static LINKS
   const socialLinks = [
     {
@@ -210,22 +216,26 @@ const Hero = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed"
             >
-              A passionate{' '}
-              <motion.span
-                className="text-primary font-semibold"
-                animate={{
-                  color: [
-                    'var(--color-primary)',
-                    'var(--color-secondary)',
-                    'var(--color-primary)',
-                  ],
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                Software Engineer
-              </motion.span>{' '}
-              who creates innovative digital experiences with clean code and
-              beautiful design.
+              {user.headline || (
+                <>
+                  A passionate{' '}
+                  <motion.span
+                    className="text-primary font-semibold"
+                    animate={{
+                      color: [
+                        'var(--color-primary)',
+                        'var(--color-secondary)',
+                        'var(--color-primary)',
+                      ],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    Software Engineer
+                  </motion.span>{' '}
+                  who creates innovative digital experiences with clean code and
+                  beautiful design.
+                </>
+              )}
             </motion.p>
 
             {/* Specialties */}
@@ -297,36 +307,34 @@ const Hero = () => {
               transition={{ duration: 0.8, delay: 1.0 }}
               className="flex justify-center space-x-4 sm:space-x-6 mb-12 sm:mb-16"
             >
-              {loading ? (
-                // Loading skeleton for social links
-                [1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="w-7 h-7 sm:w-8 sm:h-8 bg-surface animate-pulse rounded-full"
-                  />
-                ))
-              ) : (
-                socialLinks.map((social, index) => {
-                  const Icon = social.icon
-                  return (
-                    <motion.a
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`text-text-secondary text-xl sm:text-2xl transition-colors duration-200 ${social.color}`}
-                      whileHover={{ scale: 1.2, y: -2 }}
-                      whileTap={{ scale: 0.9 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={inView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ delay: 1.2 + index * 0.1, duration: 0.5 }}
-                      aria-label={`Visit my ${social.name} profile`}
-                    >
-                      <Icon size={24} className="sm:w-7 sm:h-7" />
-                    </motion.a>
-                  )
-                })
-              )}
+              {loading
+                ? // Loading skeleton for social links
+                  [1, 2, 3].map(i => (
+                    <div
+                      key={i}
+                      className="w-7 h-7 sm:w-8 sm:h-8 bg-surface animate-pulse rounded-full"
+                    />
+                  ))
+                : socialLinks.map((social, index) => {
+                    const Icon = social.icon
+                    return (
+                      <motion.a
+                        key={social.name}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-text-secondary text-xl sm:text-2xl transition-colors duration-200 ${social.color}`}
+                        whileHover={{ scale: 1.2, y: -2 }}
+                        whileTap={{ scale: 0.9 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={inView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ delay: 1.2 + index * 0.1, duration: 0.5 }}
+                        aria-label={`Visit my ${social.name} profile`}
+                      >
+                        <Icon size={24} className="sm:w-7 sm:h-7" />
+                      </motion.a>
+                    )
+                  })}
             </motion.div>
 
             {/* Scroll indicator */}
