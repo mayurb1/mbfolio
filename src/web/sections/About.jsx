@@ -659,7 +659,7 @@ const About = () => {
               </div>
 
               {/* Download Resume Button */}
-              <motion.div
+              {/* <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 1.2 }}
@@ -677,7 +677,7 @@ const About = () => {
                   />
                   <span>Download Resume</span>
                 </motion.button>
-              </motion.div>
+              </motion.div> */}
 
               {/* Quote */}
               <motion.blockquote

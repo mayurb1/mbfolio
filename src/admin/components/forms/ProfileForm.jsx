@@ -146,9 +146,9 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         resume: values.resume,
       }
 
-      // Remove empty fields (except profileImage and resume which need to be explicitly set to empty for removal)
+      // Remove empty fields (except profileImage, resume, and availability which need to be explicitly set)
       Object.keys(profileData).forEach(key => {
-        if (!profileData[key] && key !== 'profileImage' && key !== 'resume') {
+        if (!profileData[key] && key !== 'profileImage' && key !== 'resume' && key !== 'availability') {
           delete profileData[key]
         }
       })
@@ -370,13 +370,13 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                 Availability Status
               </label>
               <Field name="availability">
-                {({ field }) => (
+                {({ field, form }) => (
                   <div className="flex items-center">
                     <input
                       type="checkbox"
                       id="availability"
                       checked={field.value}
-                      onChange={field.onChange}
+                      onChange={(e) => form.setFieldValue('availability', e.target.checked)}
                       name="availability"
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600 rounded"
                     />
