@@ -1,6 +1,8 @@
 const express = require("express");
 const Project = require("../models/Project");
 const { authenticateToken } = require("../middleware/auth");
+const { upload, cleanupFile } = require("../middleware/upload");
+const uploadService = require("../services/uploadService");
 
 const router = express.Router();
 
@@ -552,6 +554,57 @@ router.patch("/:id/toggle-featured", authenticateToken, async (req, res) => {
     res.status(500).json({
       message: err.message,
       status: 500
+    });
+  }
+});
+
+// Upload project image (protected)
+router.post("/upload-image", authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file provided",
+        status: 400
+      });
+    }
+
+    const imageUrl = await uploadService.uploadProjectImage(req.file);
+
+    res.json({
+      data: { imageUrl },
+      message: "Project image uploaded successfully",
+      status: 200
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: 400
+    });
+  }
+});
+
+// Delete project image (protected)
+router.delete("/delete-image", authenticateToken, async (req, res) => {
+  try {
+    const { publicId } = req.body;
+
+    if (!publicId) {
+      return res.status(400).json({
+        message: "Public ID is required",
+        status: 400
+      });
+    }
+
+    await uploadService.deleteFile(publicId, 'image');
+
+    res.json({
+      message: "Project image deleted successfully",
+      status: 200
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: 400
     });
   }
 });

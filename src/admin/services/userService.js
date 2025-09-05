@@ -30,7 +30,7 @@ class UserService {
     }
   }
 
-  // Upload profile image to Cloudinary
+  // Upload profile image via authenticated backend
   async uploadProfileImage(file) {
     try {
       // Validate file
@@ -45,57 +45,24 @@ class UserService {
 
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', 'project_images')
-      formData.append('folder', 'portfolio/profiles')
-      // formData.append('unique_filename', 'false')
 
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-      if (!cloudName) {
-        throw new Error('Cloudinary configuration missing')
-      }
+      const response = await api.post('/auth/upload-profile-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-
-        if (response.status === 400) {
-          throw new Error(
-            errorData.error?.message || 'Invalid upload parameters.'
-          )
-        } else if (response.status === 401) {
-          throw new Error('Upload preset not found or not configured.')
-        } else if (response.status === 413) {
-          throw new Error(`File too large. Maximum size is ${FILE_SIZE_LIMITS_MB.PROFILE_IMAGE}.`)
-        } else {
-          throw new Error(
-            errorData.error?.message ||
-              `Upload failed with status ${response.status}`
-          )
-        }
-      }
-
-      const data = await response.json()
-
-      if (!data.secure_url) {
-        throw new Error('Upload completed but no URL returned')
-      }
-
-      console.log(data, 'data')
-
-      return data.secure_url
+      return response.data.data.imageUrl
     } catch (error) {
-      throw new Error(error.message || 'Failed to upload profile image')
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to upload profile image'
+      )
     }
   }
 
-  // Upload resume PDF to Cloudinary
+  // Upload resume PDF via authenticated backend
   async uploadResume(file) {
     try {
       // Validate file
@@ -110,59 +77,28 @@ class UserService {
 
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', 'project_images')
-      formData.append('folder', 'portfolio/resumes')
-      formData.append('resource_type', 'raw')
 
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-      if (!cloudName) {
-        throw new Error('Cloudinary configuration missing')
-      }
+      const response = await api.post('/auth/upload-resume', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-
-        if (response.status === 400) {
-          throw new Error(
-            errorData.error?.message || 'Invalid upload parameters.'
-          )
-        } else if (response.status === 401) {
-          throw new Error('Upload preset not found or not configured.')
-        } else if (response.status === 413) {
-          throw new Error(`File too large. Maximum size is ${FILE_SIZE_LIMITS_MB.RESUME_PDF}.`)
-        } else {
-          throw new Error(
-            errorData.error?.message ||
-              `Upload failed with status ${response.status}`
-          )
-        }
-      }
-
-      const data = await response.json()
-
-      if (!data.secure_url) {
-        throw new Error('Upload completed but no URL returned')
-      }
-
-      return data.secure_url
+      return response.data.data.resumeUrl
     } catch (error) {
-      throw new Error(error.message || 'Failed to upload resume')
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to upload resume'
+      )
     }
   }
 
-  // Delete profile image from Cloudinary
+  // Delete profile image via authenticated backend
   async deleteProfileImage(publicId) {
     try {
-      const response = await api.post('/auth/delete-profile-image', {
-        publicId,
+      const response = await api.delete('/auth/delete-profile-image', {
+        data: { publicId }
       })
       return response.data
     } catch (error) {

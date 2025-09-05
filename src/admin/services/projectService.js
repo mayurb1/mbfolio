@@ -115,7 +115,7 @@ class ProjectService {
     }
   }
 
-  // Upload project image to Cloudinary
+  // Upload project image via authenticated backend
   async uploadImage(file) {
     try {
       // Validate file
@@ -130,58 +130,29 @@ class ProjectService {
 
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', 'project_images')
-      formData.append('folder', 'portfolio/projects')
-      // formData.append('unique_filename', 'true')
 
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-      if (!cloudName) {
-        throw new Error('Cloudinary configuration missing')
-      }
+      const response = await api.post('/projects/upload-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-
-        if (response.status === 400) {
-          throw new Error(
-            errorData.error?.message || 'Invalid upload parameters.'
-          )
-        } else if (response.status === 401) {
-          throw new Error('Upload preset not found or not configured.')
-        } else if (response.status === 413) {
-          throw new Error(`File too large. Maximum size is ${FILE_SIZE_LIMITS_MB.PROJECT_IMAGE}.`)
-        } else {
-          throw new Error(
-            errorData.error?.message ||
-              `Upload failed with status ${response.status}`
-          )
-        }
-      }
-
-      const data = await response.json()
-
-      if (!data.secure_url) {
-        throw new Error('Upload completed but no URL returned')
-      }
-
-      return data.secure_url
+      return response.data.data.imageUrl
     } catch (error) {
-      throw new Error(error.message || 'Failed to upload image')
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to upload image'
+      )
     }
   }
 
-  // Delete image from Cloudinary
+  // Delete image via authenticated backend
   async deleteImage(publicId) {
     try {
-      const response = await api.post('/projects/delete-image', { publicId })
+      const response = await api.delete('/projects/delete-image', {
+        data: { publicId }
+      })
       return response.data
     } catch (error) {
       throw new Error(
