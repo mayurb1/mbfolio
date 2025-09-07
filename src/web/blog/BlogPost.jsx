@@ -11,8 +11,8 @@ import {
   Share2,
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+// Removed react-syntax-highlighter for security reasons
+// Using simple code styling instead
 
 const BlogPost = () => {
   const navigate = useNavigate()
@@ -354,17 +354,13 @@ What patterns do you use in your React applications? Share your thoughts in the 
                   code({ node: _node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '')
                     return !inline && match ? (
-                      <SyntaxHighlighter
-                        style={oneDark}
-                        language={match[1]}
-                        PreTag="div"
-                        className="rounded-lg"
-                        {...props}
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
+                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
+                        <code className="text-sm font-mono" {...props}>
+                          {String(children).replace(/\n$/, '')}
+                        </code>
+                      </pre>
                     ) : (
-                      <code className={className} {...props}>
+                      <code className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono" {...props}>
                         {children}
                       </code>
                     )
