@@ -1,10 +1,29 @@
 import { motion } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Download, MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 import CodeEditor from '../ui/CodeEditor'
+import { LINKS } from '../../data/links'
+import {
+  fetchMasterData,
+  selectUser,
+  selectStats,
+  selectHighlights,
+  selectMasterLoading,
+  selectMasterError,
+} from '../../store/masterSlice'
 
 const About = () => {
+  const dispatch = useDispatch()
+
+  // Redux selectors
+  const user = useSelector(selectUser)
+  const stats = useSelector(selectStats)
+  const highlights = useSelector(selectHighlights)
+  const loading = useSelector(selectMasterLoading)
+  const error = useSelector(selectMasterError)
+
   const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true,
@@ -20,6 +39,14 @@ const About = () => {
   const gradientIdRef = useRef(
     `igHeartGrad-${Math.random().toString(36).slice(2)}`
   )
+
+  // Fetch master data on component mount
+  useEffect(() => {
+    // Only fetch if we don't have data already
+    if (!user.name && !loading && !error) {
+      dispatch(fetchMasterData())
+    }
+  }, [dispatch, user.name, loading, error])
 
   // Close code editor when switching to mobile view
   useEffect(() => {
@@ -104,6 +131,9 @@ const About = () => {
   }
 
   const handleDownloadResume = () => {
+    // Use dynamic resume URL if available, fallback to static
+    const resumeUrl = user.resume || LINKS.resume
+
     // Analytics tracking
     if (window.gtag) {
       window.gtag('event', 'file_download', {
@@ -115,8 +145,11 @@ const About = () => {
 
     // Create download link
     const link = document.createElement('a')
-    link.href = '/resume.pdf'
-    link.download = 'Mayur_Bhalgama_Resume.pdf'
+    link.href = resumeUrl
+    link.download = 'Resume.pdf'
+    if (resumeUrl.startsWith('http')) {
+      link.target = '_blank'
+    }
     link.click()
   }
 
@@ -135,14 +168,15 @@ const About = () => {
     setShowCodeEditor(false)
   }
 
-  const stats = [
+  // Fallback data while loading or on error
+  const fallbackStats = [
     { number: '3+', label: 'Years Experience', icon: Calendar },
     { number: '9+', label: 'Projects Completed', icon: Code },
     { number: '2', label: 'Certifications', icon: Award },
     { number: '∞', label: 'Lines of Code', icon: Heart },
   ]
 
-  const highlights = [
+  const fallbackHighlights = [
     'React.js, Next.js, JavaScript, HTML5, CSS3',
     'Reusable UI with Material UI, Ant Design, Tailwind CSS',
     'Application design, debugging, and performance improvement',
@@ -150,6 +184,84 @@ const About = () => {
     'Strong client communication and requirement understanding',
     'Manual testing and issue resolution',
   ]
+
+  // Dynamic data from Redux store
+  const statsData = user.name
+    ? [
+        {
+          number: stats.experience?.text || '3+',
+          label: 'Years Experience',
+          icon: Calendar,
+        },
+        {
+          number: `${stats.projects?.completed || 0}+`,
+          label: 'Projects Completed',
+          icon: Code,
+        },
+        {
+          number: '2',
+          label: 'Certifications',
+          icon: Award,
+        },
+        {
+          number: '∞',
+          label: 'Lines of Code',
+          icon: Heart,
+        },
+      ]
+    : fallbackStats
+
+  const skillHighlights =
+    highlights.length > 0 ? highlights : fallbackHighlights
+  const userBio = user.bio || ''
+  const profileImage = user.profileImage || '/images/profile-pic.jpg'
+  const userName = user.name || 'Mayur Bhalgama'
+  const userLocation = user.location
+
+  // Loading state
+  if (loading) {
+    return (
+      <section id="about" className="py-20 lg:py-32 bg-surface/50" ref={ref}>
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="w-32 h-8 bg-surface animate-pulse rounded mx-auto mb-4"></div>
+              <div className="w-64 h-6 bg-surface animate-pulse rounded mx-auto"></div>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div className="space-y-8 order-2 lg:order-1">
+                <div className="w-64 h-64 bg-surface animate-pulse rounded-full mx-auto"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <div
+                      key={i}
+                      className="bg-surface animate-pulse h-24 rounded-lg"
+                    ></div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-6 order-1 lg:order-2">
+                <div className="w-48 h-6 bg-surface animate-pulse rounded"></div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map(i => (
+                    <div
+                      key={i}
+                      className="w-full h-4 bg-surface animate-pulse rounded"
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // Error state with fallback to static content
+  if (error) {
+    console.warn('About API failed, using fallback data:', error)
+  }
 
   return (
     <section id="about" className="py-20 lg:py-32 bg-surface/50" ref={ref}>
@@ -191,8 +303,8 @@ const About = () => {
 
                   {/* Profile photo */}
                   <img
-                    src="/images/profile-pic.jpg"
-                    alt="Mayur Bhalgama - Software Engineer"
+                    src={profileImage}
+                    alt={`${userName} - Software Engineer`}
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-2xl select-none"
                     onError={e => {
                       // Fallback to placeholder if image doesn't exist
@@ -436,7 +548,11 @@ const About = () => {
                   className="flex items-center justify-center mt-6 text-text-secondary"
                 >
                   <MapPin size={18} className="mr-2" />
-                  <span>Ahmedabad, India</span>
+                  <span>
+                    {userLocation?.city && userLocation?.country
+                      ? `${userLocation.city}, ${userLocation.country}`
+                      : 'Ahmedabad, India'}
+                  </span>
                 </motion.div>
               </div>
 
@@ -447,7 +563,7 @@ const About = () => {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="grid grid-cols-2 gap-3 sm:gap-4"
               >
-                {stats.map((stat, index) => {
+                {statsData.map((stat, index) => {
                   const Icon = stat.icon
                   return (
                     <motion.div
@@ -488,25 +604,34 @@ const About = () => {
                 </h3>
 
                 <div className="space-y-4 text-text-secondary leading-relaxed text-sm sm:text-base">
-                  <p>
-                    I&apos;m a frontend-focused software engineer with 3+ years
-                    of experience building modern web applications with React.js
-                    and Next.js. I specialize in translating client requirements
-                    into scalable, maintainable solutions.
-                  </p>
+                  {userBio ? (
+                    userBio
+                      .split('\n')
+                      .map((paragraph, index) => <p key={index}>{paragraph}</p>)
+                  ) : (
+                    <>
+                      <p>
+                        I&apos;m a frontend-focused software engineer with 3+
+                        years of experience building modern web applications
+                        with React.js and Next.js. I specialize in translating
+                        client requirements into scalable, maintainable
+                        solutions.
+                      </p>
 
-                  <p>
-                    I&apos;ve delivered responsive interfaces, reusable
-                    component systems, and performance improvements across
-                    multiple products. I care deeply about clean code,
-                    usability, and accessibility.
-                  </p>
+                      <p>
+                        I&apos;ve delivered responsive interfaces, reusable
+                        component systems, and performance improvements across
+                        multiple products. I care deeply about clean code,
+                        usability, and accessibility.
+                      </p>
 
-                  <p>
-                    I collaborate closely with stakeholders, maintain clear
-                    communication, and enjoy shipping reliable features that
-                    solve real problems.
-                  </p>
+                      <p>
+                        I collaborate closely with stakeholders, maintain clear
+                        communication, and enjoy shipping reliable features that
+                        solve real problems.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -516,7 +641,7 @@ const About = () => {
                   What I Do Best
                 </h4>
                 <div className="grid gap-3">
-                  {highlights.map((highlight, index) => (
+                  {skillHighlights.map((highlight, index) => (
                     <motion.div
                       key={index}
                       className="flex items-start space-x-3"
@@ -534,7 +659,7 @@ const About = () => {
               </div>
 
               {/* Download Resume Button */}
-              <motion.div
+              {/* <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 1.2 }}
@@ -552,7 +677,7 @@ const About = () => {
                   />
                   <span>Download Resume</span>
                 </motion.button>
-              </motion.div>
+              </motion.div> */}
 
               {/* Quote */}
               <motion.blockquote

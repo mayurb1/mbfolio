@@ -6,6 +6,7 @@ import App from './App.jsx'
 import './index.css'
 import { ThemeProvider } from './contexts/ThemeContext.jsx'
 import ErrorBoundary from './web/components/ErrorBoundary.jsx'
+import WebProvider from './store/WebProvider.jsx'
 
 // Initialize Google Analytics if GA_ID is provided
 if (import.meta.env.VITE_GA_ID) {
@@ -49,9 +50,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             v7_relativeSplatPath: true
           }}
         >
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
+          <WebProvider>
+            <ThemeProvider>
+              <App />
+            </ThemeProvider>
+          </WebProvider>
         </BrowserRouter>
       </HelmetProvider>
     </ErrorBoundary>

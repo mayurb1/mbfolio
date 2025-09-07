@@ -23,33 +23,23 @@ const ExperienceForm = ({ experience = null, onCancel }) => {
     'Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'
   ]
 
-  // Parse duration for date range picker
-  const parseDuration = (duration) => {
-    if (!duration) return { startDate: null, endDate: null }
+  // Get initial date values from the experience data
+  const getInitialDates = () => {
+    if (!experience) return { startDate: '', endDate: '' }
     
-    if (duration.toLowerCase().includes('present')) {
-      const parts = duration.split('–')
-      if (parts.length === 2) {
-        const startPart = parts[0].trim()
-        return { startDate: startPart, endDate: 'Present' }
-      }
+    return {
+      startDate: experience.startDate ? new Date(experience.startDate).toISOString().split('T')[0] : '',
+      endDate: experience.isOngoing ? 'Present' : (experience.endDate ? new Date(experience.endDate).toISOString().split('T')[0] : '')
     }
-    
-    const parts = duration.split('–')
-    if (parts.length === 2) {
-      return { startDate: parts[0].trim(), endDate: parts[1].trim() }
-    }
-    
-    return { startDate: duration, endDate: null }
   }
 
-  const { startDate, endDate } = parseDuration(experience?.duration)
+  const { startDate, endDate } = getInitialDates()
 
   const initialValues = {
     company: experience?.company || '',
     position: experience?.position || '',
-    startDate: startDate || null,
-    endDate: endDate || null,
+    startDate: startDate || '',
+    endDate: endDate || '',
     location: experience?.location || '',
     type: experience?.type || 'Full-time',
     logo: experience?.logo || '',
@@ -71,10 +61,36 @@ const ExperienceForm = ({ experience = null, onCancel }) => {
       .min(2, 'Position must be at least 2 characters')
       .max(200, 'Position cannot exceed 200 characters')
       .required('Position is required'),
-    startDate: Yup.string()
-      .required('Start date is required'),
-    endDate: Yup.string()
-      .nullable(),
+    startDate: Yup.date()
+      .required('Start date is required')
+      .max(new Date(), 'Start date cannot be in the future'),
+    endDate: Yup.mixed()
+      .nullable()
+      .test('is-date-or-present', 'End date must be a valid date or "Present"', function(value) {
+        if (!value || value === '' || value === 'Present' || value.toLowerCase() === 'present') {
+          return true
+        }
+        const date = new Date(value)
+        return !isNaN(date.getTime())
+      })
+      .when('startDate', {
+        is: (startDate) => startDate && startDate !== '',
+        then: (schema) => schema.test('is-after-start', 'End date must be after start date', function(value) {
+          if (!value || value === 'Present' || value.toLowerCase() === 'present') {
+            return true
+          }
+          const startDate = new Date(this.parent.startDate)
+          const endDate = new Date(value)
+          return endDate >= startDate
+        })
+      })
+      .test('not-future', 'End date cannot be in the future', function(value) {
+        if (!value || value === 'Present' || value.toLowerCase() === 'present') {
+          return true
+        }
+        const date = new Date(value)
+        return date <= new Date()
+      }),
     location: Yup.string()
       .min(2, 'Location must be at least 2 characters')
       .max(100, 'Location cannot exceed 100 characters')
@@ -105,35 +121,16 @@ const ExperienceForm = ({ experience = null, onCancel }) => {
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
-      // Format duration from date range
-      let duration = ''
-      if (values.startDate) {
-        const startDate = new Date(values.startDate)
-        const startStr = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-        
-        if (values.endDate && values.endDate.toLowerCase() === 'present') {
-          duration = `${startStr} – Present`
-        } else if (values.endDate) {
-          const endDate = new Date(values.endDate)
-          const endStr = endDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-          duration = `${startStr} – ${endStr}`
-        } else {
-          duration = startStr
-        }
-      }
-
       // Filter out empty achievements and technologies
       const cleanValues = {
         ...values,
-        duration,
+        startDate: values.startDate ? new Date(values.startDate) : null,
+        endDate: values.endDate && values.endDate.toLowerCase() !== 'present' ? new Date(values.endDate) : null,
+        isOngoing: values.endDate && values.endDate.toLowerCase() === 'present',
         achievements: values.achievements.filter(achievement => achievement.trim() !== ''),
         skills: values.skills,
         highlights: values.highlights.filter(highlight => highlight.metric.trim() !== '' && highlight.description.trim() !== '')
       }
-      
-      // Remove date fields as they're converted to duration string
-      delete cleanValues.startDate
-      delete cleanValues.endDate
 
       let response
       if (isEditing) {

@@ -89,7 +89,9 @@ router.post("/", authenticateToken, async (req, res) => {
     const {
       institution,
       degree,
-      duration,
+      startDate,
+      endDate,
+      isOngoing,
       location,
       gpa,
       logo,
@@ -115,7 +117,9 @@ router.post("/", authenticateToken, async (req, res) => {
     const education = new Education({
       institution,
       degree,
-      duration,
+      startDate,
+      endDate,
+      isOngoing,
       location,
       gpa,
       logo,
@@ -160,7 +164,9 @@ router.put("/:id", authenticateToken, async (req, res) => {
     const {
       institution,
       degree,
-      duration,
+      startDate,
+      endDate,
+      isOngoing,
       location,
       gpa,
       logo,
@@ -201,7 +207,9 @@ router.put("/:id", authenticateToken, async (req, res) => {
       {
         institution,
         degree,
-        duration,
+        startDate,
+      endDate,
+      isOngoing,
         location,
         gpa,
         logo,

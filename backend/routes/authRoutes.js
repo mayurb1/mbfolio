@@ -2,6 +2,9 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Users = require("../models/users");
+const { authenticateToken } = require("../middleware/auth");
+const { upload, cleanupFile } = require("../middleware/upload");
+const uploadService = require("../services/uploadService");
 
 const router = express.Router();
 
@@ -188,7 +191,7 @@ router.put("/me", async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { name, email, phone, bio, profileImage, linkedUrl, githubUrl, location } = req.body;
+    const { name, email, phone, bio, profileImage, linkedUrl, githubUrl, location, headline, availability, resume } = req.body;
 
     // Check if email is being changed and if it's already taken
     if (email) {
@@ -211,6 +214,9 @@ router.put("/me", async (req, res) => {
     if (linkedUrl !== undefined) updateData.linkedUrl = linkedUrl;
     if (githubUrl !== undefined) updateData.githubUrl = githubUrl;
     if (location !== undefined) updateData.location = location;
+    if (headline !== undefined) updateData.headline = headline;
+    if (availability !== undefined) updateData.availability = availability;
+    if (resume !== undefined) updateData.resume = resume;
 
     // Update user
     const user = await Users.findByIdAndUpdate(
@@ -321,6 +327,82 @@ router.patch("/change-password", async (req, res) => {
     res.status(500).json({ 
       message: err.message,
       status: 500
+    });
+  }
+});
+
+// Upload profile image (protected)
+router.post("/upload-profile-image", authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file provided",
+        status: 400
+      });
+    }
+
+    const imageUrl = await uploadService.uploadProfileImage(req.file);
+
+    res.json({
+      data: { imageUrl },
+      message: "Profile image uploaded successfully",
+      status: 200
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: 400
+    });
+  }
+});
+
+// Upload resume PDF (protected)
+router.post("/upload-resume", authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file provided",
+        status: 400
+      });
+    }
+
+    const resumeUrl = await uploadService.uploadResume(req.file);
+
+    res.json({
+      data: { resumeUrl },
+      message: "Resume uploaded successfully",
+      status: 200
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: 400
+    });
+  }
+});
+
+// Delete profile image (protected)
+router.delete("/delete-profile-image", authenticateToken, async (req, res) => {
+  try {
+    const { publicId } = req.body;
+
+    if (!publicId) {
+      return res.status(400).json({
+        message: "Public ID is required",
+        status: 400
+      });
+    }
+
+    await uploadService.deleteFile(publicId, 'image');
+
+    res.json({
+      message: "Profile image deleted successfully",
+      status: 200
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: 400
     });
   }
 });

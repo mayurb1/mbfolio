@@ -17,6 +17,7 @@ import {
 import { LINKS } from '../../data/links'
 import Toast from '../ui/Toast'
 import Select from '../ui/Select'
+import { useMasterData } from '../../hooks/useMasterData'
 
 // Stable form field component to prevent remounts (and focus loss)
 const FormField = ({
@@ -71,6 +72,9 @@ const Contact = () => {
     threshold: 0.1,
     triggerOnce: true,
   })
+
+  // Get dynamic data from Redux store
+  const { user, getContactInfo, getLocationDisplay, loading } = useMasterData()
 
   const [submitStatus, setSubmitStatus] = useState(null) // 'success', 'error', or null
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -277,26 +281,31 @@ const Contact = () => {
     },
   })
 
+  // Get contact info from Redux store
+  const contactData = getContactInfo()
+  const locationDisplay = getLocationDisplay()
+
+  // Dynamic contact info with fallback to static data
   const contactInfo = [
     {
       icon: Mail,
       label: 'Email',
-      value: 'mayurbhalgama2419@gmail.com',
-      href: LINKS.email,
+      value: contactData.email || 'mayurbhalgama2419@gmail.com',
+      href: contactData.email ? `mailto:${contactData.email}` : LINKS.email,
       description: 'Send me an email anytime',
     },
     {
       icon: Phone,
       label: 'Phone',
-      value: '+91 8160146264',
-      href: 'tel:+918160146264',
+      value: contactData.phone || '+91 8160146264',
+      href: contactData.phone ? `tel:${contactData.phone.replace(/\s/g, '')}` : 'tel:+918160146264',
       description: 'Call during business hours',
     },
     {
       icon: MapPin,
       label: 'Location',
-      value: 'Ahmedabad, India',
-      href: 'https://maps.google.com/?q=Ahmedabad,India',
+      value: locationDisplay,
+      href: `https://maps.google.com/?q=${encodeURIComponent(locationDisplay)}`,
       description: 'Remote collaboration worldwide',
     },
   ]
@@ -333,48 +342,67 @@ const Contact = () => {
             >
               {/* Contact Info Cards */}
               <div className="space-y-4 sm:space-y-6">
-                {contactInfo.map((info, index) => {
-                  const Icon = info.icon
-                  return (
-                    <motion.a
-                      key={index}
-                      href={info.href}
-                      target={
-                        info.href.startsWith('http') ? '_blank' : undefined
-                      }
-                      rel={
-                        info.href.startsWith('http')
-                          ? 'noopener noreferrer'
-                          : undefined
-                      }
-                      className="block p-4 sm:p-6 bg-surface border border-border rounded-xl hover:shadow-lg transition-all duration-200 group"
-                      whileHover={{ scale: 1.02 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={inView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                {loading ? (
+                  // Loading skeleton for contact info
+                  [1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="block p-4 sm:p-6 bg-surface border border-border rounded-xl"
                     >
                       <div className="flex items-start space-x-3 sm:space-x-4">
-                        <div className="p-2.5 sm:p-3 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-background transition-colors duration-200 flex-shrink-0">
-                          <Icon
-                            size={20}
-                            className="sm:w-6 sm:h-6 text-primary group-hover:text-background"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-text mb-1 text-sm sm:text-base">
-                            {info.label}
-                          </h3>
-                          <p className="text-primary font-medium mb-1 text-sm sm:text-base break-all">
-                            {info.value}
-                          </p>
-                          <p className="text-text-secondary text-xs sm:text-sm">
-                            {info.description}
-                          </p>
+                        <div className="p-2.5 sm:p-3 bg-surface animate-pulse rounded-lg w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0"></div>
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="w-16 h-4 bg-surface animate-pulse rounded"></div>
+                          <div className="w-32 h-4 bg-surface animate-pulse rounded"></div>
+                          <div className="w-48 h-3 bg-surface animate-pulse rounded"></div>
                         </div>
                       </div>
-                    </motion.a>
-                  )
-                })}
+                    </div>
+                  ))
+                ) : (
+                  contactInfo.map((info, index) => {
+                    const Icon = info.icon
+                    return (
+                      <motion.a
+                        key={index}
+                        href={info.href}
+                        target={
+                          info.href.startsWith('http') ? '_blank' : undefined
+                        }
+                        rel={
+                          info.href.startsWith('http')
+                            ? 'noopener noreferrer'
+                            : undefined
+                        }
+                        className="block p-4 sm:p-6 bg-surface border border-border rounded-xl hover:shadow-lg transition-all duration-200 group"
+                        whileHover={{ scale: 1.02 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={inView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                      >
+                        <div className="flex items-start space-x-3 sm:space-x-4">
+                          <div className="p-2.5 sm:p-3 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-background transition-colors duration-200 flex-shrink-0">
+                            <Icon
+                              size={20}
+                              className="sm:w-6 sm:h-6 text-primary group-hover:text-background"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-text mb-1 text-sm sm:text-base">
+                              {info.label}
+                            </h3>
+                            <p className="text-primary font-medium mb-1 text-sm sm:text-base break-all">
+                              {info.value}
+                            </p>
+                            <p className="text-text-secondary text-xs sm:text-sm">
+                              {info.description}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.a>
+                    )
+                  })
+                )}
               </div>
 
               {/* Availability */}
@@ -382,20 +410,31 @@ const Contact = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.8 }}
-                className="p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl"
+                className={`p-4 sm:p-6 bg-gradient-to-r border rounded-xl ${
+                  user.availability !== false 
+                    ? 'from-primary/10 to-secondary/10 border-primary/20' 
+                    : 'from-yellow-500/10 to-orange-500/10 border-yellow-500/20'
+                }`}
               >
                 <h3 className="font-semibold text-text mb-4 flex items-center text-sm sm:text-base">
                   <Calendar
                     size={18}
-                    className="sm:w-5 sm:h-5 mr-2 text-primary"
+                    className={`sm:w-5 sm:h-5 mr-2 ${
+                      user.availability !== false ? 'text-primary' : 'text-yellow-500'
+                    }`}
                   />
                   Availability
                 </h3>
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                      user.availability !== false ? 'bg-green-500' : 'bg-yellow-500'
+                    }`}></div>
                     <span className="text-text">
-                      Available for new projects
+                      {user.availability !== false 
+                        ? 'Available for new projects' 
+                        : 'Currently unavailable for new projects'
+                      }
                     </span>
                   </div>
                   <div className="flex items-center space-x-2 text-text-secondary">
@@ -700,17 +739,24 @@ const Contact = () => {
 
               {/* Embedded Map */}
               <div className="relative h-48 sm:h-64 bg-background rounded-lg overflow-hidden">
-                <iframe
-                  src="https://www.google.com/maps?q=Ahmedabad,+India&output=embed"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Ahmedabad Location"
-                  className="grayscale hover:grayscale-0 transition-all duration-300"
-                ></iframe>
+                {loading ? (
+                  // Loading skeleton for map
+                  <div className="w-full h-full bg-surface animate-pulse rounded-lg flex items-center justify-center">
+                    <div className="text-text-secondary text-sm">Loading map...</div>
+                  </div>
+                ) : (
+                  <iframe
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(locationDisplay)}&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`${locationDisplay} Location`}
+                    className="grayscale hover:grayscale-0 transition-all duration-300"
+                  ></iframe>
+                )}
 
                 {/* Overlay for better integration */}
                 <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
@@ -719,7 +765,7 @@ const Contact = () => {
               <p className="text-text-secondary text-xs sm:text-sm mt-4">
                 <span className="block sm:inline">
                   <span className="font-medium text-text">Location:</span>{' '}
-                  Ahmedabad, India.
+                  {locationDisplay}.
                 </span>
               </p>
             </div>

@@ -7,14 +7,18 @@ const FILE_SIZE_LIMITS = {
   PROJECT_IMAGE: 10 * 1024 * 1024,
   
   // Default image size limit (10MB)
-  DEFAULT_IMAGE: 10 * 1024 * 1024
+  DEFAULT_IMAGE: 10 * 1024 * 1024,
+  
+  // Resume PDF size limit (10MB)
+  RESUME_PDF: 10 * 1024 * 1024
 }
 
 // Human readable file size limits
 const FILE_SIZE_LIMITS_MB = {
   PROFILE_IMAGE: '5MB',
   PROJECT_IMAGE: '10MB',
-  DEFAULT_IMAGE: '10MB'
+  DEFAULT_IMAGE: '10MB',
+  RESUME_PDF: '10MB'
 }
 
 // Supported file types
@@ -26,9 +30,17 @@ const SUPPORTED_IMAGE_TYPES = [
   'image/webp'
 ]
 
+const SUPPORTED_PDF_TYPES = [
+  'application/pdf'
+]
+
 // File type validation
 const isValidImageType = (fileType) => {
   return SUPPORTED_IMAGE_TYPES.includes(fileType)
+}
+
+const isValidPDFType = (fileType) => {
+  return SUPPORTED_PDF_TYPES.includes(fileType)
 }
 
 // File size validation
@@ -40,6 +52,8 @@ module.exports = {
   FILE_SIZE_LIMITS,
   FILE_SIZE_LIMITS_MB,
   SUPPORTED_IMAGE_TYPES,
+  SUPPORTED_PDF_TYPES,
   isValidImageType,
+  isValidPDFType,
   isValidFileSize
 }

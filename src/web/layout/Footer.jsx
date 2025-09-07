@@ -1,26 +1,32 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Heart, ExternalLink } from 'lucide-react'
 import { LINKS } from '../../data/links'
+import { useMasterData } from '../../hooks/useMasterData'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  
+  // Get dynamic data from Redux store
+  const { user, getContactInfo, loading } = useMasterData()
+  const contactInfo = getContactInfo()
 
+  // Dynamic social links with fallback to static LINKS
   const socialLinks = [
     {
       name: 'GitHub',
-      url: LINKS.github,
+      url: contactInfo.githubUrl || LINKS.github,
       icon: Github,
       color: 'hover:text-gray-900 dark:hover:text-white',
     },
     {
       name: 'LinkedIn',
-      url: LINKS.linkedin,
+      url: contactInfo.linkedinUrl || LINKS.linkedin,
       icon: Linkedin,
       color: 'hover:text-blue-600',
     },
     {
       name: 'Email',
-      url: LINKS.email,
+      url: contactInfo.email ? `mailto:${contactInfo.email}` : LINKS.email,
       icon: Mail,
       color: 'hover:text-red-500',
     },
@@ -33,11 +39,15 @@ const Footer = () => {
     { name: 'Contact', href: '#contact' },
   ]
 
+  // Dynamic resources with fallback to static LINKS
   const resources = [
-    { name: 'Resume', href: LINKS.resume, external: true },
-    { name: 'GitHub', href: LINKS.github, external: true },
-    { name: 'LinkedIn', href: LINKS.linkedin, external: true },
+    { name: 'Resume', href: user.resume || LINKS.resume, external: true },
+    { name: 'GitHub', href: contactInfo.githubUrl || LINKS.github, external: true },
+    { name: 'LinkedIn', href: contactInfo.linkedinUrl || LINKS.linkedin, external: true },
   ]
+
+  // Dynamic email link for contact buttons
+  const emailLink = contactInfo.email ? `mailto:${contactInfo.email}` : LINKS.email
 
   const scrollToSection = href => {
     if (href.startsWith('#')) {
@@ -92,7 +102,7 @@ const Footer = () => {
             </div>
             {/* Mobile Contact CTA */}
             <a
-              href={LINKS.email}
+              href={emailLink}
               className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity md:hidden"
             >
               <Mail size={16} />
@@ -152,7 +162,7 @@ const Footer = () => {
               Get notified about new projects and posts.
             </p>
             <a
-              href={LINKS.email}
+              href={emailLink}
               className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
             >
               <Mail size={16} />
@@ -166,7 +176,7 @@ const Footer = () => {
         {/* Bottom Footer */}
         <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="text-text-secondary text-sm flex items-center gap-1">
-            <span>© {currentYear} Mayur Bhalgama</span>
+            <span>© {currentYear} {user.name || 'Mayur Bhalgama'}</span>
             <motion.span
               className="text-red-500"
               animate={{ scale: [1, 1.15, 1] }}

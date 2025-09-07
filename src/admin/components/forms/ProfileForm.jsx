@@ -5,7 +5,9 @@ import * as Yup from 'yup'
 import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import ImageUpload from '../ui/ImageUpload'
+import PDFUpload from '../ui/PDFUpload'
 import { useImageUpload } from '../../hooks/useImageUpload'
+import { usePDFUpload } from '../../hooks/usePDFUpload'
 import userService from '../../services/userService'
 import authService from '../../services/authService'
 import { FILE_SIZE_LIMITS_MB } from '../../../constants/fileConstants'
@@ -14,7 +16,8 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
   const dispatch = useDispatch()
   const { user: currentUser, token } = useSelector(state => state.adminAuth)
   const { handleApiResponse } = useToast()
-  const { uploadImage, isAnyUploading, isUploading } = useImageUpload('profile')
+  const { uploadImage, isAnyUploading: isAnyImageUploading, isUploading } = useImageUpload('profile')
+  const { uploadPDF, isAnyUploading: isAnyPDFUploading, isUploading: isPDFUploading } = usePDFUpload()
 
   // Use profile data or fallback to current user
   const userData = profile || currentUser
@@ -56,6 +59,9 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
       country: Yup.string().max(100, 'Country cannot exceed 100 characters'),
       zipCode: Yup.string().max(20, 'Zip code cannot exceed 20 characters'),
     }),
+    headline: Yup.string().max(200, 'Headline cannot exceed 200 characters'),
+    availability: Yup.boolean(),
+    resume: Yup.string(),
   })
 
   // Initial form values
@@ -78,15 +84,18 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
       country: userData?.location?.country || '',
       zipCode: userData?.location?.zipCode || '',
     },
+    headline: userData?.headline || '',
+    availability: userData?.availability !== undefined ? userData.availability : true,
+    resume: userData?.resume || '',
   }
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
-      // Check if any images are still uploading
-      if (isAnyUploading()) {
+      // Check if any files are still uploading
+      if (isAnyImageUploading() || isAnyPDFUploading()) {
         setFieldError(
           'general',
-          'Please wait for profile image upload to complete'
+          'Please wait for file uploads to complete'
         )
         return
       }
@@ -96,6 +105,14 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         setFieldError(
           'profileImage',
           'Profile image upload failed. Please try uploading again.'
+        )
+        return
+      }
+
+      if (values.resume instanceof File) {
+        setFieldError(
+          'resume',
+          'Resume upload failed. Please try uploading again.'
         )
         return
       }
@@ -124,11 +141,14 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
           country: values.location.country.trim(),
           zipCode: values.location.zipCode.trim(),
         },
+        headline: values.headline.trim(),
+        availability: values.availability,
+        resume: values.resume,
       }
 
-      // Remove empty fields (except profileImage which needs to be explicitly set to empty for removal)
+      // Remove empty fields (except profileImage, resume, and availability which need to be explicitly set)
       Object.keys(profileData).forEach(key => {
-        if (!profileData[key] && key !== 'profileImage') {
+        if (!profileData[key] && key !== 'profileImage' && key !== 'resume' && key !== 'availability') {
           delete profileData[key]
         }
       })
@@ -307,10 +327,102 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
                     ? 'border-red-300 dark:border-red-600'
                     : 'border-slate-300 dark:border-slate-600'
                 } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
-                placeholder="Tell us about yourself (max 500 characters)"
+                placeholder="Tell us about yourself (max 1000 characters)"
               />
               <ErrorMessage
                 name="bio"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
+            </div>
+
+            {/* Headline */}
+            <div className="lg:col-span-2">
+              <label
+                htmlFor="headline"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
+                Professional Headline
+              </label>
+              <Field
+                type="text"
+                name="headline"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.headline && touched.headline
+                    ? 'border-red-300 dark:border-red-600'
+                    : 'border-slate-300 dark:border-slate-600'
+                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                placeholder="e.g. Full Stack Developer | React & Node.js Expert"
+              />
+              <ErrorMessage
+                name="headline"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
+            </div>
+
+            {/* Availability */}
+            <div>
+              <label
+                htmlFor="availability"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
+                Availability Status
+              </label>
+              <Field name="availability">
+                {({ field, form }) => (
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="availability"
+                      checked={field.value}
+                      onChange={(e) => form.setFieldValue('availability', e.target.checked)}
+                      name="availability"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600 rounded"
+                    />
+                    <label
+                      htmlFor="availability"
+                      className="ml-2 text-sm text-slate-700 dark:text-slate-300"
+                    >
+                      Available for work/opportunities
+                    </label>
+                  </div>
+                )}
+              </Field>
+              <ErrorMessage
+                name="availability"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
+            </div>
+
+            {/* Resume Upload */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Resume (PDF)
+              </label>
+              <PDFUpload
+                value={values.resume}
+                onChange={async file => {
+                  if (file) {
+                    setFieldValue('resume', file)
+                    try {
+                      const uploadedUrl = await uploadPDF(file, 'resume')
+                      if (uploadedUrl) {
+                        setFieldValue('resume', uploadedUrl)
+                      }
+                    } catch (error) {
+                      console.error('Background resume upload failed:', error)
+                    }
+                  }
+                }}
+                onRemove={() => setFieldValue('resume', '')}
+                isUploading={isPDFUploading('resume')}
+                placeholder="Select your resume (PDF)"
+                maxSize={FILE_SIZE_LIMITS_MB.RESUME_PDF}
+              />
+              <ErrorMessage
+                name="resume"
                 component="div"
                 className="mt-1 text-sm text-red-600 dark:text-red-400"
               />
@@ -574,7 +686,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
               <span>
                 {isSubmitting
                   ? 'Updating...'
-                  : isAnyUploading()
+                  : isAnyImageUploading() || isAnyPDFUploading()
                     ? 'Update Profile (Uploading...)'
                     : 'Update Profile'}
               </span>
