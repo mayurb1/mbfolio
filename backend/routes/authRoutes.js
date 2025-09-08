@@ -5,6 +5,7 @@ const Users = require("../models/users");
 const { authenticateToken } = require("../middleware/auth");
 const { upload, cleanupFile } = require("../middleware/upload");
 const uploadService = require("../services/uploadService");
+const tokenBlacklist = require("../utils/tokenBlacklist");
 
 const router = express.Router();
 
@@ -130,7 +131,12 @@ router.post("/logout", async (req, res) => {
 
     // Verify token is valid before processing logout
     try {
-      jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Add token to blacklist with expiry time
+      const expiryTime = decoded.exp * 1000; // Convert to milliseconds
+      tokenBlacklist.blacklistToken(token, expiryTime);
+      
     } catch (err) {
       return res.status(401).json({ 
         message: "Invalid token",
@@ -138,13 +144,6 @@ router.post("/logout", async (req, res) => {
       });
     }
 
-    // In a production app, you might want to:
-    // 1. Add token to a blacklist/revocation list
-    // 2. Store tokens in Redis with expiration
-    // 3. Use refresh tokens with shorter-lived access tokens
-    
-    // For now, we'll just send a success response
-    // The client will clear the token from localStorage
     res.json({ 
       message: "Logout successful",
       status: 200

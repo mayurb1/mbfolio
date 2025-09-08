@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { AnimatePresence } from 'framer-motion'
@@ -33,12 +33,39 @@ function App() {
   // Check if current path is admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
 
-  // Simulate initial loading time (only for non-admin routes)
+  // Performance monitoring
+  useEffect(() => {
+    // Report Web Vitals for performance monitoring
+    if (typeof window !== 'undefined' && window.gtag) {
+      // Track Core Web Vitals
+      const sendToGoogleAnalytics = ({ name, delta, id }) => {
+        window.gtag('event', name, {
+          event_category: 'Web Vitals',
+          value: Math.round(name === 'CLS' ? delta * 1000 : delta),
+          event_label: id,
+          non_interaction: true,
+        })
+      }
+
+      // Dynamically import web-vitals for better code splitting
+      import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+        getCLS(sendToGoogleAnalytics)
+        getFID(sendToGoogleAnalytics)
+        getFCP(sendToGoogleAnalytics)
+        getLCP(sendToGoogleAnalytics)
+        getTTFB(sendToGoogleAnalytics)
+      }).catch(() => {
+        // Silently fail if web-vitals is not available
+      })
+    }
+  }, [])
+
+  // Simulate initial loading time (only for non-admin routes) - Reduced for better UX
   useEffect(() => {
     if (!isAdminRoute) {
       const timer = setTimeout(() => {
         setIsLoading(false)
-      }, 1000)
+      }, 500) // Reduced from 1000ms to 500ms
 
       return () => clearTimeout(timer)
     } else {

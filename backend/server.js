@@ -1,6 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
+const helmet = require('helmet')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
 const skillsRoutes = require('./routes/skillsRoutes')
@@ -14,6 +15,19 @@ dotenv.config()
 connectDB()
 
 const app = express()
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}))
+
 app.use(
   cors({
     origin:

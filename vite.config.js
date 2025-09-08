@@ -9,11 +9,16 @@ export default defineConfig({
     VitePWA({
       // Auto-update service worker without user prompt for seamless updates
       registerType: 'autoUpdate',
-      
+
       // Static assets to include in the service worker precache
       // These files will be cached during service worker installation
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'resume.pdf'],
-      
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'masked-icon.svg',
+        'resume.pdf',
+      ],
+
       // PWA manifest configuration for installable app
       manifest: {
         name: 'Personal Portfolio',
@@ -26,47 +31,74 @@ export default defineConfig({
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
+            type: 'image/png',
+          },
+        ],
       },
-      
+
       // Workbox service worker configuration
       workbox: {
         // File patterns to include in precache (cached during SW install)
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2,pdf}'],
-        
+        globPatterns: ['**/*.{js,css,html,ico,svg,json,vue,txt,woff2,pdf}'],
+
+        // Exclude large images from precaching - they'll be cached on-demand
+        globIgnores: [
+          '**/images/byhh_main_img.png',
+          '**/images/profile-pic.jpg',
+        ],
+
+        // Set maximum file size for precaching (5MB)
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+
         // Service worker lifecycle options for immediate updates
-        skipWaiting: true,        // New SW takes control immediately
-        clientsClaim: true,       // SW controls all tabs immediately
+        skipWaiting: true, // New SW takes control immediately
+        clientsClaim: true, // SW controls all tabs immediately
         cleanupOutdatedCaches: true, // Remove old cache versions automatically
-        
+
         // Runtime caching strategies for specific routes/files
         runtimeCaching: [
           {
             // Cache strategy specifically for resume PDF
             urlPattern: /\/resume\.pdf$/,
-            
-            // NetworkFirst: Always try network first, fallback to cache
-            // This prevents serving stale 404s when file becomes available
             handler: 'NetworkFirst',
-            
             options: {
-              // Separate cache for PDF files (v2 to invalidate old 404 cache)
               cacheName: 'pdf-cache-v2',
-              
-              // Network timeout - fallback to cache after 3 seconds
-              networkTimeoutSeconds: 3
-            }
-          }
-        ]
-      }
-    })
+              networkTimeoutSeconds: 3,
+            },
+          },
+          {
+            // Cache large images with stale-while-revalidate strategy
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          {
+            // Cache API calls
+            urlPattern: /^https:\/\/api\./,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 5 * 60, // 5 minutes
+              },
+            },
+          },
+        ],
+      },
+    }),
   ],
   build: {
     rollupOptions: {
@@ -76,12 +108,24 @@ export default defineConfig({
           router: ['react-router-dom'],
           animations: ['framer-motion'],
           charts: ['d3'],
-          forms: ['formik', 'yup']
-        }
-      }
-    }
+          forms: ['formik', 'yup'],
+          markdown: ['react-markdown'],
+          ui: ['lucide-react'],
+        },
+      },
+    },
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    cssCodeSplit: true,
+    sourcemap: false,
   },
   server: {
-    port: 3000
-  }
+    port: 3000,
+  },
 })

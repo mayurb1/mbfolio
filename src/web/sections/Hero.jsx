@@ -23,36 +23,49 @@ const Hero = () => {
     const ctx = canvas.getContext('2d')
     const particles = []
     const isMobile = window.innerWidth < 768
-    const particleCount = isMobile ? 50 : 100
+    const isLowEnd = navigator.hardwareConcurrency <= 4 || window.innerWidth < 480
+    
+    // Reduce particle count for better performance
+    const particleCount = isLowEnd ? 25 : isMobile ? 40 : 80
 
-    // Set canvas size
+    // Set canvas size with device pixel ratio optimization
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const rect = canvas.getBoundingClientRect()
+      const dpr = Math.min(window.devicePixelRatio || 1, 2) // Cap at 2x for performance
+      
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
+      canvas.style.width = rect.width + 'px'
+      canvas.style.height = rect.height + 'px'
+      
+      ctx.scale(dpr, dpr)
     }
 
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    // Particle class
+    // Particle class with performance optimizations
     class Particle {
       constructor() {
         this.x = Math.random() * canvas.width
         this.y = Math.random() * canvas.height
-        this.size = Math.random() * (isMobile ? 1.5 : 2) + 1
-        this.speedX = Math.random() * (isMobile ? 2 : 3) - (isMobile ? 1 : 1.5)
-        this.speedY = Math.random() * (isMobile ? 2 : 3) - (isMobile ? 1 : 1.5)
-        this.opacity = Math.random() * 0.5 + 0.2
+        this.size = Math.random() * (isLowEnd ? 1 : isMobile ? 1.5 : 2) + 0.5
+        const speed = isLowEnd ? 1 : isMobile ? 1.5 : 2
+        this.speedX = Math.random() * speed - speed/2
+        this.speedY = Math.random() * speed - speed/2
+        this.opacity = Math.random() * 0.3 + 0.1
       }
 
       update() {
         this.x += this.speedX
         this.y += this.speedY
 
-        if (this.x > canvas.width) this.x = 0
-        if (this.x < 0) this.x = canvas.width
-        if (this.y > canvas.height) this.y = 0
-        if (this.y < 0) this.y = canvas.height
+        // Use canvas dimensions from getBoundingClientRect for accuracy
+        const rect = canvas.getBoundingClientRect()
+        if (this.x > rect.width) this.x = 0
+        if (this.x < 0) this.x = rect.width
+        if (this.y > rect.height) this.y = 0
+        if (this.y < 0) this.y = rect.height
       }
 
       draw() {
@@ -73,47 +86,69 @@ const Hero = () => {
       particles.push(new Particle())
     }
 
-    // Animation loop
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+    // Animation loop with performance optimizations
+    let animationId
+    let lastTime = 0
+    const targetFPS = isLowEnd ? 30 : isMobile ? 45 : 60
+    const frameInterval = 1000 / targetFPS
 
+    const animate = (currentTime) => {
+      animationId = requestAnimationFrame(animate)
+
+      // Throttle frame rate for better performance
+      if (currentTime - lastTime < frameInterval) {
+        return
+      }
+      lastTime = currentTime
+
+      const rect = canvas.getBoundingClientRect()
+      ctx.clearRect(0, 0, rect.width, rect.height)
+
+      // Update and draw particles
       particles.forEach(particle => {
         particle.update()
         particle.draw()
       })
 
-      // Draw connections between nearby particles (reduced for mobile)
-      const connectionDistance = isMobile ? 80 : 100
-      particles.forEach((particle, index) => {
-        particles.slice(index + 1).forEach(otherParticle => {
-          const dx = particle.x - otherParticle.x
-          const dy = particle.y - otherParticle.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
+      // Draw connections between nearby particles (optimized)
+      if (!isLowEnd) { // Skip connections on low-end devices
+        const connectionDistance = isMobile ? 60 : 80
+        const maxConnections = isMobile ? 2 : 3 // Limit connections per particle
+        
+        particles.forEach((particle, index) => {
+          let connectionCount = 0
+          for (let i = index + 1; i < particles.length && connectionCount < maxConnections; i++) {
+            const otherParticle = particles[i]
+            const dx = particle.x - otherParticle.x
+            const dy = particle.y - otherParticle.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
 
-          if (distance < connectionDistance) {
-            ctx.save()
-            ctx.globalAlpha =
-              (1 - distance / connectionDistance) * (isMobile ? 0.15 : 0.2)
-            ctx.strokeStyle = getComputedStyle(
-              document.documentElement
-            ).getPropertyValue('--color-primary')
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.moveTo(particle.x, particle.y)
-            ctx.lineTo(otherParticle.x, otherParticle.y)
-            ctx.stroke()
-            ctx.restore()
+            if (distance < connectionDistance) {
+              ctx.save()
+              ctx.globalAlpha = (1 - distance / connectionDistance) * (isMobile ? 0.1 : 0.15)
+              ctx.strokeStyle = getComputedStyle(
+                document.documentElement
+              ).getPropertyValue('--color-primary')
+              ctx.lineWidth = 0.5
+              ctx.beginPath()
+              ctx.moveTo(particle.x, particle.y)
+              ctx.lineTo(otherParticle.x, otherParticle.y)
+              ctx.stroke()
+              ctx.restore()
+              connectionCount++
+            }
           }
         })
-      })
-
-      requestAnimationFrame(animate)
+      }
     }
 
     animate()
 
     return () => {
       window.removeEventListener('resize', resizeCanvas)
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
     }
   }, [])
 

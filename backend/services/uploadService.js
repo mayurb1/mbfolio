@@ -2,6 +2,8 @@ const cloudinary = require('../config/cloudinary')
 const { isValidImageType, isValidPDFType, FILE_SIZE_LIMITS } = require('../constants/fileConstants')
 const crypto = require('crypto')
 const fs = require('fs')
+const sharp = require('sharp')
+const path = require('path')
 
 class UploadService {
   // Generate consistent hash for file content to prevent duplicates
@@ -31,6 +33,74 @@ class UploadService {
       return null
     }
   }
+
+  // Optimize image using Sharp before upload
+  async optimizeImage(filePath, options = {}) {
+    try {
+      const {
+        maxWidth = 1200,
+        maxHeight = 800,
+        quality = 80,
+        format = 'webp'
+      } = options
+
+      // Create optimized filename
+      const ext = path.extname(filePath)
+      const basename = path.basename(filePath, ext)
+      const dirPath = path.dirname(filePath)
+      const optimizedPath = path.join(dirPath, `${basename}_optimized.${format}`)
+
+      // Check if input file exists
+      if (!fs.existsSync(filePath)) {
+        throw new Error('Input file does not exist')
+      }
+
+      // Get image info
+      const metadata = await sharp(filePath).metadata()
+      
+      let sharpInstance = sharp(filePath)
+
+      // Only resize if image is larger than max dimensions
+      if (metadata.width > maxWidth || metadata.height > maxHeight) {
+        sharpInstance = sharpInstance.resize({
+          width: maxWidth,
+          height: maxHeight,
+          fit: 'inside',
+          withoutEnlargement: true
+        })
+      }
+
+      // Convert to specified format with optimization
+      switch (format) {
+        case 'webp':
+          sharpInstance = sharpInstance.webp({ quality, effort: 6 })
+          break
+        case 'jpeg':
+        case 'jpg':
+          sharpInstance = sharpInstance.jpeg({ quality, progressive: true })
+          break
+        case 'png':
+          sharpInstance = sharpInstance.png({ quality, progressive: true })
+          break
+        default:
+          sharpInstance = sharpInstance.webp({ quality, effort: 6 })
+      }
+
+      // Save optimized image
+      await sharpInstance.toFile(optimizedPath)
+
+      // Verify the optimized file exists
+      if (!fs.existsSync(optimizedPath)) {
+        throw new Error('Failed to create optimized image')
+      }
+
+      return optimizedPath
+    } catch (error) {
+      console.error('Image optimization failed:', error)
+      // Return original path if optimization fails
+      return filePath
+    }
+  }
   // Upload profile image
   async uploadProfileImage(file) {
     if (!file) {
@@ -48,30 +118,44 @@ class UploadService {
     }
 
     try {
-      // Generate hash for file content to check for duplicates
-      const fileHash = this.generateFileHash(file.path)
+      // Optimize image before upload
+      const optimizedPath = await this.optimizeImage(file.path, {
+        maxWidth: 500,
+        maxHeight: 500,
+        quality: 85,
+        format: 'webp'
+      })
+
+      // Generate hash for optimized file content to check for duplicates
+      const fileHash = this.generateFileHash(optimizedPath)
       
       // Check if file with same content already exists
       const existingFileUrl = await this.checkExistingFile(fileHash, 'portfolio/profiles')
       if (existingFileUrl) {
+        // Clean up optimized file
+        if (optimizedPath !== file.path && fs.existsSync(optimizedPath)) {
+          fs.unlinkSync(optimizedPath)
+        }
         return existingFileUrl // Return existing file URL instead of uploading duplicate
       }
 
       // File doesn't exist, proceed with upload
       const publicId = `profile_${fileHash}`
 
-      const result = await cloudinary.uploader.upload(file.path, {
+      const result = await cloudinary.uploader.upload(optimizedPath, {
         folder: 'portfolio/profiles',
         public_id: publicId,
         resource_type: 'image',
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         overwrite: false, // Don't overwrite if same public_id exists
         unique_filename: false,
-        use_filename: false,
-        transformation: [
-          { width: 500, height: 500, crop: 'limit', quality: 'auto', fetch_format: 'auto' }
-        ]
+        use_filename: false
       })
+
+      // Clean up optimized file after upload
+      if (optimizedPath !== file.path && fs.existsSync(optimizedPath)) {
+        fs.unlinkSync(optimizedPath)
+      }
 
       return result.secure_url
     } catch (error) {
@@ -96,30 +180,44 @@ class UploadService {
     }
 
     try {
-      // Generate hash for file content to check for duplicates
-      const fileHash = this.generateFileHash(file.path)
+      // Optimize image before upload
+      const optimizedPath = await this.optimizeImage(file.path, {
+        maxWidth: 1200,
+        maxHeight: 800,
+        quality: 80,
+        format: 'webp'
+      })
+
+      // Generate hash for optimized file content to check for duplicates
+      const fileHash = this.generateFileHash(optimizedPath)
       
       // Check if file with same content already exists
       const existingFileUrl = await this.checkExistingFile(fileHash, 'portfolio/projects')
       if (existingFileUrl) {
+        // Clean up optimized file
+        if (optimizedPath !== file.path && fs.existsSync(optimizedPath)) {
+          fs.unlinkSync(optimizedPath)
+        }
         return existingFileUrl // Return existing file URL instead of uploading duplicate
       }
 
       // File doesn't exist, proceed with upload
       const publicId = `project_${fileHash}`
 
-      const result = await cloudinary.uploader.upload(file.path, {
+      const result = await cloudinary.uploader.upload(optimizedPath, {
         folder: 'portfolio/projects',
         public_id: publicId,
         resource_type: 'image',
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         overwrite: false, // Don't overwrite if same public_id exists
         unique_filename: false,
-        use_filename: false,
-        transformation: [
-          { width: 1200, height: 800, crop: 'limit', quality: 'auto', fetch_format: 'auto' }
-        ]
+        use_filename: false
       })
+
+      // Clean up optimized file after upload
+      if (optimizedPath !== file.path && fs.existsSync(optimizedPath)) {
+        fs.unlinkSync(optimizedPath)
+      }
 
       return result.secure_url
     } catch (error) {

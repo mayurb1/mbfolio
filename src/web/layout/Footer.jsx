@@ -5,7 +5,7 @@ import { useMasterData } from '../../hooks/useMasterData'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
-  
+
   // Get dynamic data from Redux store
   const { user, getContactInfo, loading } = useMasterData()
   const contactInfo = getContactInfo()
@@ -42,12 +42,22 @@ const Footer = () => {
   // Dynamic resources with fallback to static LINKS
   const resources = [
     { name: 'Resume', href: user.resume || LINKS.resume, external: true },
-    { name: 'GitHub', href: contactInfo.githubUrl || LINKS.github, external: true },
-    { name: 'LinkedIn', href: contactInfo.linkedinUrl || LINKS.linkedin, external: true },
+    {
+      name: 'GitHub',
+      href: contactInfo.githubUrl || LINKS.github,
+      external: true,
+    },
+    {
+      name: 'LinkedIn',
+      href: contactInfo.linkedinUrl || LINKS.linkedin,
+      external: true,
+    },
   ]
 
   // Dynamic email link for contact buttons
-  const emailLink = contactInfo.email ? `mailto:${contactInfo.email}` : LINKS.email
+  const emailLink = contactInfo.email
+    ? `mailto:${contactInfo.email}`
+    : LINKS.email
 
   const scrollToSection = href => {
     if (href.startsWith('#')) {
@@ -69,105 +79,96 @@ const Footer = () => {
   return (
     <footer className="bg-surface border-t border-border">
       <div className="container mx-auto px-4 lg:px-8 py-10">
-        {/* Mobile-first simplified footer */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {/* Brand + Social */}
-          <div className="space-y-4">
-            <button
-              onClick={() => scrollToSection('#hero')}
-              className="text-xl lg:text-2xl font-bold text-gradient focus:outline-none rounded-lg p-1"
-              aria-label="Go to top of page"
-            >
-              &lt;MB /&gt;
-            </button>
-            <p className="text-text-secondary text-sm leading-relaxed">
-              Software Engineer crafting modern web experiences.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {socialLinks.map(social => {
-                const Icon = social.icon
-                return (
+        {/* Footer content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* About + Social */}
+          <div className="lg:col-span-1">
+            <div className="space-y-4">
+              <p className="text-text font-semibold text-lg">
+                Software Engineer
+              </p>
+              <p className="text-text-secondary text-sm leading-relaxed">
+                Crafting modern web experiences with passion and precision.
+                Always learning, always building.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                {socialLinks.map(social => {
+                  const Icon = social.icon
+                  return (
+                    <a
+                      key={social.name}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`p-2 bg-background border border-border rounded-lg text-text-secondary transition-colors duration-200 hover:bg-primary hover:text-background hover:border-primary`}
+                      aria-label={`Visit my ${social.name} profile`}
+                    >
+                      <Icon size={18} />
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="lg:col-span-1">
+            <h3 className="text-text font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-3 text-sm">
+              {quickLinks.map(link => (
+                <li key={link.name}>
                   <a
-                    key={social.name}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`p-2 bg-background border border-border rounded-lg text-text-secondary transition-colors duration-200 ${social.color}`}
-                    aria-label={`Visit my ${social.name} profile`}
+                    href={link.href}
+                    onClick={e => handleLinkClick(e, link.href, false)}
+                    className="text-text-secondary hover:text-primary transition-colors duration-200 flex items-center group"
                   >
-                    <Icon size={18} />
+                    <span className="w-2 h-2 bg-border rounded-full mr-3 group-hover:bg-primary transition-colors duration-200"></span>
+                    {link.name}
                   </a>
-                )
-              })}
-            </div>
-            {/* Mobile Contact CTA */}
-            <a
-              href={emailLink}
-              className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity md:hidden"
-            >
-              <Mail size={16} />
-              <span>Get in Touch</span>
-            </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Links split into Website and External */}
-          <div>
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-text font-semibold mb-3">Site links</h3>
-                <ul className="space-y-2 text-sm">
-                  {quickLinks.map(link => (
-                    <li key={link.name}>
-                      <a
-                        href={link.href}
-                        onClick={e => handleLinkClick(e, link.href, false)}
-                        className="text-text-secondary hover:text-primary transition-colors"
-                      >
-                        {link.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-text font-semibold mb-3">External links</h3>
-                <ul className="space-y-2 text-sm">
+          {/* Connect Section */}
+          <div className="lg:col-span-1">
+            <h3 className="text-text font-semibold mb-4">Connect</h3>
+            <div className="space-y-4">
+              <p className="text-text-secondary text-sm leading-relaxed">
+                Let's build something amazing together.
+              </p>
+              <a
+                href={emailLink}
+                className="inline-flex items-center gap-2 bg-primary text-background px-6 py-3 rounded-lg text-sm font-semibold hover:bg-secondary transition-colors duration-200"
+              >
+                <Mail size={16} />
+                <span>Get in Touch</span>
+              </a>
+
+              {/* External Resources */}
+              {/* <div className="pt-2">
+                <p className="text-text-secondary text-xs mb-2 uppercase tracking-wide">Resources</p>
+                <div className="space-y-2">
                   {resources.map(resource => (
-                    <li key={resource.name}>
-                      <a
-                        href={resource.href}
-                        onClick={e =>
-                          handleLinkClick(e, resource.href, resource.external)
-                        }
-                        target={resource.external ? '_blank' : undefined}
-                        rel={
-                          resource.external ? 'noopener noreferrer' : undefined
-                        }
-                        className="text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1"
-                      >
-                        <span>{resource.name}</span>
-                        {resource.external && <ExternalLink size={12} />}
-                      </a>
-                    </li>
+                    <a
+                      key={resource.name}
+                      href={resource.href}
+                      onClick={e =>
+                        handleLinkClick(e, resource.href, resource.external)
+                      }
+                      target={resource.external ? '_blank' : undefined}
+                      rel={
+                        resource.external ? 'noopener noreferrer' : undefined
+                      }
+                      className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm inline-flex items-center gap-1"
+                    >
+                      <span>{resource.name}</span>
+                      {resource.external && <ExternalLink size={12} />}
+                    </a>
                   ))}
-                </ul>
-              </div>
+                </div>
+              </div> */}
             </div>
-          </div>
-
-          {/* Newsletter/Contact (hidden on small, simplified on md+) */}
-          <div className="hidden md:block">
-            <h3 className="text-text font-semibold mb-3">Stay Connected</h3>
-            <p className="text-text-secondary text-sm mb-4">
-              Get notified about new projects and posts.
-            </p>
-            <a
-              href={emailLink}
-              className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              <Mail size={16} />
-              <span>Get in Touch</span>
-            </a>
           </div>
         </div>
 
@@ -176,7 +177,9 @@ const Footer = () => {
         {/* Bottom Footer */}
         <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="text-text-secondary text-sm flex items-center gap-1">
-            <span>© {currentYear} {user.name || 'Mayur Bhalgama'}</span>
+            <span>
+              © {currentYear} {user.name || 'Mayur Bhalgama'}
+            </span>
             <motion.span
               className="text-red-500"
               animate={{ scale: [1, 1.15, 1] }}

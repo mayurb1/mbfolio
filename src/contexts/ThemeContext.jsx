@@ -15,24 +15,24 @@ export const themes = {
     icon: '🌙',
     description: 'Easy on the eyes dark theme',
   },
-  cosmic: {
-    name: 'Cosmic',
-    class: 'cosmic',
-    icon: '🌌',
-    description: 'Deep space inspired theme',
-  },
-  neon: {
-    name: 'Neon',
-    class: 'neon',
-    icon: '⚡',
-    description: 'Electric cyberpunk vibes',
-  },
-  forest: {
-    name: 'Forest',
-    class: 'forest',
-    icon: '🌲',
-    description: 'Natural and calming green theme',
-  },
+  // cosmic: {
+  //   name: 'Cosmic',
+  //   class: 'cosmic',
+  //   icon: '🌌',
+  //   description: 'Deep space inspired theme',
+  // },
+  // neon: {
+  //   name: 'Neon',
+  //   class: 'neon',
+  //   icon: '⚡',
+  //   description: 'Electric cyberpunk vibes',
+  // },
+  // forest: {
+  //   name: 'Forest',
+  //   class: 'forest',
+  //   icon: '🌲',
+  //   description: 'Natural and calming green theme',
+  // },
 }
 
 export const ThemeProvider = ({ children }) => {
