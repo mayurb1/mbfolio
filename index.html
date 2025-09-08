@@ -43,12 +43,26 @@
   <meta name="msapplication-TileColor" content="#000000" />
   <meta name="format-detection" content="telephone=no" />
 
-  <!-- Preconnect to external domains -->
+  <!-- Preconnect to external domains for faster resource loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://api.cloudinary.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+  
+  <!-- DNS prefetch for additional domains -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://api.cloudinary.com">
+  <link rel="dns-prefetch" href="https://res.cloudinary.com">
+  
+  <!-- Preload critical fonts with font-display: swap for better performance -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
     rel="stylesheet">
+  
+  <!-- Preload critical images -->
+  <link rel="preload" as="image" href="/images/profile-pic.jpg" type="image/jpeg">
+  <link rel="preload" as="image" href="/images/og-image.png" type="image/png">
 
   <!-- PWA Icons -->
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

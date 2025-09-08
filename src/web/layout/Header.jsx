@@ -130,10 +130,14 @@ const Header = () => {
           <div className="flex items-center justify-between p-4">
             <button
               onClick={() => scrollToSection('hero')}
-              className="text-xl font-bold text-gradient focus:outline-none rounded-lg p-1"
+              className="focus:outline-none"
               aria-label="Go to top of page"
             >
-              &lt;MB /&gt;
+              <img
+                src="/images/logo.png"
+                alt="MB Logo"
+                className="h-8 w-auto"
+              />
             </button>
             <button
               onClick={closeDrawer}
@@ -203,10 +207,14 @@ const Header = () => {
           >
             <button
               onClick={() => scrollToSection('hero')}
-              className="text-xl lg:text-2xl font-bold text-gradient focus:outline-none rounded-lg p-1"
+              className="focus:outline-none rounded-lg p-1"
               aria-label="Go to top of page"
             >
-              &lt;MB /&gt;
+              <img
+                src="/images/logo.png"
+                alt="MB Logo"
+                className="h-10 lg:h-12 w-auto"
+              />
             </button>
           </motion.div>
 

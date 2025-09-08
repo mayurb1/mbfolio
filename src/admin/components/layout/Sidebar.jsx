@@ -1,92 +1,94 @@
 import { NavLink } from 'react-router-dom'
-import { 
-  LayoutDashboard, 
-  FolderOpen, 
-  Mail, 
-  Image, 
+import {
+  LayoutDashboard,
+  FolderOpen,
+  Mail,
+  Image,
   Settings,
   Zap,
   Layers,
   Briefcase,
   GraduationCap,
-  X
+  X,
 } from 'lucide-react'
 
 const Sidebar = ({ isOpen = true, onClose }) => {
   const menuItems = [
-    { 
-      name: 'Dashboard', 
-      path: '/admin/dashboard', 
-      icon: LayoutDashboard,
-      description: 'Overview & stats'
-    },
-    { 
-      name: 'Projects', 
-      path: '/admin/projects', 
+    // {
+    //   name: 'Dashboard',
+    //   path: '/admin/dashboard',
+    //   icon: LayoutDashboard,
+    //   description: 'Overview & stats'
+    // },
+    {
+      name: 'Projects',
+      path: '/admin/projects',
       icon: FolderOpen,
-      description: 'Manage projects'
+      description: 'Manage projects',
     },
-    { 
-      name: 'Experience', 
-      path: '/admin/experiences', 
+    {
+      name: 'Experience',
+      path: '/admin/experiences',
       icon: Briefcase,
-      description: 'Work history'
+      description: 'Work history',
     },
-    { 
-      name: 'Education', 
-      path: '/admin/education', 
+    {
+      name: 'Education',
+      path: '/admin/education',
       icon: GraduationCap,
-      description: 'Academic background'
+      description: 'Academic background',
     },
-    { 
-      name: 'Skills', 
-      path: '/admin/skills', 
+    {
+      name: 'Skills',
+      path: '/admin/skills',
       icon: Zap,
-      description: 'Manage skills'
+      description: 'Manage skills',
     },
-    { 
-      name: 'Categories', 
-      path: '/admin/categories', 
+    {
+      name: 'Categories',
+      path: '/admin/categories',
       icon: Layers,
-      description: 'Manage categories'
+      description: 'Manage categories',
     },
-    { 
-      name: 'Contact Forms', 
-      path: '/admin/contact', 
-      icon: Mail,
-      description: 'View submissions'
-    },
-    { 
-      name: 'Media', 
-      path: '/admin/media', 
-      icon: Image,
-      description: 'File management'
-    },
-    { 
-      name: 'Settings', 
-      path: '/admin/settings', 
-      icon: Settings,
-      description: 'Account & preferences'
-    }
+    // {
+    //   name: 'Contact Forms',
+    //   path: '/admin/contact',
+    //   icon: Mail,
+    //   description: 'View submissions'
+    // },
+    // {
+    //   name: 'Media',
+    //   path: '/admin/media',
+    //   icon: Image,
+    //   description: 'File management'
+    // },
+    // {
+    //   name: 'Settings',
+    //   path: '/admin/settings',
+    //   icon: Settings,
+    //   description: 'Account & preferences'
+    // }
   ]
 
   return (
     <>
       {/* Mobile backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
-      <aside className={`
+      <aside
+        className={`
         fixed left-0 top-0 w-64 h-screen bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50
         transform transition-transform duration-300 ease-in-out flex flex-col
         lg:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      `}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
@@ -99,7 +101,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
               </h2>
             </div>
           </div>
-          
+
           {/* Mobile close button */}
           <button
             onClick={onClose}
@@ -113,7 +115,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
         {/* Navigation */}
         <nav className="flex-1 mt-6 px-3 overflow-y-auto">
           <ul className="space-y-2">
-            {menuItems.map((item) => {
+            {menuItems.map(item => {
               const Icon = item.icon
               return (
                 <li key={item.path}>
@@ -135,9 +137,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
                   >
                     <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
                     <div className="flex-1">
-                      <div className="font-medium">
-                        {item.name}
-                      </div>
+                      <div className="font-medium">{item.name}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300">
                         {item.description}
                       </div>

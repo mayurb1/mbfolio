@@ -190,7 +190,7 @@ const About = () => {
     ? [
         {
           number: stats.experience?.text || '3+',
-          label: 'Years Experience',
+          label: 'Years of Experience',
           icon: Calendar,
         },
         {
