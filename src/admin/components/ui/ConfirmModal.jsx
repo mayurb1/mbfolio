@@ -62,7 +62,7 @@ const ConfirmModal = ({
             <h3 className="text-lg sm:text-base font-semibold text-slate-900 dark:text-white mb-2 sm:mb-1">
               {title}
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 sm:mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 sm:mb-4">
               {message}
             </p>
 
@@ -72,6 +72,7 @@ const ConfirmModal = ({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
+                aria-label="Cancel action"
                 className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
               >
                 {cancelText}
@@ -80,6 +81,7 @@ const ConfirmModal = ({
                 type="button"
                 onClick={handleConfirm}
                 disabled={loading}
+                aria-label="Confirm action"
                 className={`w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-white rounded-md focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation ${styles.confirmBtn}`}
               >
                 {loading && (

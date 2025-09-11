@@ -64,7 +64,7 @@ const PDFUpload = ({
               <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                 {getFileName()}
               </p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 PDF Document
               </p>
             </div>
@@ -83,7 +83,7 @@ const PDFUpload = ({
               )}
               <label
                 htmlFor={`pdf-upload-${uploadId}`}
-                className="p-2 bg-gray-500 text-white rounded cursor-pointer hover:bg-gray-600 transition-colors"
+                className="p-2 bg-gray-600 text-white rounded cursor-pointer hover:bg-gray-700 transition-colors"
                 title="Replace PDF"
               >
                 <Upload size={16} />
@@ -92,6 +92,7 @@ const PDFUpload = ({
                 <button
                   type="button"
                   onClick={onRemove}
+                  aria-label="Remove PDF"
                   className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                   title="Remove PDF"
                 >
@@ -128,14 +129,14 @@ const PDFUpload = ({
           {isUploading ? (
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 Uploading PDF...
               </p>
             </div>
           ) : (
             <>
-              <FileText className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+              <FileText className="mx-auto h-12 w-12 text-slate-500 mb-4" />
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
                 {placeholder}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-500 mb-4">

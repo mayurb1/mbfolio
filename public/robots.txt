@@ -1,0 +1,44 @@
+# Robots.txt for Mayur Bhalgama Portfolio
+# https://mbfolio.netlify.app
+
+User-agent: *
+Allow: /
+
+# Allow crawling of all pages
+Allow: /about
+Allow: /projects
+Allow: /experience
+Allow: /skills
+Allow: /contact
+Allow: /blog
+
+# Disallow admin pages and sensitive directories
+Disallow: /admin/
+Disallow: /api/
+Disallow: /backend/
+Disallow: /.env
+Disallow: /config/
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /build/
+
+# Allow access to important files
+Allow: /robots.txt
+Allow: /sitemap.xml
+Allow: /favicon.svg
+Allow: /manifest.webmanifest
+
+# Block access to common development and system files
+Disallow: /*.log
+Disallow: /*.tmp
+Disallow: /*.bak
+Disallow: /*~
+Disallow: /.git/
+Disallow: /.vscode/
+Disallow: /.idea/
+
+# Sitemap location
+Sitemap: https://mbfolio.netlify.app/sitemap.xml
+
+# Crawl delay (optional - can help prevent server overload)
+Crawl-delay: 1

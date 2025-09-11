@@ -321,6 +321,7 @@ const Experience = () => {
                 <button
                   onClick={() => window.location.reload()}
                   className="text-primary hover:text-secondary transition-colors duration-200"
+                  aria-label="Reload page to retry loading experience data"
                 >
                   Try again
                 </button>
@@ -365,6 +366,7 @@ const Experience = () => {
                 <button
                   onClick={() => window.location.reload()}
                   className="text-primary hover:text-secondary transition-colors duration-200"
+                  aria-label="Reload page to retry loading education data"
                 >
                   Try again
                 </button>

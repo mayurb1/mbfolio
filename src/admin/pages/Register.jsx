@@ -53,7 +53,7 @@ const Register = () => {
           <h2 className="mt-6 text-3xl font-bold text-slate-900 dark:text-white">
             Create Admin Account
           </h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             Set up your admin account to manage the portfolio
           </p>
         </div>
@@ -68,7 +68,7 @@ const Register = () => {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
                 Account Created Successfully!
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 Redirecting you to login page...
               </p>
             </div>
@@ -81,7 +81,7 @@ const Register = () => {
 
               {/* Login Link */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-sm text-slate-600 dark:text-slate-300">
                   Already have an account?{' '}
                   <Link 
                     to="/admin/login" 
@@ -97,7 +97,7 @@ const Register = () => {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-600 dark:text-slate-300">
             © 2024 Portfolio Admin. All rights reserved.
           </p>
         </div>

@@ -316,6 +316,7 @@ const Testimonials = () => {
                 className="p-2.5 bg-background border border-border rounded-full text-text-secondary hover:text-primary transition-colors duration-200"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                aria-label="Previous testimonial"
               >
                 <ChevronLeft size={18} />
               </motion.button>
@@ -324,6 +325,7 @@ const Testimonials = () => {
                 className="p-2.5 bg-background border border-border rounded-full text-text-secondary hover:text-primary transition-colors duration-200"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                aria-label="Next testimonial"
               >
                 <ChevronRight size={18} />
               </motion.button>

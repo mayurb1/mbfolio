@@ -101,6 +101,7 @@ const MultiImageUpload = ({
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(index)}
+                        aria-label={`Remove image ${index + 1}`}
                         className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                       >
                         <Trash2 size={16} />
@@ -114,7 +115,7 @@ const MultiImageUpload = ({
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <ImageIcon className="mx-auto h-8 w-8 text-slate-400" />
+                    <ImageIcon className="mx-auto h-8 w-8 text-slate-500" />
                     <p className="text-xs text-slate-500 mt-1">Click to upload</p>
                   </div>
                 )}
@@ -146,11 +147,11 @@ const MultiImageUpload = ({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          <ImageIcon className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+          <ImageIcon className="mx-auto h-12 w-12 text-slate-500 mb-4" />
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
             No additional images yet
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-500 mb-4">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mb-4">
             Click "Add Image" to start adding gallery images
           </p>
         </div>

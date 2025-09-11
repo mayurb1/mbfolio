@@ -52,7 +52,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
             {/* Mobile menu button */}
             <button
               onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-md text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+              className="lg:hidden p-2 rounded-md text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
               aria-label="Open sidebar"
             >
               <Menu className="w-5 h-5" />
@@ -71,7 +71,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
             {/* Theme toggle */}
             <button
               onClick={toggleAdminTheme}
-              className="p-2 rounded-md text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              className="p-2 rounded-md text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
               aria-label="Toggle theme"
             >
               {currentTheme === 'dark' ? (
@@ -102,7 +102,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
                   <div className="text-sm font-medium">
                     {user?.name || 'Admin'}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                  <div className="text-xs text-slate-600 dark:text-slate-300">
                     Administrator
                   </div>
                 </div>
@@ -116,7 +116,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
                     <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
                       {user?.name || 'Admin'}
                     </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">
+                    <div className="text-xs text-slate-600 dark:text-slate-300 truncate mt-1">
                       {user?.email || 'admin@example.com'}
                     </div>
                   </div>
@@ -162,7 +162,7 @@ const Header = ({ onMenuClick, pageTitle = 'Dashboard' }) => {
             Sign out of admin panel?
           </h3>
 
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
             You will be redirected to the login page and will need to sign in
             again to access the admin panel.
           </p>

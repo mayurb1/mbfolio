@@ -53,6 +53,7 @@ class ErrorBoundary extends React.Component {
               <button
                 onClick={() => window.location.reload()}
                 className="w-full bg-primary hover:bg-primary/90 text-background px-6 py-3 rounded-lg font-medium transition-colors"
+                aria-label="Refresh the page to try again"
               >
                 Refresh Page
               </button>
@@ -60,6 +61,7 @@ class ErrorBoundary extends React.Component {
               <button
                 onClick={() => window.location.href = '/'}
                 className="w-full border border-border text-text hover:bg-surface px-6 py-3 rounded-lg font-medium transition-colors"
+                aria-label="Go to the home page"
               >
                 Go Home
               </button>

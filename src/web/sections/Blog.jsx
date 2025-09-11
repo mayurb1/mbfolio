@@ -319,6 +319,7 @@ const Blog = () => {
                     ? 'bg-primary text-background'
                     : 'bg-background border border-border text-text-secondary hover:text-text hover:bg-surface'
                 }`}
+                aria-label={`Filter posts by ${category.label} category`}
               >
                 {category.label} ({category.count})
               </button>
@@ -366,6 +367,7 @@ const Blog = () => {
                 className="bg-primary text-background px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition-colors duration-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label="Subscribe to newsletter"
               >
                 Subscribe
               </motion.button>

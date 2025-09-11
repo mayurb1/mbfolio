@@ -107,11 +107,11 @@ const Dashboard = () => {
       case 'updated':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
       case 'read':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
       case 'completed':
         return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
     }
   }
 
@@ -125,7 +125,7 @@ const Dashboard = () => {
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
                 Welcome back, Admin! 👋
               </h2>
-              <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm sm:text-base">
+              <p className="text-slate-600 dark:text-slate-300 mt-1 text-sm sm:text-base">
                 Here's what's happening with your portfolio today.
               </p>
             </div>
@@ -196,7 +196,7 @@ const Dashboard = () => {
                     <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                       <div className="flex-shrink-0">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400" />
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-300" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -208,10 +208,10 @@ const Dashboard = () => {
                             {activity.status}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">
                           {activity.description}
                         </p>
-                        <div className="flex items-center mt-2 text-xs text-slate-400 dark:text-slate-500">
+                        <div className="flex items-center mt-2 text-xs text-slate-500 dark:text-slate-300">
                           <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
                           <span>{activity.time}</span>
                         </div>
@@ -294,7 +294,7 @@ const Dashboard = () => {
                     <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                       Admin User
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
                       Last login: Today at 2:30 PM
                     </p>
                   </div>

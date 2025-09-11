@@ -219,7 +219,7 @@ const Experiences = () => {
       'Internship': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
       'Freelance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
     }
-    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
   }
 
   return (
@@ -231,7 +231,7 @@ const Experiences = () => {
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
               Experience
             </h1>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-slate-600 dark:text-slate-300">
               Manage your professional experience and work history
             </p>
           </div>
@@ -244,7 +244,7 @@ const Experiences = () => {
         {/* Search */}
         <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
             <input
               type="text"
               placeholder="Search experiences..."
@@ -277,7 +277,7 @@ const Experiences = () => {
             </div>
           ) : experiences.length === 0 ? (
             <div className="bg-surface border border-border rounded-xl p-8 text-center">
-              <div className="text-slate-400 dark:text-slate-500 mb-2">
+              <div className="text-slate-500 dark:text-slate-300 mb-2">
                 <Search className="w-12 h-12 mx-auto mb-4" />
                 <p className="text-lg font-medium">No experiences found</p>
                 <p className="text-sm">Start by adding your first professional experience.</p>
@@ -355,7 +355,7 @@ const Experiences = () => {
                           </span>
                         ))}
                         {experience.skills.length > 3 && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                             +{experience.skills.length - 3} more
                           </span>
                         )}
@@ -376,6 +376,7 @@ const Experiences = () => {
                       <button
                         onClick={() => handleEditExperience(experience)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation"
+                        aria-label={`Edit experience: ${experience.position} at ${experience.company}`}
                         title="Edit experience"
                       >
                         <Edit className="w-4 h-4" />
@@ -383,6 +384,7 @@ const Experiences = () => {
                       <button
                         onClick={() => handleDeleteExperience(experience)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation"
+                        aria-label={`Delete experience: ${experience.position} at ${experience.company}`}
                         title="Delete experience"
                         disabled={loading}
                       >
@@ -406,7 +408,7 @@ const Experiences = () => {
                     {pagination.total} results
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Show:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Show:</span>
                     <select
                       value={pagination.limit}
                       onChange={(e) => handleLimitChange(parseInt(e.target.value))}
@@ -419,7 +421,7 @@ const Experiences = () => {
                       <option value={50}>50</option>
                       <option value={100}>100</option>
                     </select>
-                    <span className="text-sm text-slate-600 dark:text-slate-400">entries</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">entries</span>
                   </div>
                 </div>
 
@@ -428,6 +430,7 @@ const Experiences = () => {
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1 || loading}
                     className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Go to previous page"
                   >
                     Previous
                   </button>
@@ -437,7 +440,7 @@ const Experiences = () => {
                       return (
                         <span
                           key={`ellipsis-${index}`}
-                          className="px-3 py-1 text-sm text-slate-400 dark:text-slate-500"
+                          className="px-3 py-1 text-sm text-slate-500 dark:text-slate-300"
                         >
                           ...
                         </span>
@@ -455,6 +458,8 @@ const Experiences = () => {
                             ? 'bg-primary text-white'
                             : 'text-text-secondary border border-border hover:bg-surface'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        aria-label={`Go to page ${pageNum}`}
+                        aria-current={isCurrentPage ? 'page' : undefined}
                       >
                         {pageNum}
                       </button>
@@ -465,6 +470,7 @@ const Experiences = () => {
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page === pagination.totalPages || loading}
                     className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Go to next page"
                   >
                     Next
                   </button>

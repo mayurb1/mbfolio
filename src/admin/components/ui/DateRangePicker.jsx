@@ -184,7 +184,7 @@ const DateRangePicker = ({
           : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
       } text-slate-700 dark:text-slate-300 text-sm`}>
         <div className="flex items-center gap-2">
-          <Calendar className={`w-4 h-4 ${hasError ? 'text-red-400' : 'text-slate-400'}`} />
+          <Calendar className={`w-4 h-4 ${hasError ? 'text-red-400' : 'text-slate-500'}`} />
           <span className={hasError ? 'text-red-600 dark:text-red-400' : ''}>
             {formatDisplayValue() || 'Select date range'}
           </span>
@@ -216,7 +216,7 @@ const DateRangePicker = ({
               hasError ? 'border-red-300 dark:border-red-600 focus:ring-red-500' : 'border-slate-300 dark:border-slate-600'
             } bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-400 dark:hover:border-slate-500`}
           />
-          <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
         </div>
       </div>
 
@@ -236,7 +236,7 @@ const DateRangePicker = ({
             </span>
           </label>
           {isPresent && (
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-2 text-xs text-slate-600 dark:text-slate-300">
               This position/education is currently active
             </p>
           )}
@@ -261,9 +261,9 @@ const DateRangePicker = ({
                 hasError ? 'border-red-300 dark:border-red-600 focus:ring-red-500' : 'border-slate-300 dark:border-slate-600'
               } bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-400 dark:hover:border-slate-500`}
             />
-            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-600 dark:text-slate-300">
             Leave empty if no specific end date
           </p>
         </div>

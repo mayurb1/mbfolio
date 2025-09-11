@@ -65,7 +65,7 @@ const Login = () => {
           <h2 className="mt-6 text-3xl font-bold text-slate-900 dark:text-white">
             Admin Login
           </h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             Sign in to access the admin dashboard
           </p>
         </div>
@@ -77,7 +77,7 @@ const Login = () => {
           {/* Conditional Register Link */}
           {registrationAllowed && (
             <div className="mt-6 text-center">
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 Don&apos;t have an account?{' '}
                 <Link
                   to="/admin/register"
@@ -92,7 +92,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-600 dark:text-slate-300">
             © 2024 Portfolio Admin. All rights reserved.
           </p>
         </div>

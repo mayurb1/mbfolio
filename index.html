@@ -19,7 +19,7 @@
   <meta property="og:title" content="Mayur Bhalgama - Software Engineer" />
   <meta property="og:description"
     content="Software Engineer specializing in React, Node.js, and full-stack development. View my projects, experience, and get in touch." />
-  <meta property="og:image" content="https://mbfolio.netlify.app/images/og-image.png" />
+  <meta property="og:image" content="https://mbfolio.netlify.app/images/og-image.webp" />
   <meta property="og:url" content="https://mbfolio.netlify.app" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mayur Bhalgama Portfolio" />
@@ -34,7 +34,7 @@
   <meta name="twitter:title" content="Mayur Bhalgama - Software Engineer" />
   <meta name="twitter:description"
     content="Software Engineer specializing in React, Node.js, and full-stack development." />
-  <meta name="twitter:image" content="https://mbfolio.netlify.app/images/og-image.png" />
+  <meta name="twitter:image" content="https://mbfolio.netlify.app/images/og-image.webp" />
   <meta name="twitter:image:alt" content="Mayur Bhalgama - Software Engineer Portfolio" />
   <meta name="twitter:site" content="@mayurbhalgama" />
 
@@ -56,13 +56,15 @@
   <link rel="dns-prefetch" href="https://res.cloudinary.com">
   
   <!-- Preload critical fonts with font-display: swap for better performance -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
-    rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Preload font files for faster loading -->
+  <link rel="preload" href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyeMZhrib2Bg-4.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://fonts.gstatic.com/s/jetbrainsmono/v13/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxjPVmUsaaDhw.woff2" as="font" type="font/woff2" crossorigin>
   
   <!-- Preload critical images -->
-  <link rel="preload" as="image" href="/images/profile-pic.jpg" type="image/jpeg">
-  <link rel="preload" as="image" href="/images/og-image.png" type="image/png">
+  <link rel="preload" as="image" href="/images/og-image.webp" type="image/png">
 
   <!-- PWA Icons -->
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

@@ -247,7 +247,7 @@ const Education = () => {
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
               Education
             </h1>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-slate-600 dark:text-slate-300">
               Manage your educational background and qualifications
             </p>
           </div>
@@ -265,7 +265,7 @@ const Education = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search education..."
@@ -277,7 +277,7 @@ const Education = () => {
 
             {/* Type Filter */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <select
                 value={filters.typeFilter}
                 onChange={handleTypeFilter}
@@ -316,7 +316,7 @@ const Education = () => {
             </div>
           ) : education.length === 0 ? (
             <div className="bg-surface border border-border rounded-xl p-8 text-center">
-              <div className="text-slate-400 dark:text-slate-500 mb-2">
+              <div className="text-slate-500 dark:text-slate-300 mb-2">
                 <Search className="w-12 h-12 mx-auto mb-4" />
                 <p className="text-lg font-medium">No education records found</p>
                 <p className="text-sm">Start by adding your first educational qualification.</p>
@@ -414,6 +414,7 @@ const Education = () => {
                       <button
                         onClick={() => handleEditEducation(educationRecord)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation"
+                        aria-label={`Edit education: ${educationRecord.degree} at ${educationRecord.institution}`}
                         title="Edit education"
                       >
                         <Edit className="w-4 h-4" />
@@ -421,6 +422,7 @@ const Education = () => {
                       <button
                         onClick={() => handleDeleteEducation(educationRecord)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation"
+                        aria-label={`Delete education: ${educationRecord.degree} at ${educationRecord.institution}`}
                         title="Delete education"
                         disabled={loading}
                       >
@@ -475,6 +477,7 @@ const Education = () => {
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1 || loading}
                     className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Go to previous page"
                   >
                     Previous
                   </button>
@@ -502,6 +505,8 @@ const Education = () => {
                             ? 'bg-primary text-white'
                             : 'text-text-secondary border border-border hover:bg-surface'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        aria-label={`Go to page ${pageNum}`}
+                        aria-current={isCurrentPage ? 'page' : undefined}
                       >
                         {pageNum}
                       </button>
@@ -514,6 +519,7 @@ const Education = () => {
                       pagination.page === pagination.totalPages || loading
                     }
                     className="px-3 py-1 text-sm font-medium text-text-secondary border border-border rounded-md hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Go to next page"
                   >
                     Next
                   </button>

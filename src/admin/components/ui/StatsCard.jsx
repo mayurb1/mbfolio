@@ -3,7 +3,7 @@ const StatsCard = ({ title, value, icon: Icon, change, description }) => {
     <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
             {title}
           </p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
@@ -15,13 +15,13 @@ const StatsCard = ({ title, value, icon: Icon, change, description }) => {
                 ? 'text-green-600 dark:text-green-400' 
                 : change.startsWith('-')
                 ? 'text-red-600 dark:text-red-400'
-                : 'text-slate-600 dark:text-slate-400'
+                : 'text-slate-600 dark:text-slate-300'
             }`}>
               {change}
             </p>
           )}
           {description && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
               {description}
             </p>
           )}
