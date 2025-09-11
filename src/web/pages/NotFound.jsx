@@ -66,6 +66,7 @@ const NotFound = () => {
           <button
             onClick={goHome}
             className="w-full bg-primary text-background py-3 px-6 rounded-lg font-semibold hover:bg-secondary transition-colors duration-200 flex items-center justify-center space-x-2"
+            aria-label="Navigate to home page"
           >
             <Home size={20} />
             <span>Go Home</span>
@@ -74,6 +75,7 @@ const NotFound = () => {
           <button
             onClick={goBack}
             className="w-full border border-border text-text py-3 px-6 rounded-lg font-semibold hover:bg-surface transition-colors duration-200 flex items-center justify-center space-x-2"
+            aria-label="Go back to previous page"
           >
             <ArrowLeft size={20} />
             <span>Go Back</span>

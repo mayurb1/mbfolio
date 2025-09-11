@@ -134,7 +134,7 @@ const Header = () => {
               aria-label="Go to top of page"
             >
               <img
-                src="/images/logo.png"
+                src="/images/logo.webp"
                 alt="MB Logo"
                 className="h-8 w-auto"
               />
@@ -211,7 +211,7 @@ const Header = () => {
               aria-label="Go to top of page"
             >
               <img
-                src="/images/logo.png"
+                src="/images/logo.webp"
                 alt="MB Logo"
                 className="h-10 lg:h-12 w-auto"
               />

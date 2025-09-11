@@ -11,11 +11,11 @@ const Button = ({
   
   const variants = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 disabled:hover:bg-blue-600",
-    secondary: "bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-white focus:ring-slate-500",
+    secondary: "bg-slate-200 hover:bg-slate-300 text-slate-900 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-white focus:ring-slate-500",
     danger: "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 disabled:hover:bg-red-600",
     success: "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500 disabled:hover:bg-green-600",
-    ghost: "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 focus:ring-slate-500",
-    outline: "border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-slate-500"
+    ghost: "text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700 focus:ring-slate-500",
+    outline: "border border-slate-400 dark:border-slate-500 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-slate-500"
   }
   
   const sizes = {

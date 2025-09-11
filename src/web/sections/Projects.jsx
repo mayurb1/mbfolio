@@ -555,8 +555,8 @@ const Projects = () => {
               onError={e => {
                 e.target.style.display = 'none'
                 e.target.parentElement.innerHTML = `
-                  <div class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                    <div class="text-center text-gray-500 dark:text-gray-400">
+                  <div class="absolute inset-0 flex items-center justify-center" style="background-color: var(--color-surface);">
+                    <div class="text-center" style="color: var(--color-text-secondary);">
                       <div class="text-2xl mb-2">📷</div>
                       <div class="text-sm font-medium">Project Image</div>
                       <div class="text-xs">Not Available</div>
@@ -566,8 +566,8 @@ const Projects = () => {
               }}
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-              <div className="text-center text-gray-500 dark:text-gray-400">
+            <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className="text-center" style={{ color: 'var(--color-text-secondary)' }}>
                 <div className="text-2xl mb-2">📷</div>
                 <div className="text-sm font-medium">Project Image</div>
                 <div className="text-xs">Not Available</div>
@@ -666,6 +666,7 @@ const Projects = () => {
                     e.stopPropagation()
                     window.open(project.github, '_blank')
                   }}
+                  aria-label={`View ${project.title} source code on GitHub`}
                 >
                   <Github size={16} />
                 </motion.button>
@@ -678,6 +679,7 @@ const Projects = () => {
                     e.stopPropagation()
                     window.open(project.demo, '_blank')
                   }}
+                  aria-label={`View ${project.title} live demo`}
                 >
                   <ExternalLink size={16} />
                 </motion.button>
@@ -728,6 +730,7 @@ const Projects = () => {
               </div>
               <button
                 onClick={onClose}
+                aria-label="Close project details"
                 className="p-2 hover:bg-surface rounded-full transition-colors duration-200"
               >
                 <X size={24} />
@@ -743,8 +746,8 @@ const Projects = () => {
                 </div>
               ) : (
                 <div className="mb-6">
-                  <div className="w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-500 dark:text-gray-400">
+                  <div className="w-full h-64 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface)' }}>
+                    <div className="text-center" style={{ color: 'var(--color-text-secondary)' }}>
                       <div className="text-4xl mb-2">📷</div>
                       <div className="text-lg font-medium">Project Images</div>
                       <div className="text-sm">Not Available</div>
@@ -844,6 +847,7 @@ const Projects = () => {
               <p className="text-text-secondary text-lg mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
+                aria-label="Reload page to retry loading projects"
                 className="text-primary hover:text-secondary transition-colors duration-200"
               >
                 Try again

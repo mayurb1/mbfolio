@@ -230,7 +230,7 @@ const Skills = () => {
               {skill.name}
             </div>
             {skill.description && (
-              <div className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">
+              <div className="text-sm text-slate-600 dark:text-slate-300 truncate max-w-xs">
                 {skill.description}
               </div>
             )}
@@ -307,6 +307,7 @@ const Skills = () => {
               <button
                 onClick={() => handleEditSkill(skill)}
                 className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation flex-shrink-0"
+                aria-label={`Edit skill: ${skill.name}`}
                 title="Edit skill"
               >
                 <Edit className="w-4 h-4" />
@@ -314,6 +315,7 @@ const Skills = () => {
               <button
                 onClick={() => handleDeleteSkill(skill)}
                 className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation flex-shrink-0"
+                aria-label={`Delete skill: ${skill.name}`}
                 title="Delete skill"
                 disabled={loading}
               >
@@ -335,7 +337,7 @@ const Skills = () => {
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
               Skills
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
+            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base">
               Manage your skills and proficiency levels
             </p>
           </div>
@@ -350,7 +352,7 @@ const Skills = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search skills..."
@@ -362,7 +364,7 @@ const Skills = () => {
 
             {/* Category Filter */}
             <div className="relative sm:min-w-48">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <select
                 value={filters.categoryFilter}
                 onChange={handleCategoryFilter}
@@ -413,7 +415,7 @@ const Skills = () => {
                     {pagination.total} results
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Show:</span>
+                    <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Show:</span>
                     <select
                       value={pagination.limit}
                       onChange={(e) => handleLimitChange(parseInt(e.target.value))}
@@ -426,7 +428,7 @@ const Skills = () => {
                       <option value={50}>50</option>
                       <option value={100}>100</option>
                     </select>
-                    <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">entries</span>
+                    <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">entries</span>
                   </div>
                 </div>
 
@@ -436,7 +438,8 @@ const Skills = () => {
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1 || loading}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation whitespace-nowrap"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation whitespace-nowrap"
+                    aria-label="Go to previous page"
                   >
                     <span className="hidden sm:inline">Previous</span>
                     <span className="sm:hidden">‹</span>
@@ -448,7 +451,7 @@ const Skills = () => {
                       return (
                         <span
                           key={`ellipsis-${index}`}
-                          className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-slate-400 dark:text-slate-500"
+                          className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-slate-500 dark:text-slate-300"
                         >
                           ...
                         </span>
@@ -464,8 +467,10 @@ const Skills = () => {
                         className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md touch-manipulation ${
                           isCurrentPage
                             ? 'bg-blue-600 text-white'
-                            : 'text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+                            : 'text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        aria-label={`Go to page ${pageNum}`}
+                        aria-current={isCurrentPage ? 'page' : undefined}
                       >
                         {pageNum}
                       </button>
@@ -476,7 +481,8 @@ const Skills = () => {
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page === pagination.totalPages || loading}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation whitespace-nowrap"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation whitespace-nowrap"
+                    aria-label="Go to next page"
                   >
                     <span className="hidden sm:inline">Next</span>
                     <span className="sm:hidden">›</span>

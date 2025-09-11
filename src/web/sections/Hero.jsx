@@ -313,6 +313,7 @@ const Hero = () => {
                 className="group bg-primary text-background px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-secondary transition-colors duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label="Navigate to projects section to view my work"
               >
                 <span>View My Work</span>
                 {/* <ExternalLink
@@ -326,6 +327,7 @@ const Hero = () => {
                 className="group border-2 border-primary text-primary px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-primary hover:text-background transition-colors duration-200 flex items-center space-x-2 w-full sm:w-auto justify-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label="Download my resume as PDF"
               >
                 <Download
                   size={18}

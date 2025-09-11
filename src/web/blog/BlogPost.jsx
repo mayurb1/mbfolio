@@ -278,6 +278,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               whileHover={{ x: -4 }}
+              aria-label="Go back to blog posts"
             >
               <ArrowLeft size={20} />
               <span>Back to Blog</span>
@@ -330,6 +331,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
                 className="inline-flex items-center space-x-2 px-6 py-3 bg-surface border border-border rounded-lg text-text hover:bg-background transition-colors duration-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label="Share this article"
               >
                 <Share2 size={16} />
                 <span>Share Article</span>

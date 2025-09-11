@@ -82,6 +82,7 @@ const MultiSelect = ({
         type="button"
         onClick={handleToggleDropdown}
         disabled={disabled || loading}
+        aria-label={`Open ${placeholder || 'selection'} dropdown`}
         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center justify-between min-h-[40px] ${
           error
             ? 'border-red-300 dark:border-red-600'
@@ -94,7 +95,7 @@ const MultiSelect = ({
       >
         <div className="flex-1 flex flex-wrap gap-1 min-h-[24px]">
           {loading ? (
-            <span className="text-slate-500 dark:text-slate-400">Loading...</span>
+            <span className="text-slate-600 dark:text-slate-300">Loading...</span>
           ) : selectedOptions.length > 0 ? (
             selectedOptions.map((option) => (
               <span
@@ -106,13 +107,14 @@ const MultiSelect = ({
                   type="button"
                   onClick={(e) => handleRemoveOption(getOptionValue(option), e)}
                   className="ml-1 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  aria-label={`Remove ${getOptionLabel(option)}`}
                 >
                   <X size={12} />
                 </button>
               </span>
             ))
           ) : (
-            <span className="text-slate-500 dark:text-slate-400">{placeholder}</span>
+            <span className="text-slate-600 dark:text-slate-300">{placeholder}</span>
           )}
         </div>
 
@@ -121,14 +123,15 @@ const MultiSelect = ({
             <button
               type="button"
               onClick={handleClearAll}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              className="text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200"
+              aria-label="Clear all selected options"
             >
               <X size={16} />
             </button>
           )}
           <ChevronDown 
             size={16} 
-            className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`text-slate-600 dark:text-slate-300 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
       </button>
@@ -145,7 +148,7 @@ const MultiSelect = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search options..."
-                className="w-full px-2 py-1 text-sm border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-600 dark:placeholder-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           )}
@@ -153,7 +156,7 @@ const MultiSelect = ({
           {/* Options list */}
           <div className="max-h-48 overflow-y-auto">
             {filteredOptions.length === 0 ? (
-              <div className="p-3 text-sm text-slate-500 dark:text-slate-400 text-center">
+              <div className="p-3 text-sm text-slate-600 dark:text-slate-300 text-center">
                 {searchTerm ? 'No options found' : 'No options available'}
               </div>
             ) : (
@@ -166,6 +169,7 @@ const MultiSelect = ({
                     key={optionValue}
                     type="button"
                     onClick={() => handleToggleOption(option)}
+                    aria-label={`${isSelected ? 'Deselect' : 'Select'} ${getOptionLabel(option)}`}
                     className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 ${
                       isSelected 
                         ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' 
@@ -182,7 +186,7 @@ const MultiSelect = ({
                     <span className="flex-1">{getOptionLabel(option)}</span>
                     {/* Show additional info if available */}
                     {option.category && (
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                      <span className="text-xs text-slate-600 dark:text-slate-300">
                         {option.category}
                       </span>
                     )}
@@ -195,7 +199,7 @@ const MultiSelect = ({
           {/* Footer with selection count */}
           {selectedOptions.length > 0 && (
             <div className="p-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
                 <span>{selectedOptions.length} selected</span>
                 <button
                   type="button"

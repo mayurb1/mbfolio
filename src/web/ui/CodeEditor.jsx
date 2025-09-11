@@ -272,6 +272,7 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                   backgroundColor: 'var(--color-primary)',
                   color: 'var(--color-background)',
                 }}
+                aria-label={isRunning ? 'Code is currently running' : 'Execute the code'}
               >
                 <Play size={16} />
                 <span>{isRunning ? 'Running...' : 'Run Code'}</span>
@@ -312,7 +313,8 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                   onMouseLeave={e =>
                     (e.target.style.backgroundColor = 'transparent')
                   }
-                  aria-label="Copy code"
+                  aria-label="Copy code to clipboard"
+                  title="Copy code"
                 >
                   <Copy size={16} />
                 </button>
@@ -329,7 +331,8 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                   onMouseLeave={e =>
                     (e.target.style.backgroundColor = 'transparent')
                   }
-                  aria-label="Download code"
+                  aria-label="Download code as file"
+                  title="Download code"
                 >
                   <Download size={16} />
                 </button>
@@ -346,7 +349,7 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                   onMouseLeave={e =>
                     (e.target.style.backgroundColor = 'transparent')
                   }
-                  aria-label="Reset to template"
+                  aria-label="Reset code to default template"
                   title="Reset to template"
                 >
                   <RotateCcw size={16} />
@@ -364,7 +367,7 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                   onMouseLeave={e =>
                     (e.target.style.backgroundColor = 'transparent')
                   }
-                  aria-label="Clear code"
+                  aria-label="Clear all code from editor"
                   title="Clear all code"
                 >
                   <Trash2 size={16} />
@@ -382,7 +385,8 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                   onMouseLeave={e =>
                     (e.target.style.backgroundColor = 'transparent')
                   }
-                  aria-label="Toggle fullscreen"
+                  aria-label={isFullscreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode'}
+                  title="Toggle fullscreen"
                 >
                   <Maximize2 size={16} />
                 </button>
@@ -541,7 +545,7 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
                                   : ''
                           }`}
                         >
-                          <span className="text-gray-500 mr-2">
+                          <span className="mr-2" style={{ color: 'var(--color-text-secondary)' }}>
                             [{log.type}]
                           </span>
                           {log.content}

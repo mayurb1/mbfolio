@@ -110,7 +110,7 @@ const Profile = () => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <User className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
+                    <User className="w-8 h-8 sm:w-10 sm:h-10 text-slate-500" />
                   </div>
                 )}
               </div>

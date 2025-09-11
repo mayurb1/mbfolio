@@ -105,7 +105,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
           {/* Mobile close button */}
           <button
             onClick={onClose}
-            className="lg:hidden p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+            className="lg:hidden p-1 rounded-md text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
             aria-label="Close sidebar"
           >
             <X className="w-5 h-5" />
@@ -138,7 +138,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
                     <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
                     <div className="flex-1">
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300">
+                      <div className="text-xs text-slate-600 dark:text-slate-300 group-hover:text-slate-700 dark:group-hover:text-slate-200">
                         {item.description}
                       </div>
                     </div>
@@ -152,7 +152,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
         {/* Footer */}
         <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
           <div className="text-center">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-300">
               Portfolio Admin v1.0
             </p>
           </div>

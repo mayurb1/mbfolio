@@ -60,11 +60,11 @@ const DataTable = ({
       {loading ? (
         <div className="p-6 sm:p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">Loading...</p>
+          <p className="mt-2 text-slate-700 dark:text-slate-300">Loading...</p>
         </div>
       ) : data.length === 0 ? (
         <div className="p-6 sm:p-8 text-center">
-          <p className="text-slate-600 dark:text-slate-400">{emptyMessage}</p>
+          <p className="text-slate-700 dark:text-slate-300">{emptyMessage}</p>
         </div>
       ) : (
         <>
@@ -79,7 +79,7 @@ const DataTable = ({
                       return (
                         <th
                           key={header.id}
-                          className={`px-4 xl:px-6 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${
+                          className={`px-4 xl:px-6 py-3 text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wider ${
                             isActionsColumn ? 'text-right w-48 min-w-[180px]' : 'text-left'
                           }`}
                           style={header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined}
@@ -134,7 +134,7 @@ const DataTable = ({
                     
                     return (
                       <div key={cell.id} className={`flex ${isActionsColumn ? 'justify-between items-center' : 'justify-between items-start'} py-2 border-b border-slate-100 dark:border-slate-700/50 last:border-b-0`}>
-                        <dt className="text-sm font-medium text-slate-500 dark:text-slate-400 flex-shrink-0 mr-4">
+                        <dt className="text-sm font-medium text-slate-600 dark:text-slate-300 flex-shrink-0 mr-4">
                           {flexRender(header.column.columnDef.header, header.getContext())}
                         </dt>
                         <dd className={`text-sm text-slate-900 dark:text-white ${isActionsColumn ? 'flex-shrink-0' : 'text-right flex-1'}`}>
@@ -153,7 +153,7 @@ const DataTable = ({
             <div className="px-4 sm:px-6 py-3 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-700">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Results info */}
-                <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 text-center sm:text-left">
+                <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 text-center sm:text-left">
                   Showing {pageIndex * pageSize + 1} to{' '}
                   {Math.min((pageIndex + 1) * pageSize, table.getFilteredRowModel().rows.length)} of{' '}
                   {table.getFilteredRowModel().rows.length} results
@@ -164,7 +164,8 @@ const DataTable = ({
                   <button
                     onClick={() => table.setPageIndex(0)}
                     disabled={!table.getCanPreviousPage()}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    aria-label="Go to first page"
                   >
                     <span className="hidden sm:inline">First</span>
                     <span className="sm:hidden">1</span>
@@ -172,20 +173,22 @@ const DataTable = ({
                   <button
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    aria-label="Go to previous page"
                   >
                     <span className="hidden sm:inline">Previous</span>
                     <span className="sm:hidden">‹</span>
                   </button>
                   
-                  <span className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                  <span className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
                     <span className="hidden sm:inline">Page </span>{pageIndex + 1}<span className="hidden sm:inline"> of </span><span className="sm:hidden">/</span>{pageCount}
                   </span>
                   
                   <button
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    aria-label="Go to next page"
                   >
                     <span className="hidden sm:inline">Next</span>
                     <span className="sm:hidden">›</span>
@@ -193,7 +196,8 @@ const DataTable = ({
                   <button
                     onClick={() => table.setPageIndex(pageCount - 1)}
                     disabled={!table.getCanNextPage()}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    aria-label="Go to last page"
                   >
                     <span className="hidden sm:inline">Last</span>
                     <span className="sm:hidden">{pageCount}</span>

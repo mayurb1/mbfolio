@@ -266,7 +266,7 @@ const Projects = () => {
 
           ) : projects.length === 0 ? (
             <div className="bg-surface border border-border rounded-xl p-8 text-center">
-              <div className="text-slate-400 dark:text-slate-500 mb-2">
+              <div className="text-slate-500 dark:text-slate-300 mb-2">
                 <Search className="w-12 h-12 mx-auto mb-4" />
                 <p className="text-lg font-medium">No projects found</p>
                 <p className="text-sm">Start by creating your first project.</p>
@@ -292,7 +292,7 @@ const Projects = () => {
                       </div>
                     ) : (
                       <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-2 border-border flex-shrink-0">
-                        <div className="w-6 h-6 text-slate-400">
+                        <div className="w-6 h-6 text-slate-500">
                           <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                           </svg>
@@ -332,7 +332,7 @@ const Projects = () => {
                       project.type === 'organization' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
                       project.type === 'freelance' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400' :
                       project.type === 'open-source' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                      'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
                     }`}>
                       {project.type}
                     </span>
@@ -342,8 +342,8 @@ const Projects = () => {
                       project.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
                       project.status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' :
                       project.status === 'planned' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
-                      project.status === 'archived' ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                      project.status === 'archived' ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300' :
+                      'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
                     }`}>
                       {project.status}
                     </span>
@@ -370,7 +370,7 @@ const Projects = () => {
                           </span>
                         ))}
                         {project.technologies.length > 3 && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                             +{project.technologies.length - 3} more
                           </span>
                         )}
@@ -386,7 +386,7 @@ const Projects = () => {
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors touch-manipulation"
+                          className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors touch-manipulation"
                           title="View on GitHub"
                         >
                           <Github className="w-4 h-4" />
@@ -397,7 +397,7 @@ const Projects = () => {
                           href={project.demo}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors touch-manipulation"
+                          className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors touch-manipulation"
                           title="View live demo"
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -408,8 +408,9 @@ const Projects = () => {
                         className={`p-2 rounded-lg transition-colors touch-manipulation ${
                           project.featured 
                             ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20' 
-                            : 'text-slate-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
+                            : 'text-slate-500 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
                         }`}
+                        aria-label={project.featured ? `Remove ${project.title} from featured` : `Add ${project.title} to featured`}
                         title={project.featured ? 'Remove from featured' : 'Add to featured'}
                       >
                         <Star className="w-4 h-4" fill={project.featured ? 'currentColor' : 'none'} />
@@ -419,6 +420,7 @@ const Projects = () => {
                       <button
                         onClick={() => handleEditProject(project)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 touch-manipulation"
+                        aria-label={`Edit project: ${project.title}`}
                         title="Edit project"
                       >
                         <Edit className="w-4 h-4" />
@@ -426,6 +428,7 @@ const Projects = () => {
                       <button
                         onClick={() => handleDeleteProject(project)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 touch-manipulation"
+                        aria-label={`Delete project: ${project.title}`}
                         title="Delete project"
                         disabled={loading}
                       >

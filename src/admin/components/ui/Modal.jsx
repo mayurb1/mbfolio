@@ -48,7 +48,7 @@ const Modal = ({
               {showCloseButton && (
                 <button
                   onClick={onClose}
-                  className="flex-shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors touch-manipulation"
+                  className="flex-shrink-0 text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors touch-manipulation"
                   aria-label="Close modal"
                 >
                   <X className="w-5 h-5" />

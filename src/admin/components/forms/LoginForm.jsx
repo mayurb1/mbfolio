@@ -37,7 +37,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
           type="email"
           autoComplete="email"
           required
-          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-600 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           placeholder="admin@example.com"
           value={formik.values.email}
           onChange={formik.handleChange}
@@ -61,7 +61,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
             required
-            className="w-full px-3 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-3 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-600 dark:placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             placeholder="Enter your password"
             value={formik.values.password}
             onChange={formik.handleChange}
@@ -71,11 +71,12 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             type="button"
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
             onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
-              <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+              <EyeOff className="h-5 w-5 text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200" />
             ) : (
-              <Eye className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+              <Eye className="h-5 w-5 text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200" />
             )}
           </button>
         </div>
@@ -90,6 +91,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
         <button
           type="submit"
           disabled={isLoading || !formik.isValid}
+          aria-label="Sign in to admin dashboard"
           className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? (

@@ -104,11 +104,12 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
                 type="button"
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
               >
                 {showCurrentPassword ? (
-                  <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+                  <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
                 ) : (
-                  <Eye className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+                  <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
                 )}
               </button>
             </div>
@@ -135,16 +136,17 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
                 type="button"
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowNewPassword(!showNewPassword)}
+                aria-label={showNewPassword ? "Hide new password" : "Show new password"}
               >
                 {showNewPassword ? (
-                  <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+                  <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
                 ) : (
-                  <Eye className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+                  <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
                 )}
               </button>
             </div>
             <ErrorMessage name="newPassword" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
               Password must contain at least 6 characters with uppercase, lowercase, and number
             </p>
           </div>
@@ -169,11 +171,12 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
                 type="button"
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+                  <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
                 ) : (
-                  <Eye className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+                  <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
                 )}
               </button>
             </div>

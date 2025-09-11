@@ -9,6 +9,8 @@ export default defineConfig({
     VitePWA({
       // Auto-update service worker without user prompt for seamless updates
       registerType: 'autoUpdate',
+      // Defer service worker registration to not block initial render
+      injectRegister: 'script-defer',
 
       // Static assets to include in the service worker precache
       // These files will be cached during service worker installation
@@ -124,6 +126,7 @@ export default defineConfig({
     },
     cssCodeSplit: true,
     sourcemap: false,
+    cssMinify: true,
   },
   server: {
     port: 3000,

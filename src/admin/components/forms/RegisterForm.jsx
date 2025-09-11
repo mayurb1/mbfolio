@@ -110,11 +110,12 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
             type="button"
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
             onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
-              <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+              <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
             ) : (
-              <Eye className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+              <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
             )}
           </button>
         </div>
@@ -146,11 +147,12 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
             type="button"
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
           >
             {showConfirmPassword ? (
-              <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+              <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
             ) : (
-              <Eye className="h-5 w-5 text-slate-400 hover:text-slate-500" />
+              <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
             )}
           </button>
         </div>
@@ -165,6 +167,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
         <button
           type="submit"
           disabled={isLoading || !formik.isValid}
+          aria-label="Create new admin account"
           className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? (
