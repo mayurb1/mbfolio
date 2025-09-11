@@ -5,6 +5,7 @@ import { ExternalLink, Github, Calendar, Users, Star, X } from 'lucide-react'
 import { LINKS } from '../../data/links'
 import Select from '../ui/Select'
 import Carousel from '../ui/Carousel'
+import { ProjectsGridSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
 import api from '../../services/api'
 
 const GITHUB_PROFILE = LINKS.github
@@ -834,9 +835,10 @@ const Projects = () => {
         <div className="max-w-6xl mx-auto">
           {/* Loading state */}
           {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
+            <>
+              <SectionHeaderSkeleton />
+              <ProjectsGridSkeleton count={6} />
+            </>
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-text-secondary text-lg mb-4">{error}</p>

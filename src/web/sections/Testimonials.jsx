@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+import { TestimonialsSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,6 +19,7 @@ const Testimonials = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [loading] = useState(false) // Set to false since using static data
 
   const testimonials = [
     {
@@ -240,21 +242,28 @@ const Testimonials = () => {
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
-              What Clients Say
-            </h2>
-            <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-              Don&apos;t just take my word for it - here&apos;s what my clients
-              and colleagues have to say about working with me
-            </p>
-          </motion.div>
+          {loading ? (
+            <>
+              <SectionHeaderSkeleton />
+              <TestimonialsSkeleton count={3} />
+            </>
+          ) : (
+            <>
+              {/* Section Header */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-16"
+              >
+                <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
+                  What Clients Say
+                </h2>
+                <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+                  Don&apos;t just take my word for it - here&apos;s what my clients
+                  and colleagues have to say about working with me
+                </p>
+              </motion.div>
 
           {/* Main Testimonial Display */}
           <motion.div
@@ -438,6 +447,8 @@ const Testimonials = () => {
               </motion.div>
             ))}
           </motion.div>
+            </>
+          )}
         </div>
       </div>
     </section>

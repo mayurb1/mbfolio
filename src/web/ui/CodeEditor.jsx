@@ -34,42 +34,7 @@ const CodeEditor = ({ isOpen, onClose }) => {
   // Portfolio-focused code template
   const codeTemplate = useMemo(
     () => `// Mayur's Portfolio - JavaScript Skills Demo
-console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");
-
-// My Tech Stack
-const mySkills = {
-  frontend: ['React.js', 'Next.js', 'JavaScript', 'HTML5', 'CSS3'],
-  styling: ['Tailwind CSS', 'Material UI', 'Ant Design'],
-  tools: ['Git', 'VS Code', 'Figma'],
-  experience: '3+ years'
-};
-
-console.log("💼 My Skills:", mySkills);
-
-// Portfolio Project Simulator
-class Project {
-  constructor(name, tech, status) {
-    this.name = name;
-    this.tech = tech;
-    this.status = status;
-  }
-  
-  deploy = () => {
-    console.log(\`🚀 Deploying \${this.name} built with \${this.tech.join(', ')}\`);
-    this.status = 'live';
-    return this;
-  }
-}
-
-// My Real Projects
-const projects = [
-  new Project('WoundCare Pro (BYHH)', ['React', 'Node.js', 'MongoDB'], 'completed'),
-  new Project('Menu Topspin', ['Next.js', 'Tailwind', 'PostgreSQL'], 'completed'),
-  new Project('Personal Portfolio', ['React', 'Framer Motion', 'Tailwind'], 'live')
-];
-
-projects.forEach(project => project.deploy());
-console.log("✨ All projects deployed successfully!");`,
+console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
     []
   )
 
