@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
     const total = await Skills.countDocuments(filter);
 
     const skills = await Skills.find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ experience: -1, createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 

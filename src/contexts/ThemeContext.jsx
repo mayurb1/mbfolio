@@ -36,7 +36,7 @@ export const themes = {
 }
 
 export const ThemeProvider = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState('light')
+  const [currentTheme, setCurrentTheme] = useState('dark')
   const [isLoading, setIsLoading] = useState(true)
 
   // Load theme from localStorage on mount
@@ -50,7 +50,7 @@ export const ThemeProvider = ({ children }) => {
         const prefersDark = window.matchMedia(
           '(prefers-color-scheme: dark)'
         ).matches
-        setCurrentTheme(prefersDark ? 'dark' : 'light')
+        setCurrentTheme(prefersDark ? 'dark' : 'dark')
       }
     } catch (error) {
       console.warn('Could not load theme preference:', error)
@@ -102,7 +102,7 @@ export const ThemeProvider = ({ children }) => {
       // Only auto-switch if user hasn't manually selected a theme
       const savedTheme = localStorage.getItem('portfolio-theme')
       if (!savedTheme) {
-        setCurrentTheme(e.matches ? 'dark' : 'light')
+        setCurrentTheme(e.matches ? 'dark' : 'dark')
       }
     }
 

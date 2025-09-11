@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { Calendar, MapPin, ExternalLink, Award, TrendingUp } from 'lucide-react'
+import { ExperienceTimelineSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
 import api from '../../services/api'
 
 const Experience = () => {
@@ -281,19 +282,23 @@ const Experience = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
-              Experience & Education
-            </h2>
-            <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-              My professional journey and academic background
-            </p>
-          </motion.div>
+          {loading ? (
+            <SectionHeaderSkeleton />
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
+                Experience & Education
+              </h2>
+              <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+                My professional journey and academic background
+              </p>
+            </motion.div>
+          )}
 
           {/* Experience Timeline */}
           <div className="mb-16">
@@ -309,9 +314,7 @@ const Experience = () => {
 
             {/* Loading state for experiences */}
             {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
+              <ExperienceTimelineSkeleton count={3} />
             ) : error ? (
               <div className="text-center py-12">
                 <p className="text-text-secondary text-lg mb-4">{error}</p>
@@ -355,9 +358,7 @@ const Experience = () => {
 
             {/* Loading state */}
             {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
-              </div>
+              <ExperienceTimelineSkeleton count={2} />
             ) : error ? (
               <div className="text-center py-12">
                 <p className="text-text-secondary text-lg mb-4">{error}</p>
