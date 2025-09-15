@@ -132,7 +132,7 @@ svg {
   position: absolute;
   top: -40px;
   left: 6px;
-  background: var(--color-primary);
+  /* background: var(--color-primary); */
   color: var(--color-background);
   padding: 8px;
   text-decoration: none;

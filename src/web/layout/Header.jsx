@@ -134,9 +134,13 @@ const Header = () => {
               aria-label="Go to top of page"
             >
               <img
-                src="/images/logo.webp"
+                src="/images/logo-small.webp"
                 alt="MB Logo"
                 className="h-8 w-auto"
+                width="70"
+                height="32"
+                loading="eager"
+                decoding="sync"
               />
             </button>
             <button
@@ -211,9 +215,14 @@ const Header = () => {
               aria-label="Go to top of page"
             >
               <img
-                src="/images/logo.webp"
+                src="/images/logo-medium.webp"
+                srcSet="/images/logo-medium.webp 1x, /images/logo-large.webp 2x"
                 alt="MB Logo"
                 className="h-10 lg:h-12 w-auto"
+                width="87"
+                height="40"
+                loading="eager"
+                decoding="sync"
               />
             </button>
           </motion.div>
