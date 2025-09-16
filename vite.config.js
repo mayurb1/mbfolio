@@ -109,7 +109,6 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           animations: ['framer-motion'],
-          charts: ['d3'],
           forms: ['formik', 'yup'],
           markdown: ['react-markdown'],
           ui: ['lucide-react'],

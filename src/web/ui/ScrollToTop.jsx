@@ -126,48 +126,5 @@ function throttle(func, limit) {
   }
 }
 
-// Alternative smooth scroll to top with different animation
-export const SmoothScrollToTop = () => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsVisible(window.pageYOffset > 300)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const scrollToTop = () => {
-    const scrollStep = -window.scrollY / (500 / 15) // 500ms duration
-    const scrollInterval = setInterval(() => {
-      if (window.scrollY !== 0) {
-        window.scrollBy(0, scrollStep)
-      } else {
-        clearInterval(scrollInterval)
-      }
-    }, 15)
-  }
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.button
-          onClick={scrollToTop}
-          className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-shadow duration-200"
-          initial={{ opacity: 0, rotate: -180 }}
-          animate={{ opacity: 1, rotate: 0 }}
-          exit={{ opacity: 0, rotate: 180 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          aria-label="Scroll to top of page"
-        >
-          <ArrowUp size={20} />
-        </motion.button>
-      )}
-    </AnimatePresence>
-  )
-}
 
 export default ScrollToTop
