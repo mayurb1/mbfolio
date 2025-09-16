@@ -148,25 +148,5 @@ const ThemeToggle = () => {
   )
 }
 
-// Compact theme toggle for use in headers or toolbars
-export const CompactThemeToggle = () => {
-  const { currentTheme, toggleTheme, getNextTheme } = useTheme()
-  const nextTheme = getNextTheme()
-
-  return (
-    <motion.button
-      onClick={toggleTheme}
-      className="p-2 rounded-lg text-text-secondary hover:text-text hover:bg-surface transition-colors duration-200"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      aria-label={`Switch to ${nextTheme.name} theme`}
-      title={`Current: ${currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)}. Click for ${nextTheme.name}`}
-    >
-      <div className="text-lg">
-        {nextTheme.icon}
-      </div>
-    </motion.button>
-  )
-}
 
 export default ThemeToggle

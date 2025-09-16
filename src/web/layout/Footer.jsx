@@ -7,7 +7,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   // Get dynamic data from Redux store
-  const { user, getContactInfo, loading } = useMasterData()
+  const { user, getContactInfo } = useMasterData()
   const contactInfo = getContactInfo()
 
   // Dynamic social links with fallback to static LINKS

@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Download, MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
+import { MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 import CodeEditor from '../ui/CodeEditor'
-import { LINKS } from '../../data/links'
 import {
   fetchMasterData,
   selectUser,
@@ -128,29 +127,6 @@ const About = () => {
     if (now - lastBurstRef.current < 600) return
     lastBurstRef.current = now
     triggerLikeBurst()
-  }
-
-  const handleDownloadResume = () => {
-    // Use dynamic resume URL if available, fallback to static
-    const resumeUrl = user.resume || LINKS.resume
-
-    // Analytics tracking
-    if (window.gtag) {
-      window.gtag('event', 'file_download', {
-        file_name: 'resume.pdf',
-        event_category: 'engagement',
-        event_label: 'about_section',
-      })
-    }
-
-    // Create download link
-    const link = document.createElement('a')
-    link.href = resumeUrl
-    link.download = 'Resume.pdf'
-    if (resumeUrl.startsWith('http')) {
-      link.target = '_blank'
-    }
-    link.click()
   }
 
   const handleOpenCodeEditor = () => {
@@ -657,27 +633,6 @@ const About = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Download Resume Button */}
-              {/* <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                className="pt-4"
-              >
-                <motion.button
-                  onClick={handleDownloadResume}
-                  className="group bg-primary text-background px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-secondary transition-colors duration-200 flex items-center space-x-3 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Download
-                    size={18}
-                    className="sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform duration-200"
-                  />
-                  <span>Download Resume</span>
-                </motion.button>
-              </motion.div> */}
 
               {/* Quote */}
               <motion.blockquote
