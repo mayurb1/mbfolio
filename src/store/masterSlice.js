@@ -54,7 +54,9 @@ const initialState = {
   // Loading and error states
   loading: false,
   error: null,
-  lastFetched: null
+  lastFetched: null,
+  loadingStartTime: null,
+  showSlowLoading: false
 }
 
 const masterSlice = createSlice({
@@ -66,12 +68,16 @@ const masterSlice = createSlice({
       state.error = null
     },
     // Reset master data
-    resetMasterData: (state) => {
+    resetMasterData: () => {
       return { ...initialState }
     },
     // Update user data manually (for optimistic updates)
     updateUserData: (state, action) => {
       state.user = { ...state.user, ...action.payload }
+    },
+    // Set slow loading indicator
+    setSlowLoading: (state, action) => {
+      state.showSlowLoading = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -79,6 +85,8 @@ const masterSlice = createSlice({
       .addCase(fetchMasterData.pending, (state) => {
         state.loading = true
         state.error = null
+        state.loadingStartTime = Date.now()
+        state.showSlowLoading = false
       })
       .addCase(fetchMasterData.fulfilled, (state, action) => {
         state.loading = false
@@ -87,16 +95,20 @@ const masterSlice = createSlice({
         state.stats = action.payload.stats
         state.highlights = action.payload.highlights
         state.lastFetched = new Date().toISOString()
+        state.loadingStartTime = null
+        state.showSlowLoading = false
       })
       .addCase(fetchMasterData.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
+        state.loadingStartTime = null
+        state.showSlowLoading = false
       })
   }
 })
 
 // Export actions
-export const { clearError, resetMasterData, updateUserData } = masterSlice.actions
+export const { clearError, resetMasterData, updateUserData, setSlowLoading } = masterSlice.actions
 
 // Export selectors
 export const selectMasterData = (state) => state.master
@@ -105,6 +117,8 @@ export const selectStats = (state) => state.master.stats
 export const selectHighlights = (state) => state.master.highlights
 export const selectMasterLoading = (state) => state.master.loading
 export const selectMasterError = (state) => state.master.error
+export const selectLoadingStartTime = (state) => state.master.loadingStartTime
+export const selectShowSlowLoading = (state) => state.master.showSlowLoading
 
 // Export reducer
 export default masterSlice.reducer

@@ -7,7 +7,10 @@ import {
   selectHighlights, 
   selectMasterLoading, 
   selectMasterError,
-  selectMasterData 
+  selectMasterData,
+  selectLoadingStartTime,
+  selectShowSlowLoading,
+  setSlowLoading
 } from '../store/masterSlice'
 
 /**
@@ -24,6 +27,8 @@ export const useMasterData = () => {
   const highlights = useSelector(selectHighlights)
   const loading = useSelector(selectMasterLoading)
   const error = useSelector(selectMasterError)
+  const loadingStartTime = useSelector(selectLoadingStartTime)
+  const showSlowLoading = useSelector(selectShowSlowLoading)
 
   // Auto-fetch on mount if data is not available
   useEffect(() => {
@@ -31,6 +36,20 @@ export const useMasterData = () => {
       dispatch(fetchMasterData())
     }
   }, [dispatch, user.name, loading, error])
+
+  // Check if loading has been going on for more than 3 seconds
+  useEffect(() => {
+    if (loading && loadingStartTime) {
+      const timer = setTimeout(() => {
+        const elapsed = Date.now() - loadingStartTime
+        if (elapsed >= 3000 && loading) {
+          dispatch(setSlowLoading(true))
+        }
+      }, 3000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [loading, loadingStartTime, dispatch])
 
   // Helper functions for common use cases
   const getContactInfo = () => ({
@@ -74,6 +93,7 @@ export const useMasterData = () => {
     // States
     loading,
     error,
+    showSlowLoading,
     
     // Helper functions
     getContactInfo,

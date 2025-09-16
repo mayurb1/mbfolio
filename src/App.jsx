@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState, useCallback } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { AnimatePresence } from 'framer-motion'
@@ -9,6 +9,8 @@ import Footer from './web/layout/Footer'
 import LoadingSpinner from './web/ui/LoadingSpinner'
 import ScrollToTop from './web/ui/ScrollToTop'
 import ThemeToggle from './web/ui/ThemeToggle'
+import ServerDelayNotice from './web/ui/ServerDelayNotice'
+import { useMasterData } from './hooks/useMasterData'
 
 // Lazy-loaded components for code splitting
 const Hero = lazy(() => import('./web/sections/Hero'))
@@ -29,6 +31,7 @@ const AdminApp = lazy(() => import('./admin/AdminApp'))
 function App() {
   const location = useLocation()
   const [isLoading, setIsLoading] = useState(true)
+  const { showSlowLoading } = useMasterData()
 
   // Check if current path is admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
@@ -171,6 +174,13 @@ function App() {
 
         {/* Fixed footer */}
         <Footer />
+
+        {/* Server delay notice */}
+        <ServerDelayNotice 
+          isVisible={showSlowLoading} 
+          dismissible={true}
+          showAfterMs={0}
+        />
 
         {/* Floating UI elements */}
         <div className="fixed bottom-6 right-6 z-50 space-y-3 no-print">
