@@ -6,6 +6,7 @@ const { authenticateToken } = require("../middleware/auth");
 const { upload, cleanupFile } = require("../middleware/upload");
 const uploadService = require("../services/uploadService");
 const tokenBlacklist = require("../utils/tokenBlacklist");
+const { uploadLimiter, strictLimiter } = require("../middleware/rateLimiter");
 
 const router = express.Router();
 
@@ -259,7 +260,7 @@ router.put("/me", async (req, res) => {
 });
 
 // Change password
-router.patch("/change-password", async (req, res) => {
+router.patch("/change-password", strictLimiter, async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ 
     message: "No token provided",
@@ -331,7 +332,7 @@ router.patch("/change-password", async (req, res) => {
 });
 
 // Upload profile image (protected)
-router.post("/upload-profile-image", authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
+router.post("/upload-profile-image", uploadLimiter, authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -356,7 +357,7 @@ router.post("/upload-profile-image", authenticateToken, upload.single('file'), c
 });
 
 // Upload resume PDF (protected)
-router.post("/upload-resume", authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
+router.post("/upload-resume", uploadLimiter, authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({

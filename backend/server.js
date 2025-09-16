@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const helmet = require('helmet')
+const { generalLimiter, authLimiter, publicLimiter } = require('./middleware/rateLimiter')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
 const skillsRoutes = require('./routes/skillsRoutes')
@@ -39,19 +40,25 @@ app.use(
     credentials: false,
   })
 )
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ limit: '10mb', extended: true }))
+
+// Apply rate limiting middleware
+app.use('/api/', generalLimiter) // General rate limiting for all API endpoints
 
 // Routes
 app.get('/', (req, res) => {
   res.send('API is running...')
 })
-app.use('/api/auth', authRoutes)
-app.use('/api/skills', skillsRoutes)
-app.use('/api/categories', categoriesRoutes)
-app.use('/api/experience', experienceRoutes)
-app.use('/api/education', educationRoutes)
-app.use('/api/projects', projectRoutes)
-app.use('/api/master', masterRoutes)
+
+// Apply specific rate limiting to different route groups
+app.use('/api/auth', authLimiter, authRoutes) // Strict rate limiting for authentication
+app.use('/api/master', publicLimiter, masterRoutes) // More lenient for public data
+app.use('/api/skills', skillsRoutes) // Uses general rate limiting
+app.use('/api/categories', categoriesRoutes) // Uses general rate limiting  
+app.use('/api/experience', experienceRoutes) // Uses general rate limiting
+app.use('/api/education', educationRoutes) // Uses general rate limiting
+app.use('/api/projects', projectRoutes) // Uses general rate limiting
 
 // Start server
 const PORT = process.env.PORT || 5000

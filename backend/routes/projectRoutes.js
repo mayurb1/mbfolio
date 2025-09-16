@@ -3,6 +3,7 @@ const Project = require("../models/Project");
 const { authenticateToken } = require("../middleware/auth");
 const { upload, cleanupFile } = require("../middleware/upload");
 const uploadService = require("../services/uploadService");
+const { uploadLimiter } = require("../middleware/rateLimiter");
 
 const router = express.Router();
 
@@ -559,7 +560,7 @@ router.patch("/:id/toggle-featured", authenticateToken, async (req, res) => {
 });
 
 // Upload project image (protected)
-router.post("/upload-image", authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
+router.post("/upload-image", uploadLimiter, authenticateToken, upload.single('file'), cleanupFile, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
