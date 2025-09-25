@@ -42,7 +42,7 @@ A modern, responsive, and feature-rich personal portfolio website built with Rea
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/personal-portfolio.git
+   git clone https://github.com/mayurb1/mbfolio.git
    cd personal-portfolio
    ```
 
@@ -161,7 +161,7 @@ Create a `.env` file in the root directory:
 
 ```env
 # Analytics
-VITE_GA_ID=G-XXXXXXXXXX
+VITE_GA_ID=G-YOUR_GA_ID
 
 # Contact Form (if using a backend service)
 VITE_CONTACT_API_URL=https://your-api.com/contact
@@ -333,8 +333,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you have any questions or need help with setup, feel free to:
 - Open an issue on GitHub
-- Reach out via email: [your-email@example.com](mailto:your-email@example.com)
-- Connect on [LinkedIn](https://linkedin.com/in/yourprofile)
+- Reach out via email: [mayurbhalgama2419@gmail.com](mailto:mayurbhalgama2419@gmail.com)
+- Connect on [LinkedIn](https://in.linkedin.com/in/mayur-bhalgama-reactjs)
 
 ---
 
