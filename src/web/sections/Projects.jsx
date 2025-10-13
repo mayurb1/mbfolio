@@ -398,13 +398,6 @@ const PROJECTS_DATA = [
   },
 ]
 
-// Generate three placeholder images for a given project id
-const makePlaceholders = projectId => [
-  `https://picsum.photos/seed/project-${projectId}-1/1200/675`,
-  `https://picsum.photos/seed/project-${projectId}-2/1200/675`,
-  `https://picsum.photos/seed/project-${projectId}-3/1200/675`,
-]
-
 const Projects = () => {
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -494,39 +487,40 @@ const Projects = () => {
     return projects
   }, [projects])
 
-  const categories = useMemo(() => [
-    { id: 'all', label: 'All Projects', count: processedProjects.length },
-    {
-      id: 'Full-Stack',
-      label: 'Full-Stack',
-      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Full-Stack').length,
-    },
-    {
-      id: 'Frontend',
-      label: 'Frontend',
-      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Frontend').length,
-    },
-    {
-      id: 'Backend',
-      label: 'Backend',
-      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Backend').length,
-    },
-    {
-      id: 'Data Science',
-      label: 'Data Science',
-      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Data Science').length,
-    },
-    {
-      id: 'Mobile',
-      label: 'Mobile',
-      count: processedProjects.filter(p => (p.category?.name || p.category) === 'Mobile').length,
-    },
-    {
-      id: 'DevOps',
-      label: 'DevOps',
-      count: processedProjects.filter(p => (p.category?.name || p.category) === 'DevOps').length,
-    },
-  ].filter(category => category.count > 0), [processedProjects])
+  const categories = useMemo(() => {
+    // Helper function to get category name from project
+    const getCategoryName = (project) => {
+      if (!project.category) return 'Uncategorized'
+      return project.category?.name || project.category
+    }
+
+    // Dynamically build categories from available projects
+    const categoryMap = new Map()
+
+    processedProjects.forEach(project => {
+      const categoryName = getCategoryName(project)
+      if (categoryMap.has(categoryName)) {
+        categoryMap.set(categoryName, categoryMap.get(categoryName) + 1)
+      } else {
+        categoryMap.set(categoryName, 1)
+      }
+    })
+
+    // Convert to array and sort by count (descending)
+    const dynamicCategories = Array.from(categoryMap.entries())
+      .map(([name, count]) => ({
+        id: name,
+        label: name,
+        count
+      }))
+      .sort((a, b) => b.count - a.count)
+
+    // Always include "All Projects" at the beginning
+    return [
+      { id: 'all', label: 'All Projects', count: processedProjects.length },
+      ...dynamicCategories
+    ]
+  }, [processedProjects])
 
   const filteredProjects = useMemo(() => {
     if (selectedCategory === 'all') return processedProjects
@@ -861,31 +855,36 @@ const Projects = () => {
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-3xl font-bold text-text">Projects</h2>
-                  <p className="text-text-secondary">
-                    {processedProjects.length > 0 
-                      ? `${processedProjects.length} projects showcasing my work` 
+              {/* Header and Filter */}
+              <div className="flex flex-col gap-6 mb-8 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex-1">
+                  <h2 className="text-3xl font-bold text-text mb-2">Projects</h2>
+                  <p className="text-text-secondary text-sm sm:text-base">
+                    {processedProjects.length > 0
+                      ? `${processedProjects.length} projects showcasing my work`
                       : 'Selected personal and organization projects.'}
                   </p>
                 </div>
 
-            {/* Filter Select */}
-            <div className="w-48">
-              <Select
-                id="project-category"
-                value={selectedCategory}
-                onChange={e => setSelectedCategory(e.target.value)}
-              >
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.label} ({category.count})
-                  </option>
-                ))}
-              </Select>
-            </div>
-          </div>
+                {/* Filter Select */}
+                <div className="w-full sm:w-64">
+                  <label htmlFor="project-category" className="sr-only">
+                    Filter projects by category
+                  </label>
+                  <Select
+                    id="project-category"
+                    value={selectedCategory}
+                    onChange={e => setSelectedCategory(e.target.value)}
+                    aria-label="Filter projects by category"
+                  >
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.label} ({category.count})
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
 
               {/* Project Grid */}
               {filteredProjects.length > 0 ? (
