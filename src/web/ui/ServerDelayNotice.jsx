@@ -108,11 +108,15 @@ const ServerDelayNotice = ({
               </h4>
             </div>
             
-            <p className="text-xs text-blue-700 dark:text-blue-200 leading-relaxed">
-              Using a free server that may take a moment to wake up. 
-              Thank you for your patience! <Coffee size={12} className="inline ml-1" />
+            <p className="text-xs text-blue-700 dark:text-blue-200 leading-relaxed mb-2">
+              The server is waking up from sleep (free-tier hosting).
+              This can take 30-60 seconds on first load.
             </p>
-            
+
+            <p className="text-xs text-blue-600 dark:text-blue-300 italic mb-3">
+              Your patience is appreciated! <Coffee size={12} className="inline ml-1" />
+            </p>
+
             <div className="mt-2 flex items-center space-x-2">
               <div className="flex space-x-1">
                 {[0, 1, 2].map((i) => (
@@ -132,8 +136,14 @@ const ServerDelayNotice = ({
                 ))}
               </div>
               <span className="text-xs text-blue-600 dark:text-blue-300 font-medium">
-                Loading...
+                Attempting to connect...
               </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+              <p className="text-xs text-blue-600 dark:text-blue-300">
+                <strong>Note:</strong> The site will automatically retry if the connection fails.
+              </p>
             </div>
           </div>
           

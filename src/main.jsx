@@ -7,6 +7,12 @@ import './index.css'
 import { ThemeProvider } from './contexts/ThemeContext.jsx'
 import ErrorBoundary from './web/components/ErrorBoundary.jsx'
 import WebProvider from './store/WebProvider.jsx'
+import { initiateWarmup } from './utils/apiWarmup'
+
+// Warm up the API server early (only in production for free-tier hosting)
+if (import.meta.env.MODE === 'production') {
+  initiateWarmup()
+}
 
 // Initialize Google Analytics if GA_ID is provided
 if (import.meta.env.VITE_GA_ID) {
