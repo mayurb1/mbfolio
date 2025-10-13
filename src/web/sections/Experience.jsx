@@ -18,8 +18,7 @@ const Experience = () => {
   const [error, setError] = useState(null)
 
   // Fetch both experiences and education data from API
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
@@ -106,6 +105,13 @@ const Experience = () => {
       }
     }
 
+  // Retry handler for manual retries
+  const handleRetry = () => {
+    setError(null)
+    fetchData()
+  }
+
+  useEffect(() => {
     fetchData()
   }, [])
 
@@ -319,11 +325,11 @@ const Experience = () => {
               <div className="text-center py-12">
                 <p className="text-text-secondary text-lg mb-4">{error}</p>
                 <button
-                  onClick={() => window.location.reload()}
-                  className="text-primary hover:text-secondary transition-colors duration-200"
-                  aria-label="Reload page to retry loading experience data"
+                  onClick={handleRetry}
+                  className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-secondary transition-colors duration-200 font-semibold"
+                  aria-label="Retry loading experience data"
                 >
-                  Try again
+                  Retry
                 </button>
               </div>
             ) : experiences.length > 0 ? (
@@ -364,11 +370,11 @@ const Experience = () => {
               <div className="text-center py-12">
                 <p className="text-text-secondary text-lg mb-4">{error}</p>
                 <button
-                  onClick={() => window.location.reload()}
-                  className="text-primary hover:text-secondary transition-colors duration-200"
-                  aria-label="Reload page to retry loading education data"
+                  onClick={handleRetry}
+                  className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-secondary transition-colors duration-200 font-semibold"
+                  aria-label="Retry loading education data"
                 >
-                  Try again
+                  Retry
                 </button>
               </div>
             ) : education.length > 0 ? (

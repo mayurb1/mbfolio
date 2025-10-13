@@ -415,14 +415,13 @@ const Projects = () => {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  
+
   // UI state
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedProject, setSelectedProject] = useState(null)
 
   // Fetch projects from API
-  useEffect(() => {
-    const fetchProjects = async () => {
+  const fetchProjects = async () => {
       try {
         setLoading(true)
         setError(null)
@@ -480,6 +479,13 @@ const Projects = () => {
       }
     }
 
+  // Retry handler for manual retries
+  const handleRetry = () => {
+    setError(null)
+    fetchProjects()
+  }
+
+  useEffect(() => {
     fetchProjects()
   }, [])
 
@@ -846,11 +852,11 @@ const Projects = () => {
             <div className="text-center py-20">
               <p className="text-text-secondary text-lg mb-4">{error}</p>
               <button
-                onClick={() => window.location.reload()}
-                aria-label="Reload page to retry loading projects"
-                className="text-primary hover:text-secondary transition-colors duration-200"
+                onClick={handleRetry}
+                aria-label="Retry loading projects"
+                className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-secondary transition-colors duration-200 font-semibold"
               >
-                Try again
+                Retry
               </button>
             </div>
           ) : (
