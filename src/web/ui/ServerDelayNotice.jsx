@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Clock, Server, Coffee } from 'lucide-react'
+import { Clock, Server } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 const ServerDelayNotice = ({ 
@@ -106,44 +106,6 @@ const ServerDelayNotice = ({
               <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">
                 Server Starting Up
               </h4>
-            </div>
-            
-            <p className="text-xs text-blue-700 dark:text-blue-200 leading-relaxed mb-2">
-              The server is waking up from sleep (free-tier hosting).
-              This can take 30-60 seconds on first load.
-            </p>
-
-            <p className="text-xs text-blue-600 dark:text-blue-300 italic mb-3">
-              Your patience is appreciated! <Coffee size={12} className="inline ml-1" />
-            </p>
-
-            <div className="mt-2 flex items-center space-x-2">
-              <div className="flex space-x-1">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1.5 h-1.5 bg-blue-500 dark:bg-blue-400 rounded-full"
-                    animate={{
-                      opacity: [0.3, 1, 0.3],
-                      scale: [1, 1.2, 1]
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      delay: i * 0.2
-                    }}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-blue-600 dark:text-blue-300 font-medium">
-                Attempting to connect...
-              </span>
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
-              <p className="text-xs text-blue-600 dark:text-blue-300">
-                <strong>Note:</strong> The site will automatically retry if the connection fails.
-              </p>
             </div>
           </div>
           
