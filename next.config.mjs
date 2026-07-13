@@ -2,7 +2,8 @@ import withPWAInit from '@ducanh2912/next-pwa'
 
 /** @type {import('next').NextConfig} */
 
-// Security headers ported from netlify.toml
+// Security headers — single source of truth (applied in dev, on Netlify, and
+// any other host). The Netlify adapter honors next.config `headers()`.
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-XSS-Protection', value: '1; mode=block' },
