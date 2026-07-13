@@ -117,13 +117,6 @@ const Contact = () => {
       setSubmitStatus(null)
       setErrorMessage('')
 
-      const encode = data =>
-        Object.keys(data)
-          .map(
-            key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])
-          )
-          .join('&')
-
       try {
         // 24-hour per-email rate limit (client-side)
         const emailKey = (values.email || '').trim().toLowerCase()
@@ -233,22 +226,9 @@ const Contact = () => {
 
           if (!res.ok) throw new Error('Formspree request failed')
         } else {
-          const payload = {
-            'form-name': 'contact',
-            name: values.name,
-            email: values.email,
-            subject: values.subject,
-            message: values.message,
-            budget: values.budget,
-            timeline: values.timeline,
-            'bot-field': values.botField || '',
-          }
-          const res = await fetch('/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: encode(payload),
-          })
-          if (!res.ok) throw new Error('Netlify request failed')
+          throw new Error(
+            'Contact form is not configured: set NEXT_PUBLIC_CONTACT_API_URL or NEXT_PUBLIC_FORMSPREE_FORM_ID.'
+          )
         }
 
         if (window.gtag) {
@@ -554,19 +534,18 @@ const Contact = () => {
                 )}
 
                 <form
-                  name="contact"
-                  method="POST"
-                  data-netlify="true"
-                  data-netlify-honeypot="bot-field"
                   onSubmit={formik.handleSubmit}
                   ref={formRef}
                   className="space-y-4 sm:space-y-6"
                 >
-                  {/* Netlify hidden fields */}
-                  <input type="hidden" name="form-name" value="contact" />
+                  {/* Honeypot: hidden from users, catches bots */}
                   <input
-                    type="hidden"
+                    type="text"
                     name="bot-field"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="hidden"
                     value={formik.values.botField}
                     onChange={formik.handleChange}
                   />
