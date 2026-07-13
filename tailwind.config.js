@@ -1,8 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./app/**/*.{js,jsx}",
+    "./components/**/*.{js,jsx}",
+    "./web/**/*.{js,jsx}",
+    "./admin/**/*.{js,jsx}",
   ],
   darkMode: 'class',
   theme: {
@@ -44,8 +46,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-jetbrains)', 'JetBrains Mono', 'monospace'],
       },
       spacing: {
         '18': '4.5rem',
