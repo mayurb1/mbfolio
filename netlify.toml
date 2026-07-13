@@ -17,16 +17,8 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Security headers (also emitted by next.config.mjs; kept here so they apply to
-# static/CDN responses served directly by Netlify too).
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+# Security headers live in next.config.mjs (single source — applies in dev and
+# on any host; the Netlify adapter honors next.config `headers()`).
 
 # Immutable, content-hashed build assets.
 [[headers]]
