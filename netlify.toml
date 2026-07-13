@@ -1,8 +1,13 @@
 # Netlify configuration — Next.js (App Router) via @netlify/plugin-nextjs.
 # The plugin turns Route Handlers / SSR / ISR into serverless functions and
-# publishes the framework output; no manual `publish` dir or SPA catch-all.
+# publishes the framework output.
 [build]
   command = "npm run build"
+  # Must be set explicitly: the site's UI publish setting points at the repo
+  # root, which equals the base dir and makes @netlify/plugin-nextjs fail
+  # ("publish directory cannot be the same as the base directory"). The config
+  # file overrides the UI, so pin it to Next.js' build output.
+  publish = ".next"
 
 # Next.js 16 requires Node >= 20.9. Pin to 22 LTS so the build doesn't fall back
 # to a stale site default (e.g. Node 18, which fails the build).
