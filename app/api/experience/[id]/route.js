@@ -1,5 +1,6 @@
 import { connectDB } from '@/lib/db'
 import Experience from '@/models/Experience'
+import '@/models/Skills' 
 import { ok, okMessage, fail, validationError, isObjectIdError } from '@/lib/respond'
 import { authenticate } from '@/lib/auth-node'
 import { rateLimit } from '@/lib/rate-limit'
