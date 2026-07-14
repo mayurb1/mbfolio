@@ -1,5 +1,7 @@
 import { connectDB } from '@/lib/db'
 import Project from '@/models/Project'
+import '@/models/Category'
+import '@/models/Skills'
 import { ok, fail, validationError } from '@/lib/respond'
 import { authenticate } from '@/lib/auth-node'
 import { rateLimit } from '@/lib/rate-limit'
