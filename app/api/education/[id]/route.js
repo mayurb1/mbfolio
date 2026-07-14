@@ -1,8 +1,6 @@
-import { connectDB } from '@/lib/db'
 import Education from '@/models/Education'
-import { ok, okMessage, fail, validationError, isObjectIdError } from '@/lib/respond'
-import { authenticate } from '@/lib/auth-node'
-import { rateLimit } from '@/lib/rate-limit'
+import { ok, okMessage, fail } from '@/lib/respond'
+import { withRoute, ciExact } from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -10,33 +8,20 @@ export const dynamic = 'force-dynamic'
 const NOT_FOUND = 'Education record not found'
 
 // GET /api/education/:id - Get education by ID (public)
-export async function GET(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const GET = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const education = await Education.findById(id)
     if (!education) return fail(NOT_FOUND, 404)
     return ok({ education }, 'Education record retrieved successfully', 200)
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { notFound: NOT_FOUND }
+)
 
 // PUT /api/education/:id - Update education record (protected)
-export async function PUT(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const auth = await authenticate(request)
-  if (auth.error) return auth.error
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const PUT = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const {
       institution,
       degree,
@@ -62,10 +47,8 @@ export async function PUT(request, { params }) {
       (degree && degree.toLowerCase() !== education.degree.toLowerCase())
     ) {
       const existingEducation = await Education.findOne({
-        institution: {
-          $regex: new RegExp(`^${institution || education.institution}$`, 'i'),
-        },
-        degree: { $regex: new RegExp(`^${degree || education.degree}$`, 'i') },
+        institution: ciExact(institution || education.institution),
+        degree: ciExact(degree || education.degree),
         _id: { $ne: id },
       })
       if (existingEducation) {
@@ -101,24 +84,14 @@ export async function PUT(request, { params }) {
       'Education record updated successfully',
       200
     )
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    if (err.name === 'ValidationError') return validationError(err)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { auth: true, notFound: NOT_FOUND }
+)
 
 // PATCH /api/education/:id - Partial update education record (protected)
-export async function PATCH(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const auth = await authenticate(request)
-  if (auth.error) return auth.error
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const PATCH = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const body = await request.json()
 
     const education = await Education.findById(id)
@@ -132,12 +105,8 @@ export async function PATCH(request, { params }) {
         body.degree.toLowerCase() !== education.degree.toLowerCase())
     ) {
       const existingEducation = await Education.findOne({
-        institution: {
-          $regex: new RegExp(`^${body.institution || education.institution}$`, 'i'),
-        },
-        degree: {
-          $regex: new RegExp(`^${body.degree || education.degree}$`, 'i'),
-        },
+        institution: ciExact(body.institution || education.institution),
+        degree: ciExact(body.degree || education.degree),
         _id: { $ne: id },
       })
       if (existingEducation) {
@@ -159,31 +128,19 @@ export async function PATCH(request, { params }) {
       'Education record updated successfully',
       200
     )
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    if (err.name === 'ValidationError') return validationError(err)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { auth: true, notFound: NOT_FOUND }
+)
 
 // DELETE /api/education/:id - Delete education record (protected)
-export async function DELETE(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const auth = await authenticate(request)
-  if (auth.error) return auth.error
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const DELETE = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const education = await Education.findById(id)
     if (!education) return fail(NOT_FOUND, 404)
 
     await Education.findByIdAndDelete(id)
     return okMessage('Education record deleted successfully', 200)
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { auth: true, notFound: NOT_FOUND }
+)
