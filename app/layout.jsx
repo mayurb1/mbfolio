@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SITE_URL } from '@/lib/site'
 import './globals.css'
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
         {children}
+        <SpeedInsights />
       </body>
       {process.env.NEXT_PUBLIC_GA_ID ? (
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
