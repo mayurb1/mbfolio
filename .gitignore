@@ -148,7 +148,6 @@ Thumbs.db
 
 # Deployment
 .vercel
-.netlify/.next/
 
 # next-pwa generated service worker
 public/sw.js

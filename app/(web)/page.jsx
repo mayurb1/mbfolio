@@ -4,6 +4,7 @@ import Skills from '@/web/sections/Skills'
 import Experience from '@/web/sections/Experience'
 import Projects from '@/web/sections/Projects'
 import Contact from '@/web/sections/Contact'
+import { SITE_URL } from '@/lib/site'
 
 export const metadata = {
   title: 'Mayur Bhalgama - Software Engineer Portfolio',
@@ -17,11 +18,11 @@ export const metadata = {
     'Frontend Developer',
     'Portfolio',
   ],
-  alternates: { canonical: 'https://mbfolio.netlify.app' },
+  alternates: { canonical: SITE_URL },
   openGraph: {
     title: 'Mayur Bhalgama - Software Engineer',
     description: 'Software Engineer Portfolio of Mayur Bhalgama.',
-    url: 'https://mbfolio.netlify.app',
+    url: SITE_URL,
     siteName: 'Mayur Bhalgama Portfolio',
     locale: 'en_US',
     type: 'website',

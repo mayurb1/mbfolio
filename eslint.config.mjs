@@ -22,7 +22,6 @@ const eslintConfig = [
       'src/**',
       'dist/**',
       '.next/**',
-      'netlify/**',
       'node_modules/**',
     ],
   },
