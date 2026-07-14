@@ -78,10 +78,6 @@ npm run preview      # Preview production build locally
 npm run lint         # Run ESLint
 npm run lint:fix     # Fix ESLint errors
 npm run format       # Format code with Prettier
-
-# Deployment
-npm run deploy:vercel   # Deploy to Vercel
-npm run deploy:netlify  # Deploy to Netlify
 ```
 
 ### Project Structure
@@ -174,68 +170,30 @@ VITE_TWITTER_URL=https://twitter.com/yourhandle
 
 ## 📦 Deployment
 
+This is a full-stack Next.js 16 app (App Router, serverless Route Handlers),
+deployed on **Vercel**. Vercel auto-detects Next.js — no build/output config or
+platform config file is needed beyond `vercel.json` (`{ "framework": "nextjs" }`).
+
 ### Vercel (Recommended)
 
-1. **Install Vercel CLI**
-   ```bash
-   npm install -g vercel
-   ```
+1. **Import the repository** in the Vercel dashboard (or run `npx vercel` /
+   `npx vercel --prod` from the project root). Framework is detected as Next.js;
+   build command `npm run build` and the `.next` output are handled automatically.
 
-2. **Deploy**
-   ```bash
-   npm run build
-   vercel --prod
-   ```
+2. **Set environment variables** in Project Settings → Environment Variables
+   (see [Environment Variables](#environment-variables)). At minimum:
+   - Server-only: `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`,
+     `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `FRONTEND_URL`
+   - Client: `NEXT_PUBLIC_SITE_URL` (your production domain — drives canonical/OG
+     URLs, `robots.txt`, and `sitemap.xml`), `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`,
+     `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_FORMSPREE_FORM_ID`
 
-3. **Environment Variables**
-   - Add environment variables in Vercel dashboard
-   - Set build command: `npm run build`
-   - Set output directory: `dist`
+3. **Shared state** (rate limiting + JWT logout blacklist) is backed by MongoDB
+   with TTL indexes, so it works across serverless invocations with no extra
+   service to provision.
 
-### Netlify
-
-1. **Install Netlify CLI**
-   ```bash
-   npm install -g netlify-cli
-   ```
-
-2. **Deploy**
-   ```bash
-   npm run build
-   netlify deploy --prod --dir=dist
-   ```
-
-3. **Netlify Configuration**
-   Create `netlify.toml`:
-   ```toml
-   [build]
-     publish = "dist"
-     command = "npm run build"
-
-   [[redirects]]
-     from = "/*"
-     to = "/index.html"
-     status = 200
-   ```
-
-### GitHub Pages
-
-1. **Install gh-pages**
-   ```bash
-   npm install --save-dev gh-pages
-   ```
-
-2. **Add script to package.json**
-   ```json
-   "scripts": {
-     "deploy:gh-pages": "npm run build && gh-pages -d dist"
-   }
-   ```
-
-3. **Deploy**
-   ```bash
-   npm run deploy:gh-pages
-   ```
+`robots.txt` and `sitemap.xml` are generated dynamically from `NEXT_PUBLIC_SITE_URL`
+via `app/robots.js` and `app/sitemap.js`.
 
 ## 🔧 Configuration
 

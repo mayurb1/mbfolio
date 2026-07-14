@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
@@ -13,7 +16,6 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@monaco-editor/react": "^4.7.0",
-    "@netlify/blobs": "^8.1.0",
     "@next/third-parties": "^16.2.10",
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-table": "^8.21.3",

@@ -3,6 +3,12 @@
 > Working doc so any new session can pick up exactly where we left off.
 > Full architectural plan lives at `~/.claude/plans/snug-snuggling-lake.md`.
 
+> **Update (2026-07-13):** the app was subsequently migrated off Netlify to
+> **Vercel**. Netlify Blobs (rate-limit + logout blacklist) was replaced with
+> MongoDB TTL collections, `@netlify/plugin-nextjs`/`netlify.toml` removed, and
+> `robots`/`sitemap` made dynamic. The sections below are the historical
+> Netlify migration record and are kept as-is.
+
 ## Goal (one line)
 Collapse the **Vite + React SPA (`src/web` + `src/admin`)** and the **separate Express 5 + Mongoose API (`backend/`)** into **one full-stack Next.js 16 App Router app (JavaScript)** deployed on **Netlify (serverless)**.
 

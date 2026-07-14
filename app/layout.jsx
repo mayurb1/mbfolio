@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { SITE_URL } from '@/lib/site'
 import './globals.css'
 
 const inter = Inter({
@@ -17,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata = {
-  metadataBase: new URL('https://mbfolio.netlify.app'),
+  metadataBase: new URL(SITE_URL),
   title: 'Mayur Bhalgama - Software Engineer',
   description:
     'Software Engineer Portfolio of Mayur Bhalgama — React, Next.js and front-end architecture.',
