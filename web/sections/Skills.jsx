@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { SkillsSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
-import api from '../../services/api'
+import EmptyState from '../ui/EmptyState'
+import { useApiResource } from '../../hooks/useApiResource'
 
 // Smooth animation variants for chips
 const chipsContainer = {
@@ -27,35 +27,17 @@ const chipItem = {
 
 const Skills = () => {
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
-  const [skills, setSkills] = useState([])
-  const [loading, setLoading] = useState(true)
 
   // Fetch skills from API
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        setLoading(true)
-
-        const response = await api.get('/skills', {
-          params: {
-            isActive: true,
-            limit: 100, // Get all active skills
-          },
-        })
-
-        // Extract skill names from the response
-        const skillNames = response.data.data.skills.map(skill => skill.name)
-        setSkills(skillNames)
-      } catch (err) {
-        console.error('Error fetching skills:', err)
-        setSkills([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchSkills()
-  }, [])
+  const { data: skills, loading } = useApiResource('/skills', {
+    params: {
+      isActive: true,
+      limit: 100, // Get all active skills
+    },
+    // Extract skill names from the response
+    transform: response => response.data.data.skills.map(skill => skill.name),
+    fallback: [],
+  })
 
   return (
     <section id="skills" className="py-16 lg:py-24 bg-background" ref={ref}>
@@ -108,9 +90,10 @@ const Skills = () => {
               ))}
             </motion.div>
               ) : (
-                <div className="text-center py-12">
-                  <p className="text-xl text-text-secondary">No skills found</p>
-                </div>
+                <EmptyState
+                  message="No skills found"
+                  textClassName="text-xl text-text-secondary"
+                />
               )}
             </>
           )}

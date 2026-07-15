@@ -1,9 +1,7 @@
-import { connectDB } from '@/lib/db'
 import Skills from '@/models/Skills'
 import Category from '@/models/Category'
-import { ok, okMessage, fail, validationError, isObjectIdError } from '@/lib/respond'
-import { authenticate } from '@/lib/auth-node'
-import { rateLimit } from '@/lib/rate-limit'
+import { ok, okMessage, fail } from '@/lib/respond'
+import { withRoute, ciExact } from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -11,33 +9,20 @@ export const dynamic = 'force-dynamic'
 const NOT_FOUND = 'Skill not found'
 
 // GET /api/skills/:id - Get skill by ID (public)
-export async function GET(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const GET = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const skill = await Skills.findById(id)
     if (!skill) return fail(NOT_FOUND, 404)
     return ok({ skill }, 'Skill retrieved successfully', 200)
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { notFound: NOT_FOUND }
+)
 
 // PUT /api/skills/:id - Update skill (protected)
-export async function PUT(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const auth = await authenticate(request)
-  if (auth.error) return auth.error
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const PUT = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const { name, category, proficiency, experience, description, isActive } =
       await request.json()
 
@@ -46,7 +31,7 @@ export async function PUT(request, { params }) {
 
     if (name && name.toLowerCase() !== skill.name.toLowerCase()) {
       const existingSkill = await Skills.findOne({
-        name: { $regex: new RegExp(`^${name}$`, 'i') },
+        name: ciExact(name),
         _id: { $ne: id },
       })
       if (existingSkill) {
@@ -78,24 +63,14 @@ export async function PUT(request, { params }) {
     )
 
     return ok({ skill: updatedSkill }, 'Skill updated successfully', 200)
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    if (err.name === 'ValidationError') return validationError(err)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { auth: true, notFound: NOT_FOUND }
+)
 
 // PATCH /api/skills/:id - Partial update skill (protected)
-export async function PATCH(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const auth = await authenticate(request)
-  if (auth.error) return auth.error
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const PATCH = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const body = await request.json()
 
     const skill = await Skills.findById(id)
@@ -103,7 +78,7 @@ export async function PATCH(request, { params }) {
 
     if (body.name && body.name.toLowerCase() !== skill.name.toLowerCase()) {
       const existingSkill = await Skills.findOne({
-        name: { $regex: new RegExp(`^${body.name}$`, 'i') },
+        name: ciExact(body.name),
         _id: { $ne: id },
       })
       if (existingSkill) {
@@ -128,32 +103,20 @@ export async function PATCH(request, { params }) {
     )
 
     return ok({ skill: updatedSkill }, 'Skill updated successfully', 200)
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    if (err.name === 'ValidationError') return validationError(err)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { auth: true, notFound: NOT_FOUND }
+)
 
 // DELETE /api/skills/:id - Delete skill (protected)
-export async function DELETE(request, { params }) {
-  const limited = await rateLimit(request, 'general')
-  if (limited) return limited
-
-  const auth = await authenticate(request)
-  if (auth.error) return auth.error
-
-  const { id } = await params
-  try {
-    await connectDB()
+export const DELETE = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
     const skill = await Skills.findById(id)
     if (!skill) return fail(NOT_FOUND, 404)
 
     await Skills.findByIdAndDelete(id)
 
     return okMessage('Skill deleted successfully', 200)
-  } catch (err) {
-    if (isObjectIdError(err)) return fail(NOT_FOUND, 404)
-    return fail(err.message, 500)
-  }
-}
+  },
+  { auth: true, notFound: NOT_FOUND }
+)

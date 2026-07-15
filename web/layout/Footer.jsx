@@ -1,9 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Github, Linkedin, Mail, Heart, ExternalLink } from 'lucide-react'
+import { Mail, Heart, ExternalLink } from 'lucide-react'
 import { LINKS } from '../../data/links'
 import { useMasterData } from '../../hooks/useMasterData'
+import { useSocialLinks } from '../../hooks/useSocialLinks'
+import { scrollToSection as scrollToSectionSmooth } from '../../lib/scroll'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -13,26 +15,7 @@ const Footer = () => {
   const contactInfo = getContactInfo()
 
   // Dynamic social links with fallback to static LINKS
-  const socialLinks = [
-    {
-      name: 'GitHub',
-      url: contactInfo.githubUrl || LINKS.github,
-      icon: Github,
-      color: 'hover:text-gray-900 dark:hover:text-white',
-    },
-    {
-      name: 'LinkedIn',
-      url: contactInfo.linkedinUrl || LINKS.linkedin,
-      icon: Linkedin,
-      color: 'hover:text-blue-600',
-    },
-    {
-      name: 'Email',
-      url: contactInfo.email ? `mailto:${contactInfo.email}` : LINKS.email,
-      icon: Mail,
-      color: 'hover:text-red-500',
-    },
-  ]
+  const socialLinks = useSocialLinks(contactInfo)
 
   const quickLinks = [
     { name: 'About', href: '#about' },
@@ -63,11 +46,7 @@ const Footer = () => {
 
   const scrollToSection = href => {
     if (href.startsWith('#')) {
-      const element = document.getElementById(href.slice(1))
-      if (element) {
-        const offsetTop = element.offsetTop - 80
-        window.scrollTo({ top: offsetTop, behavior: 'smooth' })
-      }
+      scrollToSectionSmooth(href.slice(1))
     }
   }
 

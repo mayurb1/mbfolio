@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback, memo } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { ExternalLink, Github, Calendar, Users, Star, X } from 'lucide-react'
@@ -8,7 +8,9 @@ import { LINKS } from '../../data/links'
 import Select from '../ui/Select'
 import Carousel from '../ui/Carousel'
 import { ProjectsGridSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
-import api from '../../services/api'
+import RetryState from '../ui/RetryState'
+import EmptyState from '../ui/EmptyState'
+import { useApiResource } from '../../hooks/useApiResource'
 
 const GITHUB_PROFILE = LINKS.github
 
@@ -400,89 +402,69 @@ const PROJECTS_DATA = [
   },
 ]
 
+// Static fallback used when the projects API request fails, mapped to the
+// same shape the component renders.
+const FALLBACK_PROJECTS = PROJECTS_DATA.map(p => {
+  const images = p.images && p.images.length > 0 ? [...p.images] : []
+  const mainImage = p.mainImage || (images.length > 0 ? images[0] : null)
+  return { ...p, images, mainImage }
+})
+
 const Projects = () => {
   const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true,
   })
 
-  // API state
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // Fetch projects from API
+  const {
+    data: projects,
+    loading,
+    error,
+    retry: handleRetry,
+  } = useApiResource('/projects', {
+    params: {
+      isActive: true,
+      limit: 50, // Get all active projects
+    },
+    // Transform API data to match existing component structure
+    transform: response =>
+      response.data.data.projects.map(project => {
+        const images = project.images && project.images.length > 0
+          ? [...project.images]
+          : []
+        const mainImage = project.mainImage || (images.length > 0 ? images[0] : null)
+
+        return {
+          id: project._id || project.id,
+          title: project.title,
+          description: project.description,
+          fullDescription: project.fullDescription,
+          category: project.category,
+          status: project.status,
+          type: project.type,
+          technologies: project.technologies || [],
+          highlights: project.highlights || [],
+          images,
+          mainImage,
+          github: project.github,
+          demo: project.demo,
+          duration: project.duration,
+          team: project.team,
+          featured: project.featured || false,
+          // For backward compatibility
+          metrics: null,
+          screenshots: []
+        }
+      }),
+    // Fallback to static data on error
+    fallback: FALLBACK_PROJECTS,
+    errorMessage: 'Failed to load projects',
+  })
 
   // UI state
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedProject, setSelectedProject] = useState(null)
-
-  // Fetch projects from API
-  const fetchProjects = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-
-        const response = await api.get('/projects', {
-          params: {
-            isActive: true,
-            limit: 50, // Get all active projects
-          },
-        })
-
-        // Transform API data to match existing component structure
-        const projectsData = response.data.data.projects.map(project => {
-          const images = project.images && project.images.length > 0 
-            ? [...project.images] 
-            : []
-          const mainImage = project.mainImage || (images.length > 0 ? images[0] : null)
-          
-          return {
-            id: project._id || project.id,
-            title: project.title,
-            description: project.description,
-            fullDescription: project.fullDescription,
-            category: project.category,
-            status: project.status,
-            type: project.type,
-            technologies: project.technologies || [],
-            highlights: project.highlights || [],
-            images,
-            mainImage,
-            github: project.github,
-            demo: project.demo,
-            duration: project.duration,
-            team: project.team,
-            featured: project.featured || false,
-            // For backward compatibility
-            metrics: null,
-            screenshots: []
-          }
-        })
-
-        setProjects(projectsData)
-      } catch (err) {
-        console.error('Error fetching projects:', err)
-        setError('Failed to load projects')
-        // Fallback to static data on error
-        const fallbackProjects = PROJECTS_DATA.map(p => {
-          const images = p.images && p.images.length > 0 ? [...p.images] : []
-          const mainImage = p.mainImage || (images.length > 0 ? images[0] : null)
-          return { ...p, images, mainImage }
-        })
-        setProjects(fallbackProjects)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-  // Retry handler for manual retries
-  const handleRetry = () => {
-    setError(null)
-    fetchProjects()
-  }
-
-  useEffect(() => {
-    fetchProjects()
-  }, [])
 
   // Memoize processed projects
   const processedProjects = useMemo(() => {
@@ -845,16 +827,12 @@ const Projects = () => {
               <ProjectsGridSkeleton count={6} />
             </>
           ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-text-secondary text-lg mb-4">{error}</p>
-              <button
-                onClick={handleRetry}
-                aria-label="Retry loading projects"
-                className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-secondary transition-colors duration-200 font-semibold"
-              >
-                Retry
-              </button>
-            </div>
+            <RetryState
+              error={error}
+              onRetry={handleRetry}
+              ariaLabel="Retry loading projects"
+              className="text-center py-20"
+            />
           ) : (
             <>
               {/* Header and Filter */}
@@ -896,13 +874,14 @@ const Projects = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-20">
-                  <p className="text-text-secondary text-lg">
-                    {selectedCategory === 'all' 
-                      ? 'No projects found.' 
-                      : `No projects found in ${selectedCategory} category.`}
-                  </p>
-                </div>
+                <EmptyState
+                  className="text-center py-20"
+                  message={
+                    selectedCategory === 'all'
+                      ? 'No projects found.'
+                      : `No projects found in ${selectedCategory} category.`
+                  }
+                />
               )}
             </>
           )}

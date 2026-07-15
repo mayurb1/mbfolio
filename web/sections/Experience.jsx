@@ -1,11 +1,35 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { Calendar, MapPin, ExternalLink, Award, TrendingUp } from 'lucide-react'
 import { ExperienceTimelineSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
-import api from '../../services/api'
+import RetryState from '../ui/RetryState'
+import EmptyState from '../ui/EmptyState'
+import { useApiResource } from '../../hooks/useApiResource'
+
+// Helper function to generate duration from dates
+const generateDuration = (startDate, endDate, isOngoing) => {
+  if (!startDate) return 'Not specified'
+
+  const start = new Date(startDate)
+  const startStr = start.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric'
+  })
+
+  if (isOngoing || !endDate) {
+    return `${startStr} – Present`
+  }
+
+  const end = new Date(endDate)
+  const endStr = end.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric'
+  })
+
+  return `${startStr} – ${endStr}`
+}
 
 const Experience = () => {
   const { ref, inView } = useInView({
@@ -13,110 +37,56 @@ const Experience = () => {
     triggerOnce: true,
   })
 
-  // State for API data
-  const [experiences, setExperiences] = useState([])
-  const [education, setEducation] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // Fetch both experiences and education data from API in parallel. A single
+  // shared loading/error is preserved: if either request fails, both fall back
+  // to empty arrays and one error message is shown.
+  const {
+    data: { experiences, education },
+    loading,
+    error,
+    retry: handleRetry,
+  } = useApiResource(['/experience', '/education'], {
+    params: {
+      isActive: true,
+      limit: 50, // Get all active experiences / education records
+    },
+    transform: ([experienceResponse, educationResponse]) => {
+      // Transform experience data to match existing component structure
+      const experienceData = experienceResponse.data.data.experiences.map(exp => ({
+        id: exp._id,
+        company: exp.company,
+        position: exp.position,
+        duration: generateDuration(exp.startDate, exp.endDate, exp.isOngoing),
+        location: exp.location,
+        type: exp.type,
+        logo: exp.logo,
+        website: exp.website,
+        description: exp.description,
+        achievements: exp.achievements || [],
+        technologies: exp.skills?.map(skill => skill?.name || skill) || [],
+        highlights: exp.highlights || [],
+      }))
 
-  // Fetch both experiences and education data from API
-  const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+      // Transform education data to match existing component structure
+      const educationData = educationResponse.data.data.education.map(edu => ({
+        id: edu._id,
+        institution: edu.institution,
+        degree: edu.degree,
+        duration: generateDuration(edu.startDate, edu.endDate, edu.isOngoing),
+        location: edu.location,
+        gpa: edu.gpa,
+        logo: edu.logo,
+        website: edu.website,
+        description: edu.description,
+        achievements: edu.achievements || [],
+      }))
 
-        // Fetch both experiences and education in parallel
-        const [experienceResponse, educationResponse] = await Promise.all([
-          api.get('/experience', {
-            params: {
-              isActive: true,
-              limit: 50, // Get all active experiences
-            },
-          }),
-          api.get('/education', {
-            params: {
-              isActive: true,
-              limit: 50, // Get all active education records
-            },
-          })
-        ])
-
-        // Helper function to generate duration from dates
-        const generateDuration = (startDate, endDate, isOngoing) => {
-          if (!startDate) return 'Not specified'
-          
-          const start = new Date(startDate)
-          const startStr = start.toLocaleDateString('en-US', { 
-            month: 'long', 
-            year: 'numeric' 
-          })
-          
-          if (isOngoing || !endDate) {
-            return `${startStr} – Present`
-          }
-          
-          const end = new Date(endDate)
-          const endStr = end.toLocaleDateString('en-US', { 
-            month: 'long', 
-            year: 'numeric' 
-          })
-          
-          return `${startStr} – ${endStr}`
-        }
-
-        // Transform experience data to match existing component structure
-        const experienceData = experienceResponse.data.data.experiences.map(exp => ({
-          id: exp._id,
-          company: exp.company,
-          position: exp.position,
-          duration: generateDuration(exp.startDate, exp.endDate, exp.isOngoing),
-          location: exp.location,
-          type: exp.type,
-          logo: exp.logo,
-          website: exp.website,
-          description: exp.description,
-          achievements: exp.achievements || [],
-          technologies: exp.skills?.map(skill => skill?.name || skill) || [],
-          highlights: exp.highlights || [],
-        }))
-
-        // Transform education data to match existing component structure
-        const educationData = educationResponse.data.data.education.map(edu => ({
-          id: edu._id,
-          institution: edu.institution,
-          degree: edu.degree,
-          duration: generateDuration(edu.startDate, edu.endDate, edu.isOngoing),
-          location: edu.location,
-          gpa: edu.gpa,
-          logo: edu.logo,
-          website: edu.website,
-          description: edu.description,
-          achievements: edu.achievements || [],
-        }))
-
-        setExperiences(experienceData)
-        setEducation(educationData)
-      } catch (err) {
-        console.error('Error fetching data:', err)
-        setError('Failed to load experience and education data')
-        // Fallback to empty arrays on error
-        setExperiences([])
-        setEducation([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-  // Retry handler for manual retries
-  const handleRetry = () => {
-    setError(null)
-    fetchData()
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
-
+      return { experiences: experienceData, education: educationData }
+    },
+    // Fallback to empty arrays on error
+    fallback: { experiences: [], education: [] },
+    errorMessage: 'Failed to load experience and education data',
+  })
 
   const TimelineItem = ({ item, index, isLast, type = 'experience' }) => {
     // Inline SVG shown when a company has no logo (empty src) or the logo
@@ -327,16 +297,11 @@ const Experience = () => {
             {loading ? (
               <ExperienceTimelineSkeleton count={3} />
             ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-text-secondary text-lg mb-4">{error}</p>
-                <button
-                  onClick={handleRetry}
-                  className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-secondary transition-colors duration-200 font-semibold"
-                  aria-label="Retry loading experience data"
-                >
-                  Retry
-                </button>
-              </div>
+              <RetryState
+                error={error}
+                onRetry={handleRetry}
+                ariaLabel="Retry loading experience data"
+              />
             ) : experiences.length > 0 ? (
               <div className="space-y-0">
                 {experiences.map((experience, index) => (
@@ -350,9 +315,7 @@ const Experience = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-text-secondary text-lg">No experience records found.</p>
-              </div>
+              <EmptyState message="No experience records found." />
             )}
           </div>
 
@@ -372,16 +335,11 @@ const Experience = () => {
             {loading ? (
               <ExperienceTimelineSkeleton count={2} />
             ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-text-secondary text-lg mb-4">{error}</p>
-                <button
-                  onClick={handleRetry}
-                  className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-secondary transition-colors duration-200 font-semibold"
-                  aria-label="Retry loading education data"
-                >
-                  Retry
-                </button>
-              </div>
+              <RetryState
+                error={error}
+                onRetry={handleRetry}
+                ariaLabel="Retry loading education data"
+              />
             ) : education.length > 0 ? (
               <div className="space-y-0">
                 {education.map((edu, index) => (
@@ -395,9 +353,7 @@ const Experience = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-text-secondary text-lg">No education records found.</p>
-              </div>
+              <EmptyState message="No education records found." />
             )}
           </div>
 
