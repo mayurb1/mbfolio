@@ -31,6 +31,8 @@ export function createResourceService(basePath, { singular, plural }) {
       request(() => api.post(basePath, data), `Failed to create ${singular}`),
     update: (id, data) =>
       request(() => api.put(`${basePath}/${id}`, data), `Failed to update ${singular}`),
+    partialUpdate: (id, data) =>
+      request(() => api.patch(`${basePath}/${id}`, data), `Failed to update ${singular}`),
     remove: (id) =>
       request(() => api.delete(`${basePath}/${id}`), `Failed to delete ${singular}`),
     toggleStatus: (id) =>
