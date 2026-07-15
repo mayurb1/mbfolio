@@ -1,21 +1,17 @@
 'use client'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { useState } from 'react'
-import { Formik, Form, Field, ErrorMessage } from 'formik'
+import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
-import { Eye, EyeOff } from 'lucide-react'
 import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
+import PasswordField from './fields/PasswordField'
 import { changePassword } from '../../store/authSlice'
 
 const ChangePasswordForm = ({ onCancel, onSuccess }) => {
   const dispatch = useDispatch()
   const { loading: isChangingPassword } = useSelector(state => state.adminAuth)
   const { handleApiResponse } = useToast()
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // Form validation schema
   const validationSchema = Yup.object().shape({
@@ -77,7 +73,7 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ isSubmitting, errors, touched }) => (
+      {({ isSubmitting, errors }) => (
         <Form className="space-y-4 sm:space-y-6">
           {/* General Error */}
           {errors.general && (
@@ -87,103 +83,35 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
           )}
 
           {/* Current Password */}
-          <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Current Password *
-            </label>
-            <div className="relative">
-              <Field
-                type={showCurrentPassword ? 'text' : 'password'}
-                name="currentPassword"
-                className={`w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.currentPassword && touched.currentPassword
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Enter your current password"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
-              >
-                {showCurrentPassword ? (
-                  <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
-                ) : (
-                  <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
-                )}
-              </button>
-            </div>
-            <ErrorMessage name="currentPassword" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-          </div>
+          <PasswordField
+            name="currentPassword"
+            label="Current Password"
+            required
+            srLabel="current password"
+            placeholder="Enter your current password"
+          />
 
           {/* New Password */}
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              New Password *
-            </label>
-            <div className="relative">
-              <Field
-                type={showNewPassword ? 'text' : 'password'}
-                name="newPassword"
-                className={`w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.newPassword && touched.newPassword
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Enter your new password"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                aria-label={showNewPassword ? "Hide new password" : "Show new password"}
-              >
-                {showNewPassword ? (
-                  <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
-                ) : (
-                  <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
-                )}
-              </button>
-            </div>
-            <ErrorMessage name="newPassword" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
+          <PasswordField
+            name="newPassword"
+            label="New Password"
+            required
+            srLabel="new password"
+            placeholder="Enter your new password"
+          >
             <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
               Password must contain at least 6 characters with uppercase, lowercase, and number
             </p>
-          </div>
+          </PasswordField>
 
           {/* Confirm Password */}
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Confirm New Password *
-            </label>
-            <div className="relative">
-              <Field
-                type={showConfirmPassword ? 'text' : 'password'}
-                name="confirmPassword"
-                className={`w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.confirmPassword && touched.confirmPassword
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Confirm your new password"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5 text-slate-500 hover:text-slate-600" />
-                ) : (
-                  <Eye className="h-5 w-5 text-slate-500 hover:text-slate-600" />
-                )}
-              </button>
-            </div>
-            <ErrorMessage name="confirmPassword" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-          </div>
+          <PasswordField
+            name="confirmPassword"
+            label="Confirm New Password"
+            required
+            srLabel="confirm password"
+            placeholder="Confirm your new password"
+          />
 
           {/* Form Actions */}
           <div className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-700">

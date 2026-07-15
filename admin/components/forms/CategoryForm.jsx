@@ -1,10 +1,11 @@
 'use client'
 
 import { useDispatch } from 'react-redux'
-import { Formik, Form, Field, ErrorMessage } from 'formik'
+import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
+import FormField from './fields/FormField'
 import { createCategory, updateCategory, fetchCategories } from '../../store/categoriesSlice'
 
 const CategoryForm = ({ category = null, onCancel }) => {
@@ -59,7 +60,7 @@ const CategoryForm = ({ category = null, onCancel }) => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ isSubmitting, errors, touched }) => (
+      {({ isSubmitting, errors }) => (
         <Form className="space-y-6">
           {/* General Error */}
           {errors.general && (
@@ -70,22 +71,12 @@ const CategoryForm = ({ category = null, onCancel }) => {
 
           <div className="space-y-6">
             {/* Category Name */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Category Name *
-              </label>
-              <Field
-                type="text"
-                name="name"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.name && touched.name
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., Frontend, Backend, DevOps"
-              />
-              <ErrorMessage name="name" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="name"
+              label="Category Name"
+              required
+              placeholder="e.g., Frontend, Backend, DevOps"
+            />
 
             {/* Is Active */}
             <div>

@@ -139,97 +139,63 @@ const Contact = () => {
 
         const formspreeId = process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID
         const apiUrl = process.env.NEXT_PUBLIC_CONTACT_API_URL
-        if (apiUrl) {
-          const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
-          const lines = [
-            'Hello Mayur,',
-            '',
-            'You have a new contact request via your portfolio:',
-            '',
-            `• Name: ${values.name}`,
-            `• Email: ${values.email}`,
-            `• Subject: ${values.subject}`,
-          ]
-          if (values.budget) lines.push(`• Budget: ${values.budget}`)
-          if (values.timeline) lines.push(`• Timeline: ${values.timeline}`)
-          lines.push(
-            '',
-            'Message:',
-            values.message,
-            '',
-            '—',
-            'Sent from mayurbhalgama.dev'
-          )
-          const emailText = lines.join('\n')
 
-          const body = {
-            subject: emailSubject,
-            reply_to: values.email,
-            message: emailText,
-            name: values.name,
-            email: values.email,
-          }
-          if (values.budget) body.budget = values.budget
-          if (values.timeline) body.timeline = values.timeline
+        const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
+        const lines = [
+          'Hello Mayur,',
+          '',
+          'You have a new contact request via your portfolio:',
+          '',
+          `• Name: ${values.name}`,
+          `• Email: ${values.email}`,
+          `• Subject: ${values.subject}`,
+        ]
+        if (values.budget) lines.push(`• Budget: ${values.budget}`)
+        if (values.timeline) lines.push(`• Timeline: ${values.timeline}`)
+        lines.push(
+          '',
+          'Message:',
+          values.message,
+          '',
+          '—',
+          'Sent from mayurbhalgama.dev'
+        )
+        const emailText = lines.join('\n')
 
-          const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-            body: JSON.stringify(body),
-          })
+        const body = {
+          subject: emailSubject,
+          reply_to: values.email,
+          message: emailText,
+          name: values.name,
+          email: values.email,
+        }
+        if (values.budget) body.budget = values.budget
+        if (values.timeline) body.timeline = values.timeline
 
-          if (!res.ok) throw new Error('Contact API request failed')
-        } else if (formspreeId) {
-          const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
-          const lines = [
-            'Hello Mayur,',
-            '',
-            'You have a new contact request via your portfolio:',
-            '',
-            `• Name: ${values.name}`,
-            `• Email: ${values.email}`,
-            `• Subject: ${values.subject}`,
-          ]
-          if (values.budget) lines.push(`• Budget: ${values.budget}`)
-          if (values.timeline) lines.push(`• Timeline: ${values.timeline}`)
-          lines.push(
-            '',
-            'Message:',
-            values.message,
-            '',
-            '—',
-            'Sent from mayurbhalgama.dev'
-          )
-          const emailText = lines.join('\n')
-
-          const body = {
-            subject: emailSubject,
-            reply_to: values.email,
-            message: emailText,
-            name: values.name,
-            email: values.email,
-          }
-          if (values.budget) body.budget = values.budget
-          if (values.timeline) body.timeline = values.timeline
-
-          const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-            body: JSON.stringify(body),
-          })
-
-          if (!res.ok) throw new Error('Formspree request failed')
-        } else {
+        const endpoint = apiUrl
+          ? apiUrl
+          : formspreeId
+            ? `https://formspree.io/f/${formspreeId}`
+            : null
+        if (!endpoint) {
           throw new Error(
             'Contact form is not configured: set NEXT_PUBLIC_CONTACT_API_URL or NEXT_PUBLIC_FORMSPREE_FORM_ID.'
           )
         }
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(body),
+        })
+
+        if (!res.ok)
+          throw new Error(
+            apiUrl ? 'Contact API request failed' : 'Formspree request failed'
+          )
 
         if (window.gtag) {
           window.gtag('event', 'form_submit', {

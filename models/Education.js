@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { timelineFields, baseSchemaOptions } from './_shared'
 
 const educationSchema = new mongoose.Schema(
   {
@@ -14,70 +15,14 @@ const educationSchema = new mongoose.Schema(
       trim: true,
       maxLength: [200, 'Degree cannot exceed 200 characters'],
     },
-    startDate: {
-      type: Date,
-      required: [true, 'Start date is required'],
-    },
-    endDate: {
-      type: Date,
-      default: null, // null means ongoing/present
-    },
-    isOngoing: {
-      type: Boolean,
-      default: false, // true if currently ongoing
-    },
-    location: {
-      type: String,
-      required: [true, 'Location is required'],
-      trim: true,
-      maxLength: [100, 'Location cannot exceed 100 characters'],
-    },
     gpa: {
       type: String,
       trim: true,
       maxLength: [50, 'GPA cannot exceed 50 characters'],
     },
-    logo: {
-      type: String,
-      trim: true,
-    },
-    website: {
-      type: String,
-      trim: true,
-      validate: {
-        validator: function (v) {
-          return !v || /^https?:\/\/.+/.test(v)
-        },
-        message: 'Website must be a valid URL',
-      },
-    },
-    description: {
-      type: String,
-      required: [true, 'Description is required'],
-      trim: true,
-      maxLength: [1000, 'Description cannot exceed 1000 characters'],
-    },
-    achievements: [
-      {
-        type: String,
-        trim: true,
-        maxLength: [500, 'Achievement cannot exceed 500 characters'],
-      },
-    ],
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    order: {
-      type: Number,
-      default: 0,
-    },
+    ...timelineFields(),
   },
-  {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
+  baseSchemaOptions
 )
 
 // Index for efficient querying

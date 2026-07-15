@@ -8,6 +8,8 @@ import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import ImageUpload from '../ui/ImageUpload'
 import PDFUpload from '../ui/PDFUpload'
+import FormField from './fields/FormField'
+import FormTextArea from './fields/FormTextArea'
 import { useImageUpload } from '../../hooks/useImageUpload'
 import { usePDFUpload } from '../../hooks/usePDFUpload'
 import userService from '../../services/userService'
@@ -234,130 +236,46 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Name */}
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Full Name *
-              </label>
-              <Field
-                type="text"
-                name="name"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.name && touched.name
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Enter your full name"
-              />
-              <ErrorMessage
-                name="name"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="name"
+              label="Full Name"
+              required
+              placeholder="Enter your full name"
+            />
 
             {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Email Address *
-              </label>
-              <Field
-                type="email"
-                name="email"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.email && touched.email
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Enter your email address"
-              />
-              <ErrorMessage
-                name="email"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="email"
+              label="Email Address"
+              type="email"
+              required
+              placeholder="Enter your email address"
+            />
 
             {/* Phone */}
-            <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Phone Number
-              </label>
-              <Field
-                type="tel"
-                name="phone"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.phone && touched.phone
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Enter your phone number"
-              />
-              <ErrorMessage
-                name="phone"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="phone"
+              label="Phone Number"
+              type="tel"
+              placeholder="Enter your phone number"
+            />
 
             {/* Bio */}
-            <div className="lg:col-span-2">
-              <label
-                htmlFor="bio"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Bio
-              </label>
-              <Field
-                as="textarea"
-                name="bio"
-                rows={4}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.bio && touched.bio
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
-                placeholder="Tell us about yourself (max 1000 characters)"
-              />
-              <ErrorMessage
-                name="bio"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormTextArea
+              name="bio"
+              label="Bio"
+              rows={4}
+              placeholder="Tell us about yourself (max 1000 characters)"
+              wrapperClassName="lg:col-span-2"
+            />
 
             {/* Headline */}
-            <div className="lg:col-span-2">
-              <label
-                htmlFor="headline"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Professional Headline
-              </label>
-              <Field
-                type="text"
-                name="headline"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.headline && touched.headline
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g. Full Stack Developer | React & Node.js Expert"
-              />
-              <ErrorMessage
-                name="headline"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="headline"
+              label="Professional Headline"
+              placeholder="e.g. Full Stack Developer | React & Node.js Expert"
+              wrapperClassName="lg:col-span-2"
+            />
 
             {/* Availability */}
             <div>
@@ -427,54 +345,20 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
             </div>
 
             {/* LinkedIn URL */}
-            <div>
-              <label
-                htmlFor="linkedUrl"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                LinkedIn URL
-              </label>
-              <Field
-                type="url"
-                name="linkedUrl"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.linkedUrl && touched.linkedUrl
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="https://linkedin.com/in/yourprofile"
-              />
-              <ErrorMessage
-                name="linkedUrl"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="linkedUrl"
+              label="LinkedIn URL"
+              type="url"
+              placeholder="https://linkedin.com/in/yourprofile"
+            />
 
             {/* GitHub URL */}
-            <div>
-              <label
-                htmlFor="githubUrl"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                GitHub URL
-              </label>
-              <Field
-                type="url"
-                name="githubUrl"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.githubUrl && touched.githubUrl
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="https://github.com/yourusername"
-              />
-              <ErrorMessage
-                name="githubUrl"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="githubUrl"
+              label="GitHub URL"
+              type="url"
+              placeholder="https://github.com/yourusername"
+            />
 
             {/* Location Section */}
             <div className="lg:col-span-2">
@@ -484,180 +368,55 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
 
               {/* Coordinates */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label
-                    htmlFor="location.coordinates.latitude"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    Latitude
-                  </label>
-                  <Field
-                    type="number"
-                    name="location.coordinates.latitude"
-                    step="any"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.coordinates?.latitude &&
-                      touched.location?.coordinates?.latitude
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="40.7128"
-                  />
-                  <ErrorMessage
-                    name="location.coordinates.latitude"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.coordinates.latitude"
+                  label="Latitude"
+                  type="number"
+                  step="any"
+                  placeholder="40.7128"
+                />
 
-                <div>
-                  <label
-                    htmlFor="location.coordinates.longitude"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    Longitude
-                  </label>
-                  <Field
-                    type="number"
-                    name="location.coordinates.longitude"
-                    step="any"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.coordinates?.longitude &&
-                      touched.location?.coordinates?.longitude
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="-74.0060"
-                  />
-                  <ErrorMessage
-                    name="location.coordinates.longitude"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.coordinates.longitude"
+                  label="Longitude"
+                  type="number"
+                  step="any"
+                  placeholder="-74.0060"
+                />
               </div>
 
               {/* Address Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="location.address"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    Address
-                  </label>
-                  <Field
-                    type="text"
-                    name="location.address"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.address && touched.location?.address
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="123 Main Street"
-                  />
-                  <ErrorMessage
-                    name="location.address"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.address"
+                  label="Address"
+                  placeholder="123 Main Street"
+                  wrapperClassName="sm:col-span-2"
+                />
 
-                <div>
-                  <label
-                    htmlFor="location.city"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    City
-                  </label>
-                  <Field
-                    type="text"
-                    name="location.city"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.city && touched.location?.city
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="New York"
-                  />
-                  <ErrorMessage
-                    name="location.city"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.city"
+                  label="City"
+                  placeholder="New York"
+                />
 
-                <div>
-                  <label
-                    htmlFor="location.state"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    State/Province
-                  </label>
-                  <Field
-                    type="text"
-                    name="location.state"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.state && touched.location?.state
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="NY"
-                  />
-                  <ErrorMessage
-                    name="location.state"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.state"
+                  label="State/Province"
+                  placeholder="NY"
+                />
 
-                <div>
-                  <label
-                    htmlFor="location.country"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    Country
-                  </label>
-                  <Field
-                    type="text"
-                    name="location.country"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.country && touched.location?.country
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="United States"
-                  />
-                  <ErrorMessage
-                    name="location.country"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.country"
+                  label="Country"
+                  placeholder="United States"
+                />
 
-                <div>
-                  <label
-                    htmlFor="location.zipCode"
-                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                  >
-                    Zip/Postal Code
-                  </label>
-                  <Field
-                    type="text"
-                    name="location.zipCode"
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.location?.zipCode && touched.location?.zipCode
-                        ? 'border-red-300 dark:border-red-600'
-                        : 'border-slate-300 dark:border-slate-600'
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                    placeholder="10001"
-                  />
-                  <ErrorMessage
-                    name="location.zipCode"
-                    component="div"
-                    className="mt-1 text-sm text-red-600 dark:text-red-400"
-                  />
-                </div>
+                <FormField
+                  name="location.zipCode"
+                  label="Zip/Postal Code"
+                  placeholder="10001"
+                />
               </div>
             </div>
           </div>

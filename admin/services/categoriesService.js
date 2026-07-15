@@ -1,90 +1,20 @@
-import api from '../../services/api'
+import { createResourceService } from './createResourceService'
 
-// Categories service for categories management APIs
-class CategoriesService {
-  // Get all categories with optional filtering and pagination
-  async getAllCategories(params = {}) {
-    try {
-      const response = await api.get('/categories', { params })
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to fetch categories'
-      )
-    }
-  }
+// Categories service for categories management APIs.
+// CRUD methods come from the shared resource factory; exposed under the
+// entity-specific names the store/pages already call.
+const base = createResourceService('/categories', {
+  singular: 'category',
+  plural: 'categories',
+})
 
-  // Get category by ID
-  async getCategoryById(id) {
-    try {
-      const response = await api.get(`/categories/${id}`)
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to fetch category'
-      )
-    }
-  }
-
-  // Create new category
-  async createCategory(categoryData) {
-    try {
-      const response = await api.post('/categories', categoryData)
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to create category'
-      )
-    }
-  }
-
-  // Update category
-  async updateCategory(id, categoryData) {
-    try {
-      const response = await api.put(`/categories/${id}`, categoryData)
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to update category'
-      )
-    }
-  }
-
-  // Delete category
-  async deleteCategory(id) {
-    try {
-      const response = await api.delete(`/categories/${id}`)
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to delete category'
-      )
-    }
-  }
-
-  // Toggle category status
-  async toggleCategoryStatus(id) {
-    try {
-      const response = await api.patch(`/categories/${id}/toggle-status`)
-      return response.data
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to toggle category status'
-      )
-    }
-  }
+const categoriesService = {
+  getAllCategories: base.getAll,
+  getCategoryById: base.getById,
+  createCategory: base.create,
+  updateCategory: base.update,
+  deleteCategory: base.remove,
+  toggleCategoryStatus: base.toggleStatus,
 }
 
-export default new CategoriesService()
+export default categoriesService
