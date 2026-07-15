@@ -13,6 +13,7 @@ import {
   Mail,
 } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import { scrollToSection as scrollToSectionSmooth } from '../../lib/scroll'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -80,10 +81,9 @@ const Header = () => {
       setIsMenuOpen(false)
       return
     }
-    const offsetTop = element.offsetTop - 80
     setIsMenuOpen(false)
     requestAnimationFrame(() => {
-      window.scrollTo({ top: offsetTop, behavior: 'smooth' })
+      scrollToSectionSmooth(sectionId)
     })
   }
 

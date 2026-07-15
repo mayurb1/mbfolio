@@ -1,10 +1,13 @@
 'use client'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { Formik, Form, Field, ErrorMessage } from 'formik'
+import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
+import FormField from './fields/FormField'
+import FormSelect from './fields/FormSelect'
+import FormTextArea from './fields/FormTextArea'
 import { createSkill, updateSkill, fetchSkills } from '../../store/skillsSlice'
 
 const SkillForm = ({ skill = null, onCancel }) => {
@@ -85,7 +88,7 @@ const SkillForm = ({ skill = null, onCancel }) => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ isSubmitting, errors, touched }) => (
+      {({ isSubmitting, errors }) => (
         <Form className="space-y-6">
           {/* General Error */}
           {errors.general && (
@@ -96,111 +99,54 @@ const SkillForm = ({ skill = null, onCancel }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Skill Name */}
-            <div className="md:col-span-2">
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Skill Name *
-              </label>
-              <Field
-                type="text"
-                name="name"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.name && touched.name
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., React, Node.js, Python"
-              />
-              <ErrorMessage name="name" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="name"
+              label="Skill Name"
+              required
+              placeholder="e.g., React, Node.js, Python"
+              wrapperClassName="md:col-span-2"
+            />
 
             {/* Category */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Category *
-              </label>
-              <Field
-                as="select"
-                name="category"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.category && touched.category
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-              >
-                <option value="">Select a category</option>
-                {availableCategories.map(category => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage name="category" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormSelect name="category" label="Category" required>
+              <option value="">Select a category</option>
+              {availableCategories.map(category => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </FormSelect>
 
             {/* Proficiency */}
-            <div>
-              <label htmlFor="proficiency" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Proficiency Level *
-              </label>
-              <Field
-                as="select"
-                name="proficiency"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.proficiency && touched.proficiency
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-              >
-                <option value="">Select proficiency level</option>
-                {proficiencyLevels.map(level => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage name="proficiency" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormSelect name="proficiency" label="Proficiency Level" required>
+              <option value="">Select proficiency level</option>
+              {proficiencyLevels.map(level => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </FormSelect>
 
             {/* Experience */}
-            <div>
-              <label htmlFor="experience" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Experience (years)
-              </label>
-              <Field
-                type="number"
-                name="experience"
-                min="0"
-                max="50"
-                step="0.1"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.experience && touched.experience
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="0.0"
-              />
-              <ErrorMessage name="experience" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="experience"
+              label="Experience (years)"
+              type="number"
+              min="0"
+              max="50"
+              step="0.1"
+              placeholder="0.0"
+            />
 
 
             {/* Description */}
-            <div className="md:col-span-2">
-              <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Description
-              </label>
-              <Field
-                as="textarea"
-                name="description"
-                rows={3}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.description && touched.description
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
-                placeholder="Brief description of your experience with this skill"
-              />
-              <ErrorMessage name="description" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormTextArea
+              name="description"
+              label="Description"
+              rows={3}
+              placeholder="Brief description of your experience with this skill"
+              wrapperClassName="md:col-span-2"
+            />
 
             {/* Is Active */}
             <div className="md:col-span-2">

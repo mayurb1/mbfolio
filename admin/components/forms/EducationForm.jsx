@@ -1,13 +1,16 @@
 'use client'
 
 import { useDispatch } from 'react-redux'
-import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik'
+import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import DateRangePicker from '../ui/DateRangePicker'
+import FormField from './fields/FormField'
+import FormTextArea from './fields/FormTextArea'
+import StringArrayField from './fields/StringArrayField'
+import { endDateSchema, getInitialDateRange, serializeDateRange } from './fields/dateRangeValidation'
 import { createEducation, updateEducation, fetchEducation } from '../../store/educationSlice'
-import { Plus, X } from 'lucide-react'
 
 const EducationForm = ({ education = null, onCancel }) => {
   const dispatch = useDispatch()
@@ -15,16 +18,7 @@ const EducationForm = ({ education = null, onCancel }) => {
   const isEditing = !!education
 
   // Get initial date values from the education data
-  const getInitialDates = () => {
-    if (!education) return { startDate: '', endDate: '' }
-    
-    return {
-      startDate: education.startDate ? new Date(education.startDate).toISOString().split('T')[0] : '',
-      endDate: education.isOngoing ? 'Present' : (education.endDate ? new Date(education.endDate).toISOString().split('T')[0] : '')
-    }
-  }
-
-  const { startDate, endDate } = getInitialDates()
+  const { startDate, endDate } = getInitialDateRange(education)
 
   const initialValues = {
     institution: education?.institution || '',
@@ -53,33 +47,7 @@ const EducationForm = ({ education = null, onCancel }) => {
     startDate: Yup.date()
       .required('Start date is required')
       .max(new Date(), 'Start date cannot be in the future'),
-    endDate: Yup.mixed()
-      .nullable()
-      .test('is-date-or-present', 'End date must be a valid date or "Present"', function(value) {
-        if (!value || value === '' || value === 'Present' || value.toLowerCase() === 'present') {
-          return true
-        }
-        const date = new Date(value)
-        return !isNaN(date.getTime())
-      })
-      .when('startDate', {
-        is: (startDate) => startDate && startDate !== '',
-        then: (schema) => schema.test('is-after-start', 'End date must be after start date', function(value) {
-          if (!value || value === 'Present' || value.toLowerCase() === 'present') {
-            return true
-          }
-          const startDate = new Date(this.parent.startDate)
-          const endDate = new Date(value)
-          return endDate >= startDate
-        })
-      })
-      .test('not-future', 'End date cannot be in the future', function(value) {
-        if (!value || value === 'Present' || value.toLowerCase() === 'present') {
-          return true
-        }
-        const date = new Date(value)
-        return date <= new Date()
-      }),
+    endDate: endDateSchema,
     location: Yup.string()
       .min(2, 'Location must be at least 2 characters')
       .max(100, 'Location cannot exceed 100 characters')
@@ -104,9 +72,7 @@ const EducationForm = ({ education = null, onCancel }) => {
       // Filter out empty achievements
       const cleanValues = {
         ...values,
-        startDate: values.startDate ? new Date(values.startDate) : null,
-        endDate: values.endDate && values.endDate.toLowerCase() !== 'present' ? new Date(values.endDate) : null,
-        isOngoing: values.endDate && values.endDate.toLowerCase() === 'present',
+        ...serializeDateRange(values),
         achievements: values.achievements.filter(achievement => achievement.trim() !== '')
       }
 
@@ -149,40 +115,20 @@ const EducationForm = ({ education = null, onCancel }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Institution */}
-            <div>
-              <label htmlFor="institution" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Institution *
-              </label>
-              <Field
-                type="text"
-                name="institution"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.institution && touched.institution
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., Silver Oak College of Engineering and Technology"
-              />
-              <ErrorMessage name="institution" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="institution"
+              label="Institution"
+              required
+              placeholder="e.g., Silver Oak College of Engineering and Technology"
+            />
 
             {/* Degree */}
-            <div>
-              <label htmlFor="degree" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Degree *
-              </label>
-              <Field
-                type="text"
-                name="degree"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.degree && touched.degree
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., B.Tech in Computer Science"
-              />
-              <ErrorMessage name="degree" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="degree"
+              label="Degree"
+              required
+              placeholder="e.g., B.Tech in Computer Science"
+            />
 
             {/* Duration - Date Range Picker */}
             <div>
@@ -209,157 +155,61 @@ const EducationForm = ({ education = null, onCancel }) => {
             </div>
 
             {/* Location */}
-            <div>
-              <label htmlFor="location" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Location *
-              </label>
-              <Field
-                type="text"
-                name="location"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.location && touched.location
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., Ahmedabad, India"
-              />
-              <ErrorMessage name="location" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="location"
+              label="Location"
+              required
+              placeholder="e.g., Ahmedabad, India"
+            />
 
             {/* GPA */}
-            <div>
-              <label htmlFor="gpa" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                GPA/Grade
-              </label>
-              <Field
-                type="text"
-                name="gpa"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.gpa && touched.gpa
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., CGPA: 8.00/10"
-              />
-              <ErrorMessage name="gpa" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="gpa"
+              label="GPA/Grade"
+              placeholder="e.g., CGPA: 8.00/10"
+            />
 
             {/* Order */}
-            <div>
-              <label htmlFor="order" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Display Order
-              </label>
-              <Field
-                type="number"
-                name="order"
-                min="0"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.order && touched.order
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="0"
-              />
-              <ErrorMessage name="order" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="order"
+              label="Display Order"
+              type="number"
+              min="0"
+              placeholder="0"
+            />
 
             {/* Logo URL */}
-            <div>
-              <label htmlFor="logo" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Institution Logo URL
-              </label>
-              <Field
-                type="text"
-                name="logo"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.logo && touched.logo
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="https://example.com/logo.png"
-              />
-              <ErrorMessage name="logo" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="logo"
+              label="Institution Logo URL"
+              placeholder="https://example.com/logo.png"
+            />
 
             {/* Website */}
-            <div>
-              <label htmlFor="website" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Institution Website
-              </label>
-              <Field
-                type="text"
-                name="website"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.website && touched.website
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="https://institution.edu"
-              />
-              <ErrorMessage name="website" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormField
+              name="website"
+              label="Institution Website"
+              placeholder="https://institution.edu"
+            />
 
             {/* Description */}
-            <div className="md:col-span-2">
-              <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Description *
-              </label>
-              <Field
-                as="textarea"
-                name="description"
-                rows={4}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.description && touched.description
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
-                placeholder="Describe your studies, projects, and academic focus..."
-              />
-              <ErrorMessage name="description" component="div" className="mt-1 text-sm text-red-600 dark:text-red-400" />
-            </div>
+            <FormTextArea
+              name="description"
+              label="Description"
+              required
+              rows={4}
+              placeholder="Describe your studies, projects, and academic focus..."
+              wrapperClassName="md:col-span-2"
+            />
 
             {/* Achievements */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Key Achievements
-              </label>
-              <FieldArray name="achievements">
-                {({ push, remove }) => (
-                  <div className="space-y-2">
-                    {values.achievements.map((achievement, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Field
-                          name={`achievements.${index}`}
-                          className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                          placeholder={`Achievement ${index + 1}`}
-                        />
-                        {values.achievements.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => remove(index)}
-                            className="p-2"
-                          >
-                            <X size={16} />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => push('')}
-                      className="flex items-center gap-2"
-                    >
-                      <Plus size={16} />
-                      Add Achievement
-                    </Button>
-                  </div>
-                )}
-              </FieldArray>
-            </div>
+            <StringArrayField
+              name="achievements"
+              label="Key Achievements"
+              addButtonText="Add Achievement"
+              placeholder={index => `Achievement ${index + 1}`}
+              wrapperClassName="md:col-span-2"
+            />
 
             {/* Is Active */}
             <div className="md:col-span-2">

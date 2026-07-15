@@ -2,13 +2,17 @@
 
 import { useDispatch } from 'react-redux'
 import { useState, useEffect } from 'react'
-import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik'
+import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 import { useToast } from '../../contexts/ToastContext'
 import Button from '../ui/Button'
 import ImageUpload from '../ui/ImageUpload'
 import MultiImageUpload from '../ui/MultiImageUpload'
 import MultiSelect from '../ui/MultiSelect'
+import FormField from './fields/FormField'
+import FormSelect from './fields/FormSelect'
+import FormTextArea from './fields/FormTextArea'
+import StringArrayField from './fields/StringArrayField'
 import {
   createProject,
   updateProject,
@@ -17,7 +21,6 @@ import {
 import { useImageUpload } from '../../hooks/useImageUpload'
 import categoriesService from '../../services/categoriesService'
 import skillsService from '../../services/skillsService'
-import { Plus, X } from 'lucide-react'
 
 const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
   const dispatch = useDispatch()
@@ -233,229 +236,83 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Title */}
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Project Title *
-              </label>
-              <Field
-                type="text"
-                name="title"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.title && touched.title
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="Enter project title"
-              />
-              <ErrorMessage
-                name="title"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="title"
+              label="Project Title"
+              required
+              placeholder="Enter project title"
+            />
 
             {/* Category */}
-            <div>
-              <label
-                htmlFor="category"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Category *
-              </label>
-              <Field
-                as="select"
-                name="category"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.category && touched.category
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                disabled={loadingCategories}
-              >
-                {loadingCategories ? (
-                  <option value="">Loading categories...</option>
-                ) : categories.length === 0 ? (
-                  <option value="">No categories available</option>
-                ) : (
-                  <>
-                    <option value="">Select a category</option>
-                    {categories.map(category => (
-                      <option key={category._id} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </>
-                )}
-              </Field>
-              <ErrorMessage
-                name="category"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormSelect
+              name="category"
+              label="Category"
+              required
+              disabled={loadingCategories}
+            >
+              {loadingCategories ? (
+                <option value="">Loading categories...</option>
+              ) : categories.length === 0 ? (
+                <option value="">No categories available</option>
+              ) : (
+                <>
+                  <option value="">Select a category</option>
+                  {categories.map(category => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </>
+              )}
+            </FormSelect>
 
             {/* Status */}
-            <div>
-              <label
-                htmlFor="status"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Status
-              </label>
-              <Field
-                as="select"
-                name="status"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.status && touched.status
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-              >
-                {statuses.map(status => (
-                  <option key={status} value={status} className="capitalize">
-                    {status}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage
-                name="status"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormSelect name="status" label="Status">
+              {statuses.map(status => (
+                <option key={status} value={status} className="capitalize">
+                  {status}
+                </option>
+              ))}
+            </FormSelect>
 
             {/* Type */}
-            <div>
-              <label
-                htmlFor="type"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Type
-              </label>
-              <Field
-                as="select"
-                name="type"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.type && touched.type
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-              >
-                {types.map(type => (
-                  <option key={type} value={type} className="capitalize">
-                    {type}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage
-                name="type"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormSelect name="type" label="Type">
+              {types.map(type => (
+                <option key={type} value={type} className="capitalize">
+                  {type}
+                </option>
+              ))}
+            </FormSelect>
 
             {/* Duration */}
-            <div>
-              <label
-                htmlFor="duration"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Duration
-              </label>
-              <Field
-                type="text"
-                name="duration"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.duration && touched.duration
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., 3 months, 2 weeks"
-              />
-              <ErrorMessage
-                name="duration"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="duration"
+              label="Duration"
+              placeholder="e.g., 3 months, 2 weeks"
+            />
 
             {/* Team */}
-            <div>
-              <label
-                htmlFor="team"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Team
-              </label>
-              <Field
-                type="text"
-                name="team"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.team && touched.team
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="e.g., Solo, Team of 4"
-              />
-              <ErrorMessage
-                name="team"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="team"
+              label="Team"
+              placeholder="e.g., Solo, Team of 4"
+            />
 
             {/* GitHub URL */}
-            <div>
-              <label
-                htmlFor="github"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                GitHub URL
-              </label>
-              <Field
-                type="url"
-                name="github"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.github && touched.github
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="https://github.com/username/repo"
-              />
-              <ErrorMessage
-                name="github"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="github"
+              label="GitHub URL"
+              type="url"
+              placeholder="https://github.com/username/repo"
+            />
 
             {/* Demo URL */}
-            <div>
-              <label
-                htmlFor="demo"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Demo URL
-              </label>
-              <Field
-                type="url"
-                name="demo"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.demo && touched.demo
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
-                placeholder="https://demo.example.com"
-              />
-              <ErrorMessage
-                name="demo"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormField
+              name="demo"
+              label="Demo URL"
+              type="url"
+              placeholder="https://demo.example.com"
+            />
 
             {/* Main Image Upload */}
             <div className="lg:col-span-2">
@@ -489,56 +346,24 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Short Description */}
-            <div className="lg:col-span-2">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Short Description *
-              </label>
-              <Field
-                as="textarea"
-                name="description"
-                rows={3}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.description && touched.description
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
-                placeholder="Brief project description (max 500 characters)"
-              />
-              <ErrorMessage
-                name="description"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormTextArea
+              name="description"
+              label="Short Description"
+              required
+              rows={3}
+              placeholder="Brief project description (max 500 characters)"
+              wrapperClassName="lg:col-span-2"
+            />
 
             {/* Full Description */}
-            <div className="lg:col-span-2">
-              <label
-                htmlFor="fullDescription"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Full Description *
-              </label>
-              <Field
-                as="textarea"
-                name="fullDescription"
-                rows={5}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.fullDescription && touched.fullDescription
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-slate-300 dark:border-slate-600'
-                } bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none`}
-                placeholder="Detailed project description (max 2000 characters)"
-              />
-              <ErrorMessage
-                name="fullDescription"
-                component="div"
-                className="mt-1 text-sm text-red-600 dark:text-red-400"
-              />
-            </div>
+            <FormTextArea
+              name="fullDescription"
+              label="Full Description"
+              required
+              rows={5}
+              placeholder="Detailed project description (max 2000 characters)"
+              wrapperClassName="lg:col-span-2"
+            />
 
             {/* Technologies */}
             <div className="lg:col-span-2">
@@ -572,49 +397,18 @@ const ProjectForm = ({ project = null, onCancel, onSuccess }) => {
             </div>
 
             {/* Highlights */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Key Highlights
-              </label>
-              <FieldArray name="highlights">
-                {({ push, remove }) => (
-                  <div className="space-y-2">
-                    {values.highlights.map((highlight, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Field
-                          as="textarea"
-                          name={`highlights.${index}`}
-                          rows={2}
-                          className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-900 text-slate-900 dark:text-white resize-none"
-                          placeholder={`Highlight ${index + 1}`}
-                        />
-                        {values.highlights.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => remove(index)}
-                            className="p-2 flex-shrink-0"
-                          >
-                            <X size={16} />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => push('')}
-                      className="flex items-center gap-2 w-full sm:w-auto justify-center"
-                    >
-                      <Plus size={16} />
-                      <span>Add Highlight</span>
-                    </Button>
-                  </div>
-                )}
-              </FieldArray>
-            </div>
+            <StringArrayField
+              name="highlights"
+              label="Key Highlights"
+              addButtonText="Add Highlight"
+              placeholder={index => `Highlight ${index + 1}`}
+              wrapperClassName="lg:col-span-2"
+              as="textarea"
+              rows={2}
+              removeButtonClassName="p-2 flex-shrink-0"
+              addButtonClassName="flex items-center gap-2 w-full sm:w-auto justify-center"
+              spanAddText
+            />
 
             {/* Additional Images */}
             <div className="lg:col-span-2">

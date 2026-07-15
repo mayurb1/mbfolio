@@ -3,9 +3,11 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Github, Linkedin, Mail, Download, ArrowDown } from 'lucide-react'
+import { Download, ArrowDown } from 'lucide-react'
 import { LINKS } from '../../data/links'
 import { useMasterData } from '../../hooks/useMasterData'
+import { useSocialLinks } from '../../hooks/useSocialLinks'
+import { scrollToSection } from '../../lib/scroll'
 
 const Hero = () => {
   const canvasRef = useRef(null)
@@ -154,17 +156,6 @@ const Hero = () => {
     }
   }, [])
 
-  const scrollToSection = sectionId => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      const offsetTop = element.offsetTop - 80
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth',
-      })
-    }
-  }
-
   const handleDownloadResume = () => {
     // Use dynamic resume URL if available, fallback to static
     const resumeUrl = user.resume || LINKS.resume
@@ -190,26 +181,7 @@ const Hero = () => {
   const contactInfo = getContactInfo()
 
   // Dynamic social links with fallback to static LINKS
-  const socialLinks = [
-    {
-      name: 'GitHub',
-      url: contactInfo.githubUrl || LINKS.github,
-      icon: Github,
-      color: 'hover:text-gray-900 dark:hover:text-white',
-    },
-    {
-      name: 'LinkedIn',
-      url: contactInfo.linkedinUrl || LINKS.linkedin,
-      icon: Linkedin,
-      color: 'hover:text-blue-600',
-    },
-    {
-      name: 'Email',
-      url: contactInfo.email ? `mailto:${contactInfo.email}` : LINKS.email,
-      icon: Mail,
-      color: 'hover:text-red-500',
-    },
-  ]
+  const socialLinks = useSocialLinks(contactInfo)
 
   return (
     <section
