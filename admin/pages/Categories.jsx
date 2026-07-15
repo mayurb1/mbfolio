@@ -11,10 +11,12 @@ import ConfirmModal from '../components/ui/ConfirmModal'
 import DataTable from '../components/ui/DataTable'
 import ToggleSwitch from '../components/ui/ToggleSwitch'
 import Pagination from '../components/ui/Pagination'
+import EditableCell from '../components/ui/EditableCell'
 import CategoryForm from '../components/forms/CategoryForm'
 import {
   fetchCategories,
   deleteCategory,
+  inlineUpdateCategory,
   toggleCategoryStatus,
   openAddModal,
   closeAddModal,
@@ -116,6 +118,21 @@ const Categories = () => {
     }
   }
 
+  // Handle inline (single-field) category update from a table cell. Rethrows so
+  // the EditableCell can surface the error inline and stay open for correction.
+  const handleInlineUpdate = useCallback(
+    async (id, data) => {
+      try {
+        const response = await dispatch(inlineUpdateCategory({ id, data })).unwrap()
+        handleApiResponse(response)
+      } catch (error) {
+        handleApiError({ message: error })
+        throw new Error(typeof error === 'string' ? error : error?.message || 'Failed to update')
+      }
+    },
+    [dispatch, handleApiResponse, handleApiError]
+  )
+
   // Confirm delete category
   const confirmDeleteCategory = async () => {
     if (deletingCategory) {
@@ -160,11 +177,26 @@ const Categories = () => {
     {
       accessorKey: 'name',
       header: 'Category Name',
-      cell: ({ getValue }) => (
-        <div className="text-sm font-medium text-slate-900 dark:text-white">
-          {getValue()}
-        </div>
-      )
+      cell: ({ row }) => {
+        const category = row.original
+        return (
+          <EditableCell
+            value={category.name}
+            type="text"
+            ariaLabel="category name"
+            inputProps={{ maxLength: 50 }}
+            validate={(v) => {
+              if (!v || v.length < 2) return 'Category name must be at least 2 characters'
+              if (v.length > 50) return 'Category name cannot exceed 50 characters'
+              return null
+            }}
+            onSave={(v) => handleInlineUpdate(category._id, { name: v })}
+            display={(v) => (
+              <span className="text-sm font-medium text-slate-900 dark:text-white">{v}</span>
+            )}
+          />
+        )
+      }
     },
     {
       accessorKey: 'isActive',
@@ -221,7 +253,7 @@ const Categories = () => {
         )
       }
     }
-  ], [loading])
+  ], [loading, handleInlineUpdate])
 
   return (
     <AdminLayout pageTitle="Categories Management">

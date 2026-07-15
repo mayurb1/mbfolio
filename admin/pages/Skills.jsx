@@ -11,11 +11,13 @@ import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import DataTable from '../components/ui/DataTable'
 import Pagination from '../components/ui/Pagination'
+import EditableCell from '../components/ui/EditableCell'
 import SkillForm from '../components/forms/SkillForm'
 import {
   fetchSkills,
   fetchCategories,
   deleteSkill,
+  inlineUpdateSkill,
   toggleSkillStatus,
   openAddModal,
   closeAddModal,
@@ -27,6 +29,8 @@ import {
   setCategoryFilter,
   clearError
 } from '../store/skillsSlice'
+
+const PROFICIENCY_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Expert']
 
 const Skills = () => {
   const dispatch = useDispatch()
@@ -145,6 +149,21 @@ const Skills = () => {
     }
   }
 
+  // Handle inline (single-field) skill update from a table cell. Rethrows so the
+  // EditableCell can surface the error inline and stay open for correction.
+  const handleInlineUpdate = useCallback(
+    async (id, data) => {
+      try {
+        const response = await dispatch(inlineUpdateSkill({ id, data })).unwrap()
+        handleApiResponse(response)
+      } catch (error) {
+        handleApiError({ message: error })
+        throw new Error(typeof error === 'string' ? error : error?.message || 'Failed to update')
+      }
+    },
+    [dispatch, handleApiResponse, handleApiError]
+  )
+
   // Handle pagination
   const handlePageChange = (newPage) => {
     const params = {
@@ -185,6 +204,12 @@ const Skills = () => {
     return colors[proficiency] || 'bg-gray-100 text-gray-800'
   }
 
+  // Category dropdown options for inline editing (active categories from state).
+  const categoryOptions = useMemo(
+    () => categories.map((c) => ({ value: c, label: c })),
+    [categories]
+  )
+
   // Define table columns
   const columns = useMemo(() => [
     {
@@ -193,15 +218,41 @@ const Skills = () => {
       cell: ({ row }) => {
         const skill = row.original
         return (
-          <div>
-            <div className="text-sm font-medium text-slate-900 dark:text-white">
-              {skill.name}
-            </div>
-            {skill.description && (
-              <div className="text-sm text-slate-600 dark:text-slate-300 truncate max-w-xs">
-                {skill.description}
-              </div>
-            )}
+          <div className="space-y-1">
+            <EditableCell
+              value={skill.name}
+              type="text"
+              ariaLabel="skill name"
+              inputProps={{ maxLength: 100 }}
+              validate={(v) => {
+                if (!v || v.length < 2) return 'Skill name must be at least 2 characters'
+                if (v.length > 100) return 'Skill name cannot exceed 100 characters'
+                return null
+              }}
+              onSave={(v) => handleInlineUpdate(skill._id, { name: v })}
+              display={(v) => (
+                <span className="text-sm font-medium text-slate-900 dark:text-white">{v}</span>
+              )}
+            />
+            <EditableCell
+              value={skill.description || ''}
+              type="textarea"
+              ariaLabel="description"
+              inputProps={{ maxLength: 500, rows: 2 }}
+              validate={(v) => (v.length > 500 ? 'Description cannot exceed 500 characters' : null)}
+              onSave={(v) => handleInlineUpdate(skill._id, { description: v })}
+              display={(v) =>
+                v ? (
+                  <span className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 max-w-xs">
+                    {v}
+                  </span>
+                ) : (
+                  <span className="text-sm italic text-slate-400 dark:text-slate-500">
+                    Add description
+                  </span>
+                )
+              }
+            />
           </div>
         )
       }
@@ -209,33 +260,69 @@ const Skills = () => {
     {
       accessorKey: 'category',
       header: 'Category',
-      cell: ({ getValue }) => (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-          {getValue()}
-        </span>
-      )
+      cell: ({ row }) => {
+        const skill = row.original
+        return (
+          <EditableCell
+            value={skill.category}
+            type="select"
+            options={categoryOptions}
+            ariaLabel="category"
+            onSave={(v) => handleInlineUpdate(skill._id, { category: v })}
+            display={(v) => (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                {v}
+              </span>
+            )}
+          />
+        )
+      }
     },
     {
       accessorKey: 'proficiency',
       header: 'Proficiency',
-      cell: ({ getValue }) => {
-        const proficiency = getValue()
+      cell: ({ row }) => {
+        const skill = row.original
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProficiencyColor(proficiency)}`}>
-            {proficiency}
-          </span>
+          <EditableCell
+            value={skill.proficiency}
+            type="select"
+            options={PROFICIENCY_LEVELS.map((p) => ({ value: p, label: p }))}
+            ariaLabel="proficiency"
+            onSave={(v) => handleInlineUpdate(skill._id, { proficiency: v })}
+            display={(v) => (
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProficiencyColor(v)}`}>
+                {v}
+              </span>
+            )}
+          />
         )
       }
     },
     {
       accessorKey: 'experience',
       header: 'Experience',
-      cell: ({ getValue }) => {
-        const experience = getValue()
+      cell: ({ row }) => {
+        const skill = row.original
         return (
-          <span className="text-sm text-slate-900 dark:text-white">
-            {experience} {experience === 1 ? 'year' : 'years'}
-          </span>
+          <EditableCell
+            value={skill.experience}
+            type="number"
+            ariaLabel="experience"
+            inputProps={{ min: 0, max: 50, step: 0.1 }}
+            validate={(v) => {
+              if (Number.isNaN(v)) return 'Experience must be a number'
+              if (v < 0) return 'Experience cannot be negative'
+              if (v > 50) return 'Experience cannot exceed 50 years'
+              return null
+            }}
+            onSave={(v) => handleInlineUpdate(skill._id, { experience: v })}
+            display={(v) => (
+              <span className="text-sm text-slate-900 dark:text-white">
+                {v} {v === 1 ? 'year' : 'years'}
+              </span>
+            )}
+          />
         )
       }
     },
@@ -294,7 +381,7 @@ const Skills = () => {
         )
       }
     }
-  ], [loading])
+  ], [loading, handleInlineUpdate, categoryOptions])
 
   return (
     <AdminLayout pageTitle="Skills Management">

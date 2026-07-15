@@ -11,9 +11,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
  * @param {string} name    slice name, e.g. 'categories' (used as the action-type prefix)
  * @param {object} service the entity service
  * @param {object} opts
- * @param {{getAll,create,update,remove,toggleStatus}} opts.methods service method names
+ * @param {{getAll,create,update,remove,toggleStatus,patch?}} opts.methods service method names
  * @param {string} opts.updateArgKey key on the update() arg holding the payload, e.g. 'categoryData'
- * @returns {{fetch,create,update,remove,toggleStatus}}
+ * @returns {{fetch,create,update,remove,toggleStatus,inlineUpdate?}}
  */
 export function createEntityThunks(name, service, { methods, updateArgKey }) {
   const wrap = (fn) => async (arg, { rejectWithValue }) => {
@@ -34,6 +34,15 @@ export function createEntityThunks(name, service, { methods, updateArgKey }) {
       `${name}/update`,
       wrap((arg) => service[methods.update](arg.id, arg[updateArgKey]))
     ),
+    // Partial single-field update for inline table editing. Separate from
+    // `update` so its reducer can upsert the row WITHOUT flipping the global
+    // `loading` flag (which would blank the whole DataTable on every save).
+    inlineUpdate: methods.patch
+      ? createAsyncThunk(
+          `${name}/inlineUpdate`,
+          wrap((arg) => service[methods.patch](arg.id, arg.data))
+        )
+      : undefined,
     remove: createAsyncThunk(`${name}/remove`, async (id, { rejectWithValue }) => {
       try {
         const response = await service[methods.remove](id)
@@ -194,6 +203,22 @@ export function applyUpsertCases(builder, thunk, { collectionKey, itemKey }) {
     })
     .addCase(thunk.rejected, (state, action) => {
       state.loading = false
+      state.error = action.payload
+    })
+}
+
+// Attach cases for the inline (partial) update thunk. Unlike the other CRUD
+// cases this deliberately does NOT touch `state.loading` — inline edits keep
+// the table rendered and track their own per-cell saving state — it only
+// upserts the returned row on success and records the error on failure.
+export function applyInlineUpdateCase(builder, thunk, { collectionKey, itemKey }) {
+  builder
+    .addCase(thunk.fulfilled, (state, action) => {
+      const item = action.payload.data[itemKey]
+      const index = state[collectionKey].findIndex((x) => x._id === item._id)
+      if (index !== -1) state[collectionKey][index] = item
+    })
+    .addCase(thunk.rejected, (state, action) => {
       state.error = action.payload
     })
 }

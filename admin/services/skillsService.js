@@ -9,6 +9,7 @@ const skillsService = {
   getSkillById: base.getById,
   createSkill: base.create,
   updateSkill: base.update,
+  patchSkill: base.partialUpdate,
   deleteSkill: base.remove,
   toggleSkillStatus: base.toggleStatus,
 

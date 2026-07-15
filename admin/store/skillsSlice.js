@@ -5,6 +5,7 @@ import {
   makeModalReducers,
   baseEntityState,
   applyCrudCases,
+  applyInlineUpdateCase,
 } from './createEntitySlice'
 
 const CFG = {
@@ -19,6 +20,7 @@ const thunks = createEntityThunks('skills', skillsService, {
     getAll: 'getAllSkills',
     create: 'createSkill',
     update: 'updateSkill',
+    patch: 'patchSkill',
     remove: 'deleteSkill',
     toggleStatus: 'toggleSkillStatus',
   },
@@ -28,6 +30,7 @@ const thunks = createEntityThunks('skills', skillsService, {
 export const fetchSkills = thunks.fetch
 export const createSkill = thunks.create
 export const updateSkill = thunks.update
+export const inlineUpdateSkill = thunks.inlineUpdate
 export const deleteSkill = thunks.remove
 export const toggleSkillStatus = thunks.toggleStatus
 
@@ -69,6 +72,7 @@ const skillsSlice = createSlice({
   },
   extraReducers: (builder) => {
     applyCrudCases(builder, thunks, CFG)
+    applyInlineUpdateCase(builder, thunks.inlineUpdate, CFG)
     builder
       .addCase(fetchCategories.pending, (state) => {
         state.categoriesLoading = true
