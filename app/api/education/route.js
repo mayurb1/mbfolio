@@ -1,88 +1,106 @@
 import Education from '@/models/Education'
 import { ok, fail } from '@/lib/respond'
-import { withRoute, ciExact, parsePagination, paginationMeta } from '@/lib/crud'
+import {
+  withRoute,
+  ciExact,
+  parsePagination,
+  paginationMeta,
+  resolveScopeUserId,
+} from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-// GET /api/education - Get all education records (public)
-export const GET = withRoute(async (request) => {
-  const sp = request.nextUrl.searchParams
-  const isActive = sp.get('isActive')
-  const search = sp.get('search')
-  const { page, limit, skip } = parsePagination(sp, 10)
+// GET /api/education - Get a user's education records (public; scoped by ?userId/?username or session)
+export const GET = withRoute(
+  async (request, ctx, session) => {
+    const userId = await resolveScopeUserId(request, session)
+    if (!userId) return fail('User scope required', 400)
 
-  const filter = {}
-  if (isActive !== null) filter.isActive = isActive === 'true'
+    const sp = request.nextUrl.searchParams
+    const isActive = sp.get('isActive')
+    const search = sp.get('search')
+    const { page, limit, skip } = parsePagination(sp, 10)
 
-  if (search) {
-    filter.$or = [
-      { institution: { $regex: search, $options: 'i' } },
-      { degree: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-    ]
-  }
+    const filter = { userId }
+    if (isActive !== null) filter.isActive = isActive === 'true'
 
-  const total = await Education.countDocuments(filter)
+    if (search) {
+      filter.$or = [
+        { institution: { $regex: search, $options: 'i' } },
+        { degree: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ]
+    }
 
-  const education = await Education.find(filter)
-    .sort({ order: 1, createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
+    const total = await Education.countDocuments(filter)
 
-  return ok(
-    { education, pagination: paginationMeta(total, page, limit) },
-    'Education records retrieved successfully',
-    200
-  )
-})
+    const education = await Education.find(filter)
+      .sort({ order: 1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
 
-// POST /api/education - Create new education record (protected)
-export const POST = withRoute(async (request) => {
-  const {
-    institution,
-    degree,
-    startDate,
-    endDate,
-    isOngoing,
-    location,
-    gpa,
-    logo,
-    website,
-    description,
-    achievements,
-    isActive,
-    order,
-  } = await request.json()
-
-  const existingEducation = await Education.findOne({
-    institution: ciExact(institution),
-    degree: ciExact(degree),
-  })
-  if (existingEducation) {
-    return fail(
-      'Education record with this institution and degree already exists',
-      409
+    return ok(
+      { education, pagination: paginationMeta(total, page, limit) },
+      'Education records retrieved successfully',
+      200
     )
-  }
+  },
+  { auth: 'optional' }
+)
 
-  const education = new Education({
-    institution,
-    degree,
-    startDate,
-    endDate,
-    isOngoing,
-    location,
-    gpa,
-    logo,
-    website,
-    description,
-    achievements,
-    isActive,
-    order,
-  })
+// POST /api/education - Create new education record (protected, owned by caller)
+export const POST = withRoute(
+  async (request, ctx, session) => {
+    const {
+      institution,
+      degree,
+      startDate,
+      endDate,
+      isOngoing,
+      location,
+      gpa,
+      logo,
+      website,
+      description,
+      achievements,
+      isActive,
+      order,
+    } = await request.json()
+    const userId = session.user._id
 
-  await education.save()
+    const existingEducation = await Education.findOne({
+      userId,
+      institution: ciExact(institution),
+      degree: ciExact(degree),
+    })
+    if (existingEducation) {
+      return fail(
+        'Education record with this institution and degree already exists',
+        409
+      )
+    }
 
-  return ok({ education }, 'Education record created successfully', 201)
-}, { auth: true })
+    const education = new Education({
+      userId,
+      institution,
+      degree,
+      startDate,
+      endDate,
+      isOngoing,
+      location,
+      gpa,
+      logo,
+      website,
+      description,
+      achievements,
+      isActive,
+      order,
+    })
+
+    await education.save()
+
+    return ok({ education }, 'Education record created successfully', 201)
+  },
+  { auth: true }
+)

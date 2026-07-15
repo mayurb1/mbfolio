@@ -21,7 +21,7 @@ export async function POST(request) {
       return fail('No file provided', 400)
     }
 
-    const resumeUrl = await uploadResume(file)
+    const resumeUrl = await uploadResume(file, auth.user._id)
     return ok({ resumeUrl }, 'Resume uploaded successfully', 200)
   } catch (error) {
     return fail(error.message, 400)

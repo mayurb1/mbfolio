@@ -2,6 +2,12 @@ import mongoose from 'mongoose'
 
 const projectSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: [true, 'Owner is required'],
+      index: true,
+    },
     title: {
       type: String,
       required: [true, 'Project title is required'],
@@ -117,9 +123,9 @@ const projectSchema = new mongoose.Schema(
   }
 )
 
-// Index for efficient querying
-projectSchema.index({ isActive: 1, featured: -1, order: 1 })
-projectSchema.index({ category: 1, isActive: 1 })
+// Index for efficient querying (scoped per owner)
+projectSchema.index({ userId: 1, isActive: 1, featured: -1, order: 1 })
+projectSchema.index({ userId: 1, category: 1, isActive: 1 })
 
 export default mongoose.models.Project ||
   mongoose.model('Project', projectSchema)

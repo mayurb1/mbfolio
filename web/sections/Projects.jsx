@@ -11,6 +11,7 @@ import { ProjectsGridSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoade
 import RetryState from '../ui/RetryState'
 import EmptyState from '../ui/EmptyState'
 import { useApiResource } from '../../hooks/useApiResource'
+import { useProfile } from '../../contexts/ProfileContext'
 
 const GITHUB_PROFILE = LINKS.github
 
@@ -415,8 +416,9 @@ const Projects = () => {
     threshold: 0.1,
     triggerOnce: true,
   })
+  const { userId } = useProfile()
 
-  // Fetch projects from API
+  // Fetch projects from API (scoped to the profile owner)
   const {
     data: projects,
     loading,
@@ -426,6 +428,7 @@ const Projects = () => {
     params: {
       isActive: true,
       limit: 50, // Get all active projects
+      userId,
     },
     // Transform API data to match existing component structure
     transform: response =>

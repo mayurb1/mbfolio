@@ -3,6 +3,19 @@ import mongoose from 'mongoose'
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    username: {
+      type: String,
+      required: [true, 'Username is required'],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      minlength: [3, 'Username must be at least 3 characters'],
+      maxlength: [30, 'Username cannot exceed 30 characters'],
+      match: [
+        /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
+        'Username may contain only lowercase letters, numbers and hyphens',
+      ],
+    },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phone: { type: String },

@@ -2,6 +2,7 @@ import { connectDB } from '@/lib/db'
 import Users from '@/models/users'
 import { ok, fail } from '@/lib/respond'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth-node'
+import { isValidUsername, RESERVED_USERNAMES } from '@/lib/username'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -39,6 +40,7 @@ export async function PUT(request) {
     const body = await request.json()
     const {
       name,
+      username,
       email,
       phone,
       bio,
@@ -62,8 +64,31 @@ export async function PUT(request) {
       }
     }
 
+    // Username change: validate, reject reserved, and enforce uniqueness.
+    // NOTE: changing the username breaks existing /profile/{old} links.
+    let normalizedUsername
+    if (username !== undefined) {
+      normalizedUsername = String(username).toLowerCase().trim()
+      if (!isValidUsername(normalizedUsername)) {
+        return fail(
+          RESERVED_USERNAMES.has(normalizedUsername)
+            ? 'That username is reserved. Please choose another.'
+            : 'Username must be 3-30 chars: lowercase letters, numbers, hyphens.',
+          400
+        )
+      }
+      const usernameTaken = await Users.findOne({
+        username: normalizedUsername,
+        _id: { $ne: decoded.id },
+      }).select('_id').lean()
+      if (usernameTaken) {
+        return fail('That username is already taken', 409)
+      }
+    }
+
     const updateData = {}
     if (name !== undefined) updateData.name = name
+    if (normalizedUsername !== undefined) updateData.username = normalizedUsername
     if (email !== undefined) updateData.email = email
     if (phone !== undefined) updateData.phone = phone
     if (bio !== undefined) updateData.bio = bio
@@ -91,6 +116,10 @@ export async function PUT(request) {
     }
     if (err.name === 'JsonWebTokenError') {
       return fail('Invalid token', 401)
+    }
+    if (err?.code === 11000) {
+      const field = Object.keys(err.keyPattern || {})[0] || 'field'
+      return fail(`That ${field} is already taken`, 409)
     }
     return fail(err.message, 500)
   }

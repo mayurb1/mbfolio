@@ -2,92 +2,104 @@ import Project from '@/models/Project'
 import '@/models/Category'
 import '@/models/Skills'
 import { ok, fail } from '@/lib/respond'
-import { withRoute, ciExact, parsePagination, paginationMeta } from '@/lib/crud'
+import {
+  withRoute,
+  ciExact,
+  parsePagination,
+  paginationMeta,
+  resolveScopeUserId,
+} from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-// GET /api/projects - Get all projects (public)
-export const GET = withRoute(async (request) => {
-  const sp = request.nextUrl.searchParams
-  const isActive = sp.get('isActive')
-  const category = sp.get('category')
-  const type = sp.get('type')
-  const featured = sp.get('featured')
-  const search = sp.get('search')
-  const { page, limit, skip } = parsePagination(sp, 10)
+// GET /api/projects - Get a user's projects (public; scoped by ?userId/?username or session)
+export const GET = withRoute(
+  async (request, ctx, session) => {
+    const userId = await resolveScopeUserId(request, session)
+    if (!userId) return fail('User scope required', 400)
 
-  // Build filter object
-  const filter = {}
-  if (isActive !== null) filter.isActive = isActive === 'true'
-  if (category) filter.category = category
-  if (type) filter.type = type
-  if (featured !== null) filter.featured = featured === 'true'
+    const sp = request.nextUrl.searchParams
+    const isActive = sp.get('isActive')
+    const category = sp.get('category')
+    const type = sp.get('type')
+    const featured = sp.get('featured')
+    const search = sp.get('search')
+    const { page, limit, skip } = parsePagination(sp, 10)
 
-  let projects, total
+    // Build filter object
+    const filter = { userId }
+    if (isActive !== null) filter.isActive = isActive === 'true'
+    if (category) filter.category = category
+    if (type) filter.type = type
+    if (featured !== null) filter.featured = featured === 'true'
 
-  if (search) {
-    // Use aggregation pipeline for search with populated fields
-    const pipeline = [
-      { $match: filter },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category',
+    let projects, total
+
+    if (search) {
+      // Use aggregation pipeline for search with populated fields
+      const pipeline = [
+        { $match: filter },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category',
+          },
         },
-      },
-      {
-        $lookup: {
-          from: 'skills',
-          localField: 'technologies',
-          foreignField: '_id',
-          as: 'technologies',
+        {
+          $lookup: {
+            from: 'skills',
+            localField: 'technologies',
+            foreignField: '_id',
+            as: 'technologies',
+          },
         },
-      },
-      {
-        $match: {
-          $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { description: { $regex: search, $options: 'i' } },
-            { 'technologies.name': { $regex: search, $options: 'i' } },
-          ],
+        {
+          $match: {
+            $or: [
+              { title: { $regex: search, $options: 'i' } },
+              { description: { $regex: search, $options: 'i' } },
+              { 'technologies.name': { $regex: search, $options: 'i' } },
+            ],
+          },
         },
+        { $sort: { featured: -1, order: 1, createdAt: -1 } },
+      ]
+
+      const countPipeline = [...pipeline, { $count: 'total' }]
+      const totalResult = await Project.aggregate(countPipeline)
+      total = totalResult.length > 0 ? totalResult[0].total : 0
+
+      const dataPipeline = [...pipeline, { $skip: skip }, { $limit: limit }]
+      projects = await Project.aggregate(dataPipeline)
+    } else {
+      // Regular query without search
+      total = await Project.countDocuments(filter)
+      projects = await Project.find(filter)
+        .populate('category', 'name')
+        .populate('technologies', 'name')
+        .sort({ featured: -1, order: 1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+    }
+
+    return ok(
+      {
+        projects,
+        pagination: paginationMeta(total, page, limit),
       },
-      { $sort: { featured: -1, order: 1, createdAt: -1 } },
-    ]
+      'Projects retrieved successfully',
+      200
+    )
+  },
+  { auth: 'optional' }
+)
 
-    const countPipeline = [...pipeline, { $count: 'total' }]
-    const totalResult = await Project.aggregate(countPipeline)
-    total = totalResult.length > 0 ? totalResult[0].total : 0
-
-    const dataPipeline = [...pipeline, { $skip: skip }, { $limit: limit }]
-    projects = await Project.aggregate(dataPipeline)
-  } else {
-    // Regular query without search
-    total = await Project.countDocuments(filter)
-    projects = await Project.find(filter)
-      .populate('category', 'name')
-      .populate('technologies', 'name')
-      .sort({ featured: -1, order: 1, createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-  }
-
-  return ok(
-    {
-      projects,
-      pagination: paginationMeta(total, page, limit),
-    },
-    'Projects retrieved successfully',
-    200
-  )
-})
-
-// POST /api/projects - Create new project (protected)
+// POST /api/projects - Create new project (protected, owned by caller)
 export const POST = withRoute(
-  async (request) => {
+  async (request, ctx, session) => {
     const {
       title,
       description,
@@ -107,9 +119,11 @@ export const POST = withRoute(
       isActive,
       order,
     } = await request.json()
+    const userId = session.user._id
 
     // Check if project with same title already exists
     const existingProject = await Project.findOne({
+      userId,
       title: ciExact(title),
     })
     if (existingProject) {
@@ -117,6 +131,7 @@ export const POST = withRoute(
     }
 
     const project = new Project({
+      userId,
       title,
       description,
       fullDescription,

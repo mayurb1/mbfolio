@@ -1,21 +1,32 @@
 import { SITE_URL } from '@/lib/site'
+import { connectDB } from '@/lib/db'
+import Users from '@/models/users'
 
 // Generates /sitemap.xml from SITE_URL so entries stay correct on any domain.
-export default function sitemap() {
-  const pages = [
-    { path: '/', changeFrequency: 'monthly', priority: 1.0 },
-    { path: '/about', changeFrequency: 'monthly', priority: 0.9 },
-    { path: '/projects', changeFrequency: 'weekly', priority: 0.9 },
-    { path: '/experience', changeFrequency: 'monthly', priority: 0.8 },
-    { path: '/skills', changeFrequency: 'monthly', priority: 0.8 },
-    { path: '/contact', changeFrequency: 'monthly', priority: 0.7 },
-    { path: '/blog', changeFrequency: 'weekly', priority: 0.6 },
-    { path: '/resume.pdf', changeFrequency: 'monthly', priority: 0.5 },
-  ]
+// In the multi-user model the canonical pages are each user's /profile/{username}.
+export default async function sitemap() {
+  const entries = [{ path: '/', changeFrequency: 'daily', priority: 1.0 }]
 
-  return pages.map(({ path, changeFrequency, priority }) => ({
+  try {
+    await connectDB()
+    const users = await Users.find({}).select('username updatedAt').lean()
+    for (const u of users) {
+      if (!u.username) continue
+      entries.push({
+        path: `/profile/${u.username}`,
+        changeFrequency: 'weekly',
+        priority: 0.9,
+        lastModified: u.updatedAt,
+      })
+    }
+  } catch {
+    // On DB failure, fall back to just the root entry.
+  }
+
+  return entries.map(({ path, changeFrequency, priority, lastModified }) => ({
     url: `${SITE_URL}${path}`,
     changeFrequency,
     priority,
+    ...(lastModified ? { lastModified } : {}),
   }))
 }

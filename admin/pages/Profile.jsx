@@ -128,6 +128,19 @@ const Profile = () => {
                   <Mail className="w-4 h-4" />
                   {profile?.email || currentUser?.email}
                 </p>
+                {profile?.username && (
+                  <p className="text-text-secondary flex items-center gap-2 mt-1">
+                    <User className="w-4 h-4" />
+                    <a
+                      href={`/profile/${profile.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 break-all"
+                    >
+                      /profile/{profile.username}
+                    </a>
+                  </p>
+                )}
                 {profile?.role && (
                   <p className="text-text-secondary flex items-center gap-2 mt-1">
                     <Shield className="w-4 h-4" />
@@ -191,6 +204,10 @@ const Profile = () => {
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1">Name</label>
                 <p className="text-text">{profile.name || 'Not set'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1">Username</label>
+                <p className="text-text">{profile.username || 'Not set'}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1">Email</label>

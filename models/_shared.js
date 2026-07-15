@@ -1,3 +1,5 @@
+import mongoose from 'mongoose'
+
 // Shared schema fragments for timeline-style models (Experience, Education).
 // Keep these in sync with the field definitions they replace — schemas are
 // load-bearing, so every field/validator here must match exactly.
@@ -16,6 +18,12 @@ export function urlValidator(message) {
 // so each schema gets its own fresh definition objects (no cross-schema
 // mutation via shared references).
 export const timelineFields = () => ({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+    required: [true, 'Owner is required'],
+    index: true,
+  },
   startDate: {
     type: Date,
     required: [true, 'Start date is required'],

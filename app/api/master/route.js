@@ -5,13 +5,21 @@ import { rateLimit } from '@/lib/rate-limit'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-// GET /api/master - Master data for the entire public website
+// GET /api/master - Master data for a user's public website.
+// Scope with ?username= (preferred) or ?userId=. With neither, falls back to
+// the configured primary user so the legacy single-site behavior is preserved.
 export async function GET(request) {
   const limited = await rateLimit(request, 'public')
   if (limited) return limited
 
   try {
-    const masterData = await getMasterData()
+    const sp = request.nextUrl.searchParams
+    const username = sp.get('username')
+    const userId = sp.get('userId')
+
+    const masterData = await getMasterData(
+      username ? { username } : userId ? { userId } : {}
+    )
     if (!masterData) {
       return fail('User profile not found', 404)
     }

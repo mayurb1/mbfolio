@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer'
 import { SkillsSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
 import EmptyState from '../ui/EmptyState'
 import { useApiResource } from '../../hooks/useApiResource'
+import { useProfile } from '../../contexts/ProfileContext'
 
 // Smooth animation variants for chips
 const chipsContainer = {
@@ -27,12 +28,14 @@ const chipItem = {
 
 const Skills = () => {
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
+  const { userId } = useProfile()
 
-  // Fetch skills from API
+  // Fetch skills from API (scoped to the profile owner)
   const { data: skills, loading } = useApiResource('/skills', {
     params: {
       isActive: true,
       limit: 100, // Get all active skills
+      userId,
     },
     // Extract skill names from the response
     transform: response => response.data.data.skills.map(skill => skill.name),

@@ -1,46 +1,29 @@
-import { getMasterData } from '@/lib/getMasterData'
-import WebProvider from '@/store/WebProvider'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import ErrorBoundary from '@/web/components/ErrorBoundary'
-import Header from '@/web/layout/Header'
-import Footer from '@/web/layout/Footer'
 import ThemeToggle from '@/web/ui/ThemeToggle'
 import ScrollToTop from '@/web/ui/ScrollToTop'
 import WebVitals from '@/components/WebVitals'
 
-// Public site is statically generated and revalidated every 5 minutes (ISR),
-// so master data lands in the initial HTML for SEO while staying fresh.
-export const revalidate = 300
-
-export default async function WebLayout({ children }) {
-  let initialData = null
-  try {
-    initialData = await getMasterData()
-  } catch {
-    initialData = null
-  }
-
+// Global chrome shared by every public route (root redirect, /profile/[username],
+// blog). The Redux store + Header/Footer live in PortfolioShell at the page
+// level instead, because per-user master data depends on the [username] route
+// param, which a layout cannot read.
+export default function WebLayout({ children }) {
   return (
     <ErrorBoundary>
-      <WebProvider initialData={initialData}>
-        <ThemeProvider>
-          <WebVitals />
-          <a href="#main-content" className="skip-to-content" aria-label="Skip to main content">
-            Skip to content
-          </a>
-          <div className="min-h-screen bg-background text-text">
-            <Header />
-            <main id="main-content" role="main">
-              {children}
-            </main>
-            <Footer />
-            <div className="fixed bottom-6 right-6 z-50 space-y-3 no-print">
-              <ThemeToggle />
-              <ScrollToTop />
-            </div>
+      <ThemeProvider>
+        <WebVitals />
+        <a href="#main-content" className="skip-to-content" aria-label="Skip to main content">
+          Skip to content
+        </a>
+        <div className="min-h-screen bg-background text-text">
+          {children}
+          <div className="fixed bottom-6 right-6 z-50 space-y-3 no-print">
+            <ThemeToggle />
+            <ScrollToTop />
           </div>
-        </ThemeProvider>
-      </WebProvider>
+        </div>
+      </ThemeProvider>
     </ErrorBoundary>
   )
 }

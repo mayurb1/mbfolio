@@ -7,6 +7,7 @@ import { ExperienceTimelineSkeleton, SectionHeaderSkeleton } from '../ui/Skeleto
 import RetryState from '../ui/RetryState'
 import EmptyState from '../ui/EmptyState'
 import { useApiResource } from '../../hooks/useApiResource'
+import { useProfile } from '../../contexts/ProfileContext'
 
 // Helper function to generate duration from dates
 const generateDuration = (startDate, endDate, isOngoing) => {
@@ -36,10 +37,12 @@ const Experience = () => {
     threshold: 0.1,
     triggerOnce: true,
   })
+  const { userId } = useProfile()
 
   // Fetch both experiences and education data from API in parallel. A single
   // shared loading/error is preserved: if either request fails, both fall back
-  // to empty arrays and one error message is shown.
+  // to empty arrays and one error message is shown. Both requests share the
+  // params object, so the owner scope applies to each.
   const {
     data: { experiences, education },
     loading,
@@ -49,6 +52,7 @@ const Experience = () => {
     params: {
       isActive: true,
       limit: 50, // Get all active experiences / education records
+      userId,
     },
     transform: ([experienceResponse, educationResponse]) => {
       // Transform experience data to match existing component structure

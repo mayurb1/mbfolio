@@ -21,7 +21,7 @@ export async function POST(request) {
       return fail('No file provided', 400)
     }
 
-    const imageUrl = await uploadProfileImage(file)
+    const imageUrl = await uploadProfileImage(file, auth.user._id)
     return ok({ imageUrl }, 'Profile image uploaded successfully', 200)
   } catch (error) {
     return fail(error.message, 400)

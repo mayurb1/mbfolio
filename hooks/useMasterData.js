@@ -2,12 +2,13 @@
 
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react'
-import { 
-  fetchMasterData, 
-  selectUser, 
-  selectStats, 
-  selectHighlights, 
-  selectMasterLoading, 
+import { useProfile } from '../contexts/ProfileContext'
+import {
+  fetchMasterData,
+  selectUser,
+  selectStats,
+  selectHighlights,
+  selectMasterLoading,
   selectMasterError,
   selectMasterData,
   selectLoadingStartTime,
@@ -21,7 +22,9 @@ import {
  */
 export const useMasterData = () => {
   const dispatch = useDispatch()
-  
+  // Scope refetches to the profile being viewed (null on the legacy root).
+  const { username } = useProfile()
+
   // Selectors
   const masterData = useSelector(selectMasterData)
   const user = useSelector(selectUser)
@@ -35,9 +38,9 @@ export const useMasterData = () => {
   // Auto-fetch on mount if data is not available
   useEffect(() => {
     if (!user.name && !loading && !error) {
-      dispatch(fetchMasterData())
+      dispatch(fetchMasterData({ username }))
     }
-  }, [dispatch, user.name, loading, error])
+  }, [dispatch, user.name, loading, error, username])
 
   // Check if loading has been going on for more than 3 seconds
   useEffect(() => {
@@ -105,7 +108,7 @@ export const useMasterData = () => {
     getCompletedProjectsCount,
     
     // Actions
-    refetch: () => dispatch(fetchMasterData())
+    refetch: () => dispatch(fetchMasterData({ username }))
   }
 }
 

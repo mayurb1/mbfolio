@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { timelineFields, baseSchemaOptions } from './_shared'
+import { timelineFields, baseSchemaOptions } from './_shared.js'
 
 const highlightSchema = new mongoose.Schema(
   {
@@ -60,9 +60,9 @@ const experienceSchema = new mongoose.Schema(
   baseSchemaOptions
 )
 
-// Index for efficient querying
-experienceSchema.index({ isActive: 1, order: 1 })
-experienceSchema.index({ startDate: -1 }) // For sorting by start date
+// Index for efficient querying (scoped per owner)
+experienceSchema.index({ userId: 1, isActive: 1, order: 1 })
+experienceSchema.index({ userId: 1, startDate: -1 }) // For sorting by start date
 
 export default mongoose.models.Experience ||
   mongoose.model('Experience', experienceSchema)

@@ -8,7 +8,6 @@ import { UserPlus, CheckCircle } from 'lucide-react'
 import { useToast } from '../contexts/ToastContext'
 import RegisterForm from '../components/forms/RegisterForm'
 import { registerAdmin, clearError } from '../store/authSlice'
-import authService from '../services/authService'
 
 const Register = () => {
   const dispatch = useDispatch()
@@ -21,18 +20,6 @@ const Register = () => {
   useEffect(() => {
     dispatch(clearError())
   }, [dispatch])
-
-  // Registration is only open when no admin exists yet — otherwise bounce to login.
-  useEffect(() => {
-    authService
-      .checkRegistrationStatus()
-      .then((response) => {
-        if (!response.data.isRegistrationAllowed) {
-          router.replace('/admin/login')
-        }
-      })
-      .catch(() => router.replace('/admin/login'))
-  }, [router])
 
   // Redirect if already authenticated
   useEffect(() => {

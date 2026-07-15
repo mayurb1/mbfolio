@@ -20,7 +20,7 @@ export async function POST(request) {
     const file = await fileFromFormData(entry)
     if (!file) return fail('No file provided', 400)
 
-    const imageUrl = await uploadProjectImage(file)
+    const imageUrl = await uploadProjectImage(file, auth.user._id)
 
     return ok({ imageUrl }, 'Project image uploaded successfully', 200)
   } catch (error) {

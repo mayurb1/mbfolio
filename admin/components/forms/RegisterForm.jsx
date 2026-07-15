@@ -9,9 +9,12 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const [usernameEdited, setUsernameEdited] = useState(false)
+
   const formik = useFormik({
     initialValues: {
       name: '',
+      username: '',
       email: '',
       password: '',
       confirmPassword: ''
@@ -21,6 +24,14 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
         .min(2, 'Name must be at least 2 characters')
         .max(50, 'Name must be less than 50 characters')
         .required('Name is required'),
+      username: Yup.string()
+        .min(3, 'Username must be at least 3 characters')
+        .max(30, 'Username must be less than 30 characters')
+        .matches(
+          /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
+          'Only lowercase letters, numbers and hyphens'
+        )
+        .required('Username is required'),
       email: Yup.string()
         .email('Invalid email address')
         .required('Email is required'),
@@ -42,6 +53,29 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
     }
   })
 
+  // Derive a URL-safe username suggestion from the display name.
+  const toSlug = (value = '') =>
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 30)
+      .replace(/-+$/g, '')
+
+  // Auto-fill the username from the name until the user edits it themselves.
+  const handleNameChange = (e) => {
+    formik.handleChange(e)
+    if (!usernameEdited) {
+      formik.setFieldValue('username', toSlug(e.target.value))
+    }
+  }
+
+  const handleUsernameChange = (e) => {
+    setUsernameEdited(true)
+    formik.setFieldValue('username', e.target.value.toLowerCase())
+  }
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
 
@@ -58,12 +92,43 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           placeholder="John Doe"
           value={formik.values.name}
-          onChange={formik.handleChange}
+          onChange={handleNameChange}
           onBlur={formik.handleBlur}
         />
         {formik.touched.name && formik.errors.name && (
           <p className="mt-2 text-sm text-red-600 dark:text-red-400">
             {formik.errors.name}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+          Username
+        </label>
+        <div className="flex items-center">
+          <span className="inline-flex items-center px-3 py-2 rounded-l-lg border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-sm select-none">
+            /profile/
+          </span>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autoComplete="username"
+            required
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-r-lg shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="john-doe"
+            value={formik.values.username}
+            onChange={handleUsernameChange}
+            onBlur={formik.handleBlur}
+          />
+        </div>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Your public portfolio will live at <span className="font-mono">/profile/{formik.values.username || 'username'}</span>
+        </p>
+        {formik.touched.username && formik.errors.username && (
+          <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            {formik.errors.username}
           </p>
         )}
       </div>

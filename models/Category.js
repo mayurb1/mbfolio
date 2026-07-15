@@ -2,10 +2,15 @@ import mongoose from 'mongoose'
 
 const categorySchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: [true, 'Owner is required'],
+      index: true,
+    },
     name: {
       type: String,
       required: [true, 'Category name is required'],
-      unique: true,
       trim: true,
       maxLength: [50, 'Category name cannot exceed 50 characters'],
     },
@@ -19,8 +24,9 @@ const categorySchema = new mongoose.Schema(
   }
 )
 
-// Index for efficient querying
-categorySchema.index({ isActive: 1, name: 1 })
+// Category names are unique per user (not globally).
+categorySchema.index({ userId: 1, name: 1 }, { unique: true })
+categorySchema.index({ userId: 1, isActive: 1, name: 1 })
 
 export default mongoose.models.Category ||
   mongoose.model('Category', categorySchema)

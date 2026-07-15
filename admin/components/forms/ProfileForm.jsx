@@ -31,6 +31,14 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
       .required('Name is required')
       .min(2, 'Name must be at least 2 characters')
       .max(100, 'Name cannot exceed 100 characters'),
+    username: Yup.string()
+      .required('Username is required')
+      .min(3, 'Username must be at least 3 characters')
+      .max(30, 'Username cannot exceed 30 characters')
+      .matches(
+        /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
+        'Only lowercase letters, numbers and hyphens'
+      ),
     email: Yup.string()
       .required('Email is required')
       .email('Must be a valid email address'),
@@ -70,6 +78,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
   // Initial form values
   const initialValues = {
     name: userData?.name || '',
+    username: userData?.username || '',
     email: userData?.email || '',
     phone: userData?.phone || '',
     bio: userData?.bio || '',
@@ -123,6 +132,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
       // Prepare data for API
       const profileData = {
         name: values.name.trim(),
+        username: values.username.trim().toLowerCase(),
         email: values.email.trim(),
         phone: values.phone.trim(),
         bio: values.bio.trim(),
@@ -171,6 +181,8 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     } catch (error) {
       if (error.message.includes('email already exists')) {
         setFieldError('email', 'This email is already in use')
+      } else if (/username/i.test(error.message)) {
+        setFieldError('username', error.message)
       } else {
         setFieldError('general', error.message)
       }
@@ -242,6 +254,20 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
               required
               placeholder="Enter your full name"
             />
+
+            {/* Username */}
+            <div>
+              <FormField
+                name="username"
+                label="Username"
+                required
+                placeholder="your-username"
+              />
+              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                Public URL: /profile/{values.username || 'username'}. Changing it
+                will break existing links to your old URL.
+              </p>
+            </div>
 
             {/* Email */}
             <FormField

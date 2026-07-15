@@ -1,36 +1,41 @@
 import Skills from '@/models/Skills'
 import Category from '@/models/Category'
 import { ok, okMessage, fail } from '@/lib/respond'
-import { withRoute, ciExact } from '@/lib/crud'
+import { withRoute, ciExact, resolveScopeUserId } from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const NOT_FOUND = 'Skill not found'
 
-// GET /api/skills/:id - Get skill by ID (public)
+// GET /api/skills/:id - Get skill by ID (public; scoped)
 export const GET = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
+    const userId = await resolveScopeUserId(request, session)
+    if (!userId) return fail('User scope required', 400)
+
     const { id } = await params
-    const skill = await Skills.findById(id)
+    const skill = await Skills.findOne({ _id: id, userId })
     if (!skill) return fail(NOT_FOUND, 404)
     return ok({ skill }, 'Skill retrieved successfully', 200)
   },
-  { notFound: NOT_FOUND }
+  { auth: 'optional', notFound: NOT_FOUND }
 )
 
-// PUT /api/skills/:id - Update skill (protected)
+// PUT /api/skills/:id - Update skill (protected, owner-scoped)
 export const PUT = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const { name, category, proficiency, experience, description, isActive } =
       await request.json()
 
-    const skill = await Skills.findById(id)
+    const skill = await Skills.findOne({ _id: id, userId })
     if (!skill) return fail(NOT_FOUND, 404)
 
     if (name && name.toLowerCase() !== skill.name.toLowerCase()) {
       const existingSkill = await Skills.findOne({
+        userId,
         name: ciExact(name),
         _id: { $ne: id },
       })
@@ -41,6 +46,7 @@ export const PUT = withRoute(
 
     if (category) {
       const categoryExists = await Category.findOne({
+        userId,
         name: category,
         isActive: true,
       })
@@ -49,8 +55,8 @@ export const PUT = withRoute(
       }
     }
 
-    const updatedSkill = await Skills.findByIdAndUpdate(
-      id,
+    const updatedSkill = await Skills.findOneAndUpdate(
+      { _id: id, userId },
       {
         name,
         category,
@@ -67,17 +73,19 @@ export const PUT = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// PATCH /api/skills/:id - Partial update skill (protected)
+// PATCH /api/skills/:id - Partial update skill (protected, owner-scoped)
 export const PATCH = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const body = await request.json()
 
-    const skill = await Skills.findById(id)
+    const skill = await Skills.findOne({ _id: id, userId })
     if (!skill) return fail(NOT_FOUND, 404)
 
     if (body.name && body.name.toLowerCase() !== skill.name.toLowerCase()) {
       const existingSkill = await Skills.findOne({
+        userId,
         name: ciExact(body.name),
         _id: { $ne: id },
       })
@@ -88,6 +96,7 @@ export const PATCH = withRoute(
 
     if (body.category) {
       const categoryExists = await Category.findOne({
+        userId,
         name: body.category,
         isActive: true,
       })
@@ -96,8 +105,11 @@ export const PATCH = withRoute(
       }
     }
 
-    const updatedSkill = await Skills.findByIdAndUpdate(
-      id,
+    // Never allow the owner to be reassigned via the body.
+    delete body.userId
+
+    const updatedSkill = await Skills.findOneAndUpdate(
+      { _id: id, userId },
       { $set: body },
       { new: true, runValidators: true }
     )
@@ -107,14 +119,15 @@ export const PATCH = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// DELETE /api/skills/:id - Delete skill (protected)
+// DELETE /api/skills/:id - Delete skill (protected, owner-scoped)
 export const DELETE = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
-    const skill = await Skills.findById(id)
+    const userId = session.user._id
+    const skill = await Skills.findOne({ _id: id, userId })
     if (!skill) return fail(NOT_FOUND, 404)
 
-    await Skills.findByIdAndDelete(id)
+    await Skills.deleteOne({ _id: id, userId })
 
     return okMessage('Skill deleted successfully', 200)
   },

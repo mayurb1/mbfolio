@@ -4,9 +4,12 @@ import masterService from '../services/masterService'
 // Async thunk to fetch master data
 export const fetchMasterData = createAsyncThunk(
   'master/fetchMasterData',
-  async (_, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
-      const response = await masterService.getMasterData()
+      // Accept either a username string or an options object { username }.
+      const options =
+        typeof arg === 'string' ? { username: arg } : arg || {}
+      const response = await masterService.getMasterData(options)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message)

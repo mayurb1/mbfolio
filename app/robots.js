@@ -8,11 +8,7 @@ export default function robots() {
         userAgent: '*',
         allow: [
           '/',
-          '/about',
-          '/projects',
-          '/experience',
-          '/skills',
-          '/contact',
+          '/profile/',
           '/blog',
         ],
         disallow: [

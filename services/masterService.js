@@ -37,13 +37,15 @@ const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
 }
 
 export const masterService = {
-  // Get master data for entire website
+  // Get master data for a user's website (scoped by username when provided)
   getMasterData: async (options = {}) => {
-    const { skipRetry = false } = options
+    const { skipRetry = false, username } = options
 
     try {
       const fetchData = async () => {
-        const response = await api.get('/master')
+        const response = await api.get('/master', {
+          params: username ? { username } : undefined,
+        })
         return response.data
       }
 

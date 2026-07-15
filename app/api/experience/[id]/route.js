@@ -1,29 +1,33 @@
 import Experience from '@/models/Experience'
 import '@/models/Skills'
 import { ok, okMessage, fail } from '@/lib/respond'
-import { withRoute, ciExact } from '@/lib/crud'
+import { withRoute, ciExact, resolveScopeUserId } from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const NOT_FOUND = 'Experience not found'
 
-// GET /api/experience/:id - Get experience by ID (public)
+// GET /api/experience/:id - Get experience by ID (public; scoped)
 export const GET = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
+    const userId = await resolveScopeUserId(request, session)
+    if (!userId) return fail('User scope required', 400)
+
     const { id } = await params
-    const experience = await Experience.findById(id)
+    const experience = await Experience.findOne({ _id: id, userId })
       .populate('skills', 'name category proficiency')
     if (!experience) return fail(NOT_FOUND, 404)
     return ok({ experience }, 'Experience retrieved successfully', 200)
   },
-  { notFound: NOT_FOUND }
+  { auth: 'optional', notFound: NOT_FOUND }
 )
 
-// PUT /api/experience/:id - Update experience (protected)
+// PUT /api/experience/:id - Update experience (protected, owner-scoped)
 export const PUT = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const {
       company,
       position,
@@ -42,7 +46,7 @@ export const PUT = withRoute(
       order,
     } = await request.json()
 
-    const experience = await Experience.findById(id)
+    const experience = await Experience.findOne({ _id: id, userId })
     if (!experience) return fail(NOT_FOUND, 404)
 
     if (
@@ -50,6 +54,7 @@ export const PUT = withRoute(
       (position && position.toLowerCase() !== experience.position.toLowerCase())
     ) {
       const existingExperience = await Experience.findOne({
+        userId,
         company: ciExact(company || experience.company),
         position: ciExact(position || experience.position),
         _id: { $ne: id },
@@ -59,8 +64,8 @@ export const PUT = withRoute(
       }
     }
 
-    const updatedExperience = await Experience.findByIdAndUpdate(
-      id,
+    const updatedExperience = await Experience.findOneAndUpdate(
+      { _id: id, userId },
       {
         company,
         position,
@@ -89,13 +94,14 @@ export const PUT = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// PATCH /api/experience/:id - Partial update experience (protected)
+// PATCH /api/experience/:id - Partial update experience (protected, owner-scoped)
 export const PATCH = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const body = await request.json()
 
-    const experience = await Experience.findById(id)
+    const experience = await Experience.findOne({ _id: id, userId })
     if (!experience) return fail(NOT_FOUND, 404)
 
     if (
@@ -103,6 +109,7 @@ export const PATCH = withRoute(
       (body.position && body.position.toLowerCase() !== experience.position.toLowerCase())
     ) {
       const existingExperience = await Experience.findOne({
+        userId,
         company: ciExact(body.company || experience.company),
         position: ciExact(body.position || experience.position),
         _id: { $ne: id },
@@ -112,8 +119,11 @@ export const PATCH = withRoute(
       }
     }
 
-    const updatedExperience = await Experience.findByIdAndUpdate(
-      id,
+    // Never allow the owner to be reassigned via the body.
+    delete body.userId
+
+    const updatedExperience = await Experience.findOneAndUpdate(
+      { _id: id, userId },
       { $set: body },
       { new: true, runValidators: true }
     )
@@ -126,14 +136,15 @@ export const PATCH = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// DELETE /api/experience/:id - Delete experience (protected)
+// DELETE /api/experience/:id - Delete experience (protected, owner-scoped)
 export const DELETE = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
-    const experience = await Experience.findById(id)
+    const userId = session.user._id
+    const experience = await Experience.findOne({ _id: id, userId })
     if (!experience) return fail(NOT_FOUND, 404)
 
-    await Experience.findByIdAndDelete(id)
+    await Experience.deleteOne({ _id: id, userId })
     return okMessage('Experience deleted successfully', 200)
   },
   { auth: true, notFound: NOT_FOUND }

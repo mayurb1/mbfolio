@@ -2,18 +2,21 @@ import Project from '@/models/Project'
 import '@/models/Category'
 import '@/models/Skills'
 import { ok, okMessage, fail } from '@/lib/respond'
-import { withRoute, ciExact } from '@/lib/crud'
+import { withRoute, ciExact, resolveScopeUserId } from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const NOT_FOUND = 'Project not found'
 
-// GET /api/projects/:id - Get project by ID (public)
+// GET /api/projects/:id - Get project by ID (public; scoped)
 export const GET = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
+    const userId = await resolveScopeUserId(request, session)
+    if (!userId) return fail('User scope required', 400)
+
     const { id } = await params
-    const project = await Project.findById(id)
+    const project = await Project.findOne({ _id: id, userId })
       .populate('category', 'name')
       .populate('technologies', 'name')
 
@@ -21,13 +24,14 @@ export const GET = withRoute(
 
     return ok({ project }, 'Project retrieved successfully', 200)
   },
-  { notFound: NOT_FOUND }
+  { auth: 'optional', notFound: NOT_FOUND }
 )
 
-// PUT /api/projects/:id - Update project (protected)
+// PUT /api/projects/:id - Update project (protected, owner-scoped)
 export const PUT = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const {
       title,
       description,
@@ -49,12 +53,13 @@ export const PUT = withRoute(
     } = await request.json()
 
     // Check if project exists
-    const project = await Project.findById(id)
+    const project = await Project.findOne({ _id: id, userId })
     if (!project) return fail(NOT_FOUND, 404)
 
     // Check if title is being changed and if new title already exists
     if (title && title.toLowerCase() !== project.title.toLowerCase()) {
       const existingProject = await Project.findOne({
+        userId,
         title: ciExact(title),
         _id: { $ne: id },
       })
@@ -63,8 +68,8 @@ export const PUT = withRoute(
       }
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(
-      id,
+    const updatedProject = await Project.findOneAndUpdate(
+      { _id: id, userId },
       {
         title,
         description,
@@ -94,18 +99,20 @@ export const PUT = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// PATCH /api/projects/:id - Partial update project (protected)
+// PATCH /api/projects/:id - Partial update project (protected, owner-scoped)
 export const PATCH = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const body = await request.json()
 
-    const project = await Project.findById(id)
+    const project = await Project.findOne({ _id: id, userId })
     if (!project) return fail(NOT_FOUND, 404)
 
     // Check if title is being changed and if new title already exists
     if (body.title && body.title.toLowerCase() !== project.title.toLowerCase()) {
       const existingProject = await Project.findOne({
+        userId,
         title: ciExact(body.title),
         _id: { $ne: id },
       })
@@ -114,8 +121,11 @@ export const PATCH = withRoute(
       }
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(
-      id,
+    // Never allow the owner to be reassigned via the body.
+    delete body.userId
+
+    const updatedProject = await Project.findOneAndUpdate(
+      { _id: id, userId },
       { $set: body },
       { new: true, runValidators: true }
     )
@@ -127,14 +137,15 @@ export const PATCH = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// DELETE /api/projects/:id - Delete project (protected)
+// DELETE /api/projects/:id - Delete project (protected, owner-scoped)
 export const DELETE = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
-    const project = await Project.findById(id)
+    const userId = session.user._id
+    const project = await Project.findOne({ _id: id, userId })
     if (!project) return fail(NOT_FOUND, 404)
 
-    await Project.findByIdAndDelete(id)
+    await Project.deleteOne({ _id: id, userId })
 
     return okMessage('Project deleted successfully', 200)
   },

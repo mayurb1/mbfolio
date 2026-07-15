@@ -2,6 +2,12 @@ import mongoose from 'mongoose'
 
 const skillSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: [true, 'Owner is required'],
+      index: true,
+    },
     name: {
       type: String,
       required: [true, 'Skill name is required'],
@@ -45,7 +51,9 @@ const skillSchema = new mongoose.Schema(
   }
 )
 
-// Index for efficient querying
-skillSchema.index({ category: 1, isActive: 1 })
+// Index for efficient querying (scoped per owner). Uniqueness of skill name
+// per user is enforced case-insensitively in the route handler, not here.
+skillSchema.index({ userId: 1, category: 1, isActive: 1 })
+skillSchema.index({ userId: 1, name: 1 })
 
 export default mongoose.models.Skills || mongoose.model('Skills', skillSchema)

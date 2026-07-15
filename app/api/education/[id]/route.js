@@ -1,27 +1,31 @@
 import Education from '@/models/Education'
 import { ok, okMessage, fail } from '@/lib/respond'
-import { withRoute, ciExact } from '@/lib/crud'
+import { withRoute, ciExact, resolveScopeUserId } from '@/lib/crud'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const NOT_FOUND = 'Education record not found'
 
-// GET /api/education/:id - Get education by ID (public)
+// GET /api/education/:id - Get education by ID (public; scoped)
 export const GET = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
+    const userId = await resolveScopeUserId(request, session)
+    if (!userId) return fail('User scope required', 400)
+
     const { id } = await params
-    const education = await Education.findById(id)
+    const education = await Education.findOne({ _id: id, userId })
     if (!education) return fail(NOT_FOUND, 404)
     return ok({ education }, 'Education record retrieved successfully', 200)
   },
-  { notFound: NOT_FOUND }
+  { auth: 'optional', notFound: NOT_FOUND }
 )
 
-// PUT /api/education/:id - Update education record (protected)
+// PUT /api/education/:id - Update education record (protected, owner-scoped)
 export const PUT = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const {
       institution,
       degree,
@@ -38,7 +42,7 @@ export const PUT = withRoute(
       order,
     } = await request.json()
 
-    const education = await Education.findById(id)
+    const education = await Education.findOne({ _id: id, userId })
     if (!education) return fail(NOT_FOUND, 404)
 
     if (
@@ -47,6 +51,7 @@ export const PUT = withRoute(
       (degree && degree.toLowerCase() !== education.degree.toLowerCase())
     ) {
       const existingEducation = await Education.findOne({
+        userId,
         institution: ciExact(institution || education.institution),
         degree: ciExact(degree || education.degree),
         _id: { $ne: id },
@@ -59,8 +64,8 @@ export const PUT = withRoute(
       }
     }
 
-    const updatedEducation = await Education.findByIdAndUpdate(
-      id,
+    const updatedEducation = await Education.findOneAndUpdate(
+      { _id: id, userId },
       {
         institution,
         degree,
@@ -88,13 +93,14 @@ export const PUT = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// PATCH /api/education/:id - Partial update education record (protected)
+// PATCH /api/education/:id - Partial update education record (protected, owner-scoped)
 export const PATCH = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
+    const userId = session.user._id
     const body = await request.json()
 
-    const education = await Education.findById(id)
+    const education = await Education.findOne({ _id: id, userId })
     if (!education) return fail(NOT_FOUND, 404)
 
     if (
@@ -105,6 +111,7 @@ export const PATCH = withRoute(
         body.degree.toLowerCase() !== education.degree.toLowerCase())
     ) {
       const existingEducation = await Education.findOne({
+        userId,
         institution: ciExact(body.institution || education.institution),
         degree: ciExact(body.degree || education.degree),
         _id: { $ne: id },
@@ -117,8 +124,11 @@ export const PATCH = withRoute(
       }
     }
 
-    const updatedEducation = await Education.findByIdAndUpdate(
-      id,
+    // Never allow the owner to be reassigned via the body.
+    delete body.userId
+
+    const updatedEducation = await Education.findOneAndUpdate(
+      { _id: id, userId },
       { $set: body },
       { new: true, runValidators: true }
     )
@@ -132,14 +142,15 @@ export const PATCH = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
-// DELETE /api/education/:id - Delete education record (protected)
+// DELETE /api/education/:id - Delete education record (protected, owner-scoped)
 export const DELETE = withRoute(
-  async (request, { params }) => {
+  async (request, { params }, session) => {
     const { id } = await params
-    const education = await Education.findById(id)
+    const userId = session.user._id
+    const education = await Education.findOne({ _id: id, userId })
     if (!education) return fail(NOT_FOUND, 404)
 
-    await Education.findByIdAndDelete(id)
+    await Education.deleteOne({ _id: id, userId })
     return okMessage('Education record deleted successfully', 200)
   },
   { auth: true, notFound: NOT_FOUND }

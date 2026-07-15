@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { timelineFields, baseSchemaOptions } from './_shared'
+import { timelineFields, baseSchemaOptions } from './_shared.js'
 
 const educationSchema = new mongoose.Schema(
   {
@@ -25,9 +25,9 @@ const educationSchema = new mongoose.Schema(
   baseSchemaOptions
 )
 
-// Index for efficient querying
-educationSchema.index({ isActive: 1, order: 1 })
-educationSchema.index({ startDate: -1 }) // For sorting by start date
+// Index for efficient querying (scoped per owner)
+educationSchema.index({ userId: 1, isActive: 1, order: 1 })
+educationSchema.index({ userId: 1, startDate: -1 }) // For sorting by start date
 
 export default mongoose.models.Education ||
   mongoose.model('Education', educationSchema)

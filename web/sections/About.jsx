@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 import CodeEditor from '../ui/CodeEditor'
+import { useProfile } from '../../contexts/ProfileContext'
 import {
   fetchMasterData,
   selectUser,
@@ -17,6 +18,7 @@ import {
 
 const About = () => {
   const dispatch = useDispatch()
+  const { username } = useProfile()
 
   // Redux selectors
   const user = useSelector(selectUser)
@@ -45,9 +47,9 @@ const About = () => {
   useEffect(() => {
     // Only fetch if we don't have data already
     if (!user.name && !loading && !error) {
-      dispatch(fetchMasterData())
+      dispatch(fetchMasterData({ username }))
     }
-  }, [dispatch, user.name, loading, error])
+  }, [dispatch, user.name, loading, error, username])
 
   // Close code editor when switching to mobile view
   useEffect(() => {
