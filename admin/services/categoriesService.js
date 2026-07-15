@@ -13,6 +13,7 @@ const categoriesService = {
   getCategoryById: base.getById,
   createCategory: base.create,
   updateCategory: base.update,
+  patchCategory: base.partialUpdate,
   deleteCategory: base.remove,
   toggleCategoryStatus: base.toggleStatus,
 }

@@ -49,6 +49,36 @@ export const PUT = withRoute(
   { auth: true, notFound: NOT_FOUND }
 )
 
+// PATCH /api/categories/:id - Partial update category (protected)
+export const PATCH = withRoute(
+  async (request, { params }) => {
+    const { id } = await params
+    const body = await request.json()
+
+    const category = await Category.findById(id)
+    if (!category) return fail(NOT_FOUND, 404)
+
+    if (body.name && body.name.toLowerCase() !== category.name.toLowerCase()) {
+      const existingCategory = await Category.findOne({
+        name: ciExact(body.name),
+        _id: { $ne: id },
+      })
+      if (existingCategory) {
+        return fail('Category with this name already exists', 409)
+      }
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true, runValidators: true }
+    )
+
+    return ok({ category: updatedCategory }, 'Category updated successfully', 200)
+  },
+  { auth: true, notFound: NOT_FOUND }
+)
+
 // DELETE /api/categories/:id - Delete category (protected)
 export const DELETE = withRoute(
   async (request, { params }) => {
