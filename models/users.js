@@ -94,6 +94,19 @@ const userSchema = new mongoose.Schema(
     resume: {
       type: String,
     },
+    logo: {
+      type: String,
+    },
+    highlights: {
+      type: [
+        {
+          type: String,
+          trim: true,
+          maxlength: [500, 'Highlight cannot exceed 500 characters'],
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 )

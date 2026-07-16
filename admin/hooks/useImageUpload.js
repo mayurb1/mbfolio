@@ -3,18 +3,25 @@
 import { useCallback } from 'react'
 import projectService from '../services/projectService'
 import userService from '../services/userService'
-import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType } from '../../constants/fileConstants'
+import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType, isValidLogoType } from '../../constants/fileConstants'
 import { useFileUpload } from './useFileUpload'
 
 export const useImageUpload = (serviceType = 'project') => {
-  const sizeType = serviceType === 'profile' ? 'PROFILE_IMAGE' : 'PROJECT_IMAGE'
+  const isLogo = serviceType === 'logo'
+  const sizeType = isLogo
+    ? 'LOGO'
+    : serviceType === 'profile'
+      ? 'PROFILE_IMAGE'
+      : 'PROJECT_IMAGE'
 
   const uploadFn = useCallback(
-    file =>
-      serviceType === 'profile'
+    file => {
+      if (isLogo) return userService.uploadLogo(file)
+      return serviceType === 'profile'
         ? userService.uploadProfileImage(file)
-        : projectService.uploadImage(file),
-    [serviceType]
+        : projectService.uploadImage(file)
+    },
+    [serviceType, isLogo]
   )
 
   const {
@@ -23,14 +30,18 @@ export const useImageUpload = (serviceType = 'project') => {
     isUploading,
     isAnyUploading,
   } = useFileUpload({
-    validate: isValidImageType,
-    invalidTypeMessage: 'Please select an image file',
+    validate: isLogo ? isValidLogoType : isValidImageType,
+    invalidTypeMessage: isLogo
+      ? 'Please select an SVG file'
+      : 'Please select an image file',
     sizeLimit: FILE_SIZE_LIMITS[sizeType],
-    sizeErrorMessage: `Please select an image smaller than ${FILE_SIZE_LIMITS_MB[sizeType]}`,
+    sizeErrorMessage: isLogo
+      ? `Please select an SVG smaller than ${FILE_SIZE_LIMITS_MB[sizeType]}`
+      : `Please select an image smaller than ${FILE_SIZE_LIMITS_MB[sizeType]}`,
     uploadFn,
-    successMessage: 'Image uploaded successfully',
-    errorLogLabel: 'Error uploading image:',
-    uploadErrorFallback: 'Failed to upload image',
+    successMessage: isLogo ? 'Logo uploaded successfully' : 'Image uploaded successfully',
+    errorLogLabel: isLogo ? 'Error uploading logo:' : 'Error uploading image:',
+    uploadErrorFallback: isLogo ? 'Failed to upload logo' : 'Failed to upload image',
   })
 
   const uploadMultipleImages = useCallback(async (files, identifierPrefix = 'image') => {

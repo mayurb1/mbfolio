@@ -156,25 +156,17 @@ const About = () => {
     { number: '∞', label: 'Lines of Code', icon: Heart },
   ]
 
-  const fallbackHighlights = [
-    'React.js, Next.js, JavaScript, HTML5, CSS3',
-    'Reusable UI with Material UI, Ant Design, Tailwind CSS',
-    'Application design, debugging, and performance improvement',
-    'Front-end architecture and webpage optimization',
-    'Strong client communication and requirement understanding',
-    'Manual testing and issue resolution',
-  ]
-
   // Dynamic data from Redux store
   const statsData = user.name
     ? [
         {
-          number: stats.experience?.text || '3+',
+          number: stats.experience?.text ? stats.experience?.text : '3+',
           label: 'Years of Experience',
           icon: Calendar,
-        },
+        }, 
         {
-          number: `${stats.projects?.completed || 0}+`,
+
+          number: stats.projects?.completed ? `${stats.projects?.completed}+` : "0",
           label: 'Projects Completed',
           icon: Code,
         },
@@ -191,8 +183,8 @@ const About = () => {
       ]
     : fallbackStats
 
-  const skillHighlights =
-    highlights.length > 0 ? highlights : fallbackHighlights
+  // Highlights come from the profile owner's data only (no static fallback).
+  const skillHighlights = highlights
   const userBio = user.bio || ''
   const profileImage = user.profileImage || '/images/profile-pic.jpg'
   const userName = user.name || 'Mayur Bhalgama'
@@ -531,7 +523,7 @@ const About = () => {
                   <span>
                     {userLocation?.city && userLocation?.country
                       ? `${userLocation.city}, ${userLocation.country}`
-                      : 'Ahmedabad, India'}
+                      : ''}
                   </span>
                 </motion.div>
               </div>
@@ -616,6 +608,7 @@ const About = () => {
               </div>
 
               {/* Key Highlights */}
+              {skillHighlights.length > 0 && (
               <div>
                 <h4 className="text-base sm:text-lg font-semibold text-text mb-4">
                   What I Do Best
@@ -637,6 +630,7 @@ const About = () => {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Quote */}
               <motion.blockquote

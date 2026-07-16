@@ -13,6 +13,7 @@ const ImageUpload = ({
   className = '',
   maxSize = FILE_SIZE_LIMITS_MB.DEFAULT_IMAGE,
   accept = 'image/*',
+  formatsHint = 'PNG, JPG, GIF',
 }) => {
   const [dragOver, setDragOver] = useState(false)
   const uploadId = useId()
@@ -119,7 +120,7 @@ const ImageUpload = ({
                 {placeholder}
               </p>
               <p className="text-xs text-slate-600 dark:text-slate-300 mb-4">
-                PNG, JPG, GIF up to {maxSize}
+                {formatsHint} up to {maxSize}
               </p>
               <label
                 htmlFor={`image-upload-select-${uploadId}`}

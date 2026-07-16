@@ -51,6 +51,8 @@ export async function PUT(request) {
       headline,
       availability,
       resume,
+      highlights,
+      logo,
     } = body
 
     // Email uniqueness check (excluding the current user)
@@ -99,6 +101,12 @@ export async function PUT(request) {
     if (headline !== undefined) updateData.headline = headline
     if (availability !== undefined) updateData.availability = availability
     if (resume !== undefined) updateData.resume = resume
+    if (logo !== undefined) updateData.logo = logo
+    if (highlights !== undefined) {
+      updateData.highlights = Array.isArray(highlights)
+        ? highlights.map(h => String(h).trim()).filter(Boolean)
+        : []
+    }
 
     const user = await Users.findByIdAndUpdate(decoded.id, updateData, {
       new: true,

@@ -1,8 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Mail, Heart, ExternalLink } from 'lucide-react'
-import { LINKS } from '../../data/links'
+import { Mail, Heart } from 'lucide-react'
 import { useMasterData } from '../../hooks/useMasterData'
 import { useSocialLinks } from '../../hooks/useSocialLinks'
 import { scrollToSection as scrollToSectionSmooth } from '../../lib/scroll'
@@ -14,7 +13,7 @@ const Footer = () => {
   const { user, getContactInfo } = useMasterData()
   const contactInfo = getContactInfo()
 
-  // Dynamic social links with fallback to static LINKS
+  // Social links built from the user's dynamic contact info
   const socialLinks = useSocialLinks(contactInfo)
 
   const quickLinks = [
@@ -24,25 +23,10 @@ const Footer = () => {
     { name: 'Contact', href: '#contact' },
   ]
 
-  // Dynamic resources with fallback to static LINKS
-  const resources = [
-    { name: 'Resume', href: user.resume || LINKS.resume, external: true },
-    {
-      name: 'GitHub',
-      href: contactInfo.githubUrl || LINKS.github,
-      external: true,
-    },
-    {
-      name: 'LinkedIn',
-      href: contactInfo.linkedinUrl || LINKS.linkedin,
-      external: true,
-    },
-  ]
-
   // Dynamic email link for contact buttons
   const emailLink = contactInfo.email
     ? `mailto:${contactInfo.email}`
-    : LINKS.email
+    : undefined
 
   const scrollToSection = href => {
     if (href.startsWith('#')) {
@@ -125,30 +109,6 @@ const Footer = () => {
                 <Mail size={16} />
                 <span>Get in Touch</span>
               </a>
-
-              {/* External Resources */}
-              {/* <div className="pt-2">
-                <p className="text-text-secondary text-xs mb-2 uppercase tracking-wide">Resources</p>
-                <div className="space-y-2">
-                  {resources.map(resource => (
-                    <a
-                      key={resource.name}
-                      href={resource.href}
-                      onClick={e =>
-                        handleLinkClick(e, resource.href, resource.external)
-                      }
-                      target={resource.external ? '_blank' : undefined}
-                      rel={
-                        resource.external ? 'noopener noreferrer' : undefined
-                      }
-                      className="text-text-secondary hover:text-primary transition-colors duration-200 text-sm inline-flex items-center gap-1"
-                    >
-                      <span>{resource.name}</span>
-                      {resource.external && <ExternalLink size={12} />}
-                    </a>
-                  ))}
-                </div>
-              </div> */}
             </div>
           </div>
         </div>
@@ -159,7 +119,7 @@ const Footer = () => {
         <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="text-text-secondary text-sm flex items-center gap-1">
             <span>
-              © {currentYear} {user.name || 'Mayur Bhalgama'}
+              © {currentYear} {user.name || ''}
             </span>
             <motion.span
               className="text-red-500"

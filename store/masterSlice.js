@@ -25,6 +25,7 @@ const initialState = {
     phone: '',
     bio: '',
     profileImage: '',
+    logo: '',
     linkedinUrl: '',
     githubUrl: '',
     location: {

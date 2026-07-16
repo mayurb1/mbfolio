@@ -13,7 +13,12 @@ import {
   Mail,
 } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import { useSelector } from 'react-redux'
 import { scrollToSection as scrollToSectionSmooth } from '../../lib/scroll'
+import { selectUser } from '../../store/masterSlice'
+
+// Default logo used when the profile owner hasn't uploaded their own.
+const DEFAULT_LOGO = '/images/logo.webp'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -22,6 +27,11 @@ const Header = () => {
   // Gate the portal so document.body is only accessed on the client (SSR-safe).
   const [mounted, setMounted] = useState(false)
   const scrollYRef = useRef(0)
+
+  // Dynamic per-profile logo (SVG), with a static fallback.
+  const user = useSelector(selectUser)
+  const logoSrc = user.logo || DEFAULT_LOGO
+  const logoAlt = user.name ? `${user.name} logo` : 'Logo'
 
   useEffect(() => {
     setMounted(true)
@@ -142,9 +152,14 @@ const Header = () => {
               aria-label="Go to top of page"
             >
               <img
-                src="/images/logo.webp"
-                alt="MB Logo"
+                src={logoSrc}
+                alt={logoAlt}
                 className="h-8 w-auto"
+                onError={e => {
+                  if (e.currentTarget.src !== window.location.origin + DEFAULT_LOGO) {
+                    e.currentTarget.src = DEFAULT_LOGO
+                  }
+                }}
               />
             </button>
             <button
@@ -219,9 +234,14 @@ const Header = () => {
               aria-label="Go to top of page"
             >
               <img
-                src="/images/logo.webp"
-                alt="MB Logo"
+                src={logoSrc}
+                alt={logoAlt}
                 className="h-10 lg:h-12 w-auto"
+                onError={e => {
+                  if (e.currentTarget.src !== window.location.origin + DEFAULT_LOGO) {
+                    e.currentTarget.src = DEFAULT_LOGO
+                  }
+                }}
               />
             </button>
           </motion.div>

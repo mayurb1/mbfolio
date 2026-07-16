@@ -1,5 +1,5 @@
 import api from '../../services/api'
-import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType, isValidPDFType } from '../../constants/fileConstants'
+import { FILE_SIZE_LIMITS, FILE_SIZE_LIMITS_MB, isValidImageType, isValidPDFType, isValidLogoType } from '../../constants/fileConstants'
 
 class UserService {
   // Get current user profile
@@ -90,6 +90,38 @@ class UserService {
         error.response?.data?.message ||
           error.message ||
           'Failed to upload resume'
+      )
+    }
+  }
+
+  // Upload SVG logo via authenticated backend
+  async uploadLogo(file) {
+    try {
+      // Validate file (SVG only)
+      if (!file || !isValidLogoType(file.type)) {
+        throw new Error('Please select an SVG file')
+      }
+
+      // Check file size using constants
+      if (file.size > FILE_SIZE_LIMITS.LOGO) {
+        throw new Error(`File size must be less than ${FILE_SIZE_LIMITS_MB.LOGO}`)
+      }
+
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await api.post('/auth/upload-logo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return response.data.data.logoUrl
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to upload logo'
       )
     }
   }

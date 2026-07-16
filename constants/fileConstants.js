@@ -11,6 +11,9 @@ export const FILE_SIZE_LIMITS = {
 
   // Resume PDF size limit (10MB)
   RESUME_PDF: 10 * 1024 * 1024,
+
+  // Logo (SVG) size limit (1MB)
+  LOGO: 1 * 1024 * 1024,
 }
 
 // Human readable file size limits
@@ -19,6 +22,7 @@ export const FILE_SIZE_LIMITS_MB = {
   PROJECT_IMAGE: '10MB',
   DEFAULT_IMAGE: '10MB',
   RESUME_PDF: '10MB',
+  LOGO: '1MB',
 }
 
 // Supported file types
@@ -32,6 +36,9 @@ export const SUPPORTED_IMAGE_TYPES = [
 
 export const SUPPORTED_PDF_TYPES = ['application/pdf']
 
+// Logo must be an SVG only (vector, small, theme-friendly)
+export const SUPPORTED_LOGO_TYPES = ['image/svg+xml']
+
 // File type validation
 export const isValidImageType = (fileType) => {
   return SUPPORTED_IMAGE_TYPES.includes(fileType)
@@ -39,6 +46,10 @@ export const isValidImageType = (fileType) => {
 
 export const isValidPDFType = (fileType) => {
   return SUPPORTED_PDF_TYPES.includes(fileType)
+}
+
+export const isValidLogoType = (fileType) => {
+  return SUPPORTED_LOGO_TYPES.includes(fileType)
 }
 
 // File size validation

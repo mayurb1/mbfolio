@@ -16,7 +16,6 @@ import {
   Clock,
   Globe,
 } from 'lucide-react'
-import { LINKS } from '../../data/links'
 import Toast from '../ui/Toast'
 import Select from '../ui/Select'
 import { useMasterData } from '../../hooks/useMasterData'
@@ -142,7 +141,7 @@ const Contact = () => {
 
         const emailSubject = `Portfolio Contact — ${values.subject} from ${values.name}`
         const lines = [
-          'Hello Mayur,',
+          `Hello ${user.name || 'there'},`,
           '',
           'You have a new contact request via your portfolio:',
           '',
@@ -158,7 +157,7 @@ const Contact = () => {
           values.message,
           '',
           '—',
-          'Sent from mayurbhalgama.dev'
+          `Sent from ${typeof window !== 'undefined' ? window.location.host : 'the portfolio site'}`
         )
         const emailText = lines.join('\n')
 
@@ -233,27 +232,31 @@ const Contact = () => {
   const contactData = getContactInfo()
   const locationDisplay = getLocationDisplay()
 
-  // Dynamic contact info with fallback to static data
+  // Dynamic contact info (rendered only for fields the user has provided)
   const contactInfo = [
     {
       icon: Mail,
       label: 'Email',
-      value: contactData.email || 'mayurbhalgama2419@gmail.com',
-      href: contactData.email ? `mailto:${contactData.email}` : LINKS.email,
+      value: contactData.email || '',
+      href: contactData.email ? `mailto:${contactData.email}` : undefined,
       description: 'Send me an email anytime',
     },
     {
       icon: Phone,
       label: 'Phone',
-      value: contactData.phone || '+91 8160146264',
-      href: contactData.phone ? `tel:${contactData.phone.replace(/\s/g, '')}` : 'tel:+918160146264',
+      value: contactData.phone || '',
+      href: contactData.phone
+        ? `tel:${contactData.phone.replace(/\s/g, '')}`
+        : undefined,
       description: 'Call during business hours',
     },
     {
       icon: MapPin,
       label: 'Location',
       value: locationDisplay,
-      href: `https://maps.google.com/?q=${encodeURIComponent(locationDisplay)}`,
+      href: locationDisplay
+        ? `https://maps.google.com/?q=${encodeURIComponent(locationDisplay)}`
+        : undefined,
       description: 'Remote collaboration worldwide',
     },
   ]
@@ -315,10 +318,10 @@ const Contact = () => {
                         key={index}
                         href={info.href}
                         target={
-                          info.href.startsWith('http') ? '_blank' : undefined
+                          info.href?.startsWith('http') ? '_blank' : undefined
                         }
                         rel={
-                          info.href.startsWith('http')
+                          info.href?.startsWith('http')
                             ? 'noopener noreferrer'
                             : undefined
                         }
@@ -521,7 +524,7 @@ const Contact = () => {
                       formik={formik}
                       label="Full Name"
                       name="name"
-                      placeholder="Mayur Bhalgama"
+                      placeholder="Your name"
                       required
                     />
                     <FormField

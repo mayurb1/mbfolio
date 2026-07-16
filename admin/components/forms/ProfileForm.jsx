@@ -10,6 +10,7 @@ import ImageUpload from '../ui/ImageUpload'
 import PDFUpload from '../ui/PDFUpload'
 import FormField from './fields/FormField'
 import FormTextArea from './fields/FormTextArea'
+import StringArrayField from './fields/StringArrayField'
 import { useImageUpload } from '../../hooks/useImageUpload'
 import { usePDFUpload } from '../../hooks/usePDFUpload'
 import userService from '../../services/userService'
@@ -20,6 +21,11 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
   const { user: currentUser } = useSelector(state => state.adminAuth)
   const { handleApiResponse } = useToast()
   const { uploadImage, isAnyUploading: isAnyImageUploading, isUploading } = useImageUpload('profile')
+  const {
+    uploadImage: uploadLogo,
+    isAnyUploading: isAnyLogoUploading,
+    isUploading: isLogoUploading,
+  } = useImageUpload('logo')
   const { uploadPDF, isAnyUploading: isAnyPDFUploading, isUploading: isPDFUploading } = usePDFUpload()
 
   // Use profile data or fallback to current user
@@ -48,6 +54,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     ),
     bio: Yup.string().max(1000, 'Bio cannot exceed 1000 characters'),
     profileImage: Yup.string(),
+    logo: Yup.string(),
     linkedUrl: Yup.string().url('Must be a valid URL'),
     githubUrl: Yup.string()
       .url('Must be a valid URL')
@@ -73,6 +80,9 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     headline: Yup.string().max(200, 'Headline cannot exceed 200 characters'),
     availability: Yup.boolean(),
     resume: Yup.string(),
+    highlights: Yup.array().of(
+      Yup.string().max(500, 'Highlight cannot exceed 500 characters')
+    ),
   })
 
   // Initial form values
@@ -83,6 +93,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     phone: userData?.phone || '',
     bio: userData?.bio || '',
     profileImage: userData?.profileImage || '',
+    logo: userData?.logo || '',
     linkedUrl: userData?.linkedUrl || '',
     githubUrl: userData?.githubUrl || '',
     location: {
@@ -99,12 +110,13 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
     headline: userData?.headline || '',
     availability: userData?.availability !== undefined ? userData.availability : true,
     resume: userData?.resume || '',
+    highlights: userData?.highlights?.length ? userData.highlights : [''],
   }
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
       // Check if any files are still uploading
-      if (isAnyImageUploading() || isAnyPDFUploading()) {
+      if (isAnyImageUploading() || isAnyLogoUploading() || isAnyPDFUploading()) {
         setFieldError(
           'general',
           'Please wait for file uploads to complete'
@@ -117,6 +129,14 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         setFieldError(
           'profileImage',
           'Profile image upload failed. Please try uploading again.'
+        )
+        return
+      }
+
+      if (values.logo instanceof File) {
+        setFieldError(
+          'logo',
+          'Logo upload failed. Please try uploading again.'
         )
         return
       }
@@ -137,6 +157,7 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         phone: values.phone.trim(),
         bio: values.bio.trim(),
         profileImage: values.profileImage,
+        logo: values.logo,
         linkedUrl: values.linkedUrl.trim(),
         githubUrl: values.githubUrl.trim(),
         location: {
@@ -157,11 +178,20 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
         headline: values.headline.trim(),
         availability: values.availability,
         resume: values.resume,
+        highlights: values.highlights
+          .map(highlight => highlight.trim())
+          .filter(Boolean),
       }
 
-      // Remove empty fields (except profileImage, resume, and availability which need to be explicitly set)
+      // Remove empty fields (except profileImage, logo, resume, and availability which need to be explicitly set)
       Object.keys(profileData).forEach(key => {
-        if (!profileData[key] && key !== 'profileImage' && key !== 'resume' && key !== 'availability') {
+        if (
+          !profileData[key] &&
+          key !== 'profileImage' &&
+          key !== 'logo' &&
+          key !== 'resume' &&
+          key !== 'availability'
+        ) {
           delete profileData[key]
         }
       })
@@ -247,6 +277,46 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
               />
             </div>
 
+            {/* Logo (SVG) — shown in the public site header */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Logo (SVG)
+              </label>
+              <div className="max-w-xs">
+                <ImageUpload
+                  value={values.logo}
+                  onChange={async file => {
+                    if (file) {
+                      setFieldValue('logo', file)
+                      try {
+                        const uploadedUrl = await uploadLogo(file, 'logo')
+                        if (uploadedUrl) {
+                          setFieldValue('logo', uploadedUrl)
+                        }
+                      } catch (error) {
+                        console.error('Background logo upload failed:', error)
+                      }
+                    }
+                  }}
+                  onRemove={() => setFieldValue('logo', '')}
+                  isUploading={isLogoUploading('logo')}
+                  placeholder="Select SVG logo"
+                  accept="image/svg+xml"
+                  formatsHint="SVG"
+                  maxSize={FILE_SIZE_LIMITS_MB.LOGO}
+                />
+              </div>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Appears in your public site header. SVG only; falls back to the
+                default logo if not set.
+              </p>
+              <ErrorMessage
+                name="logo"
+                component="div"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              />
+            </div>
+
             {/* Name */}
             <FormField
               name="name"
@@ -301,6 +371,20 @@ const ProfileForm = ({ profile = null, onCancel, onSuccess }) => {
               label="Professional Headline"
               placeholder="e.g. Full Stack Developer | React & Node.js Expert"
               wrapperClassName="lg:col-span-2"
+            />
+
+            {/* Highlights ("What I Do Best" on the public About section) */}
+            <StringArrayField
+              name="highlights"
+              label="Highlights (What I Do Best)"
+              addButtonText="Add Highlight"
+              placeholder={index => `Highlight ${index + 1}`}
+              wrapperClassName="lg:col-span-2"
+              as="textarea"
+              rows={2}
+              removeButtonClassName="p-2 flex-shrink-0"
+              addButtonClassName="flex items-center gap-2 w-full sm:w-auto justify-center"
+              spanAddText
             />
 
             {/* Availability */}

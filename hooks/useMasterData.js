@@ -77,11 +77,11 @@ export const useMasterData = () => {
     if (loc?.city && loc?.country) {
       return `${loc.city}, ${loc.country}`
     }
-    return 'Ahmedabad, India' // fallback
+    return ''
   }
 
   const getExperienceText = () => {
-    return stats.experience?.text || '3+ years'
+    return stats.experience?.text || ''
   }
 
   const getCompletedProjectsCount = () => {

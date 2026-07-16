@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { Download, ArrowDown } from 'lucide-react'
-import { LINKS } from '../../data/links'
 import { useMasterData } from '../../hooks/useMasterData'
 import { useSocialLinks } from '../../hooks/useSocialLinks'
 import { scrollToSection } from '../../lib/scroll'
@@ -157,8 +156,9 @@ const Hero = () => {
   }, [])
 
   const handleDownloadResume = () => {
-    // Use dynamic resume URL if available, fallback to static
-    const resumeUrl = user.resume || LINKS.resume
+    // Use the dynamic resume URL; do nothing if the user has none.
+    const resumeUrl = user.resume
+    if (!resumeUrl) return
 
     // Analytics tracking
     if (window.gtag) {
@@ -180,7 +180,7 @@ const Hero = () => {
   // Get contact info from Redux store
   const contactInfo = getContactInfo()
 
-  // Dynamic social links with fallback to static LINKS
+  // Social links built from the user's dynamic contact info
   const socialLinks = useSocialLinks(contactInfo)
 
   return (
@@ -213,7 +213,7 @@ const Hero = () => {
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 break-words leading-snug overflow-visible">
                 <span className="block text-text">Hi, I&apos;m</span>
                 <span className="block text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pb-1 sm:pb-1.5">
-                  {user.name || 'Mayur Bhalgama'}
+                  {user.name || ''}
                 </span>
               </h1>
             </motion.div>
@@ -225,55 +225,8 @@ const Hero = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed"
             >
-              {user.headline || (
-                <>
-                  A passionate{' '}
-                  <motion.span
-                    className="text-primary font-semibold"
-                    animate={{
-                      color: [
-                        'var(--color-primary)',
-                        'var(--color-secondary)',
-                        'var(--color-primary)',
-                      ],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    Software Engineer
-                  </motion.span>{' '}
-                  who creates innovative digital experiences with clean code and
-                  beautiful design.
-                </>
-              )}
+              {user.headline || ''}
             </motion.p>
-
-            {/* Specialties */}
-            {/* <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-12"
-            >
-              {['React', 'Node.js', 'TypeScript', 'Full-Stack', 'UI/UX'].map(
-                (skill, index) => (
-                  <motion.span
-                    key={skill}
-                    className="px-3 py-2 sm:px-4 bg-surface border border-border rounded-full text-text-secondary text-xs sm:text-sm font-medium"
-                    whileHover={{
-                      scale: 1.05,
-                      backgroundColor: 'var(--color-primary)',
-                      color: 'var(--color-background)',
-                    }}
-                    transition={{ duration: 0.2 }}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={inView ? { opacity: 1, scale: 1 } : {}}
-                    style={{ transitionDelay: `${0.8 + index * 0.1}s` }}
-                  >
-                    {skill}
-                  </motion.span>
-                )
-              )}
-            </motion.div> */}
 
             {/* Call to action buttons */}
             <motion.div
