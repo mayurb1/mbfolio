@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { Mail, Heart, ExternalLink } from 'lucide-react'
 import { LINKS } from '../../data/links'
 import { useMasterData } from '../../hooks/useMasterData'
@@ -161,13 +161,13 @@ const Footer = () => {
             <span>
               © {currentYear} {user.name || 'Mayur Bhalgama'}
             </span>
-            <motion.span
+            <m.span
               className="text-red-500"
               animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
             >
               <Heart size={14} fill="currentColor" />
-            </motion.span>
+            </m.span>
             <span>Thanks for visiting.</span>
           </div>
 

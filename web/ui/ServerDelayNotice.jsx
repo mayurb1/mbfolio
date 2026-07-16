@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { Clock, Server } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
@@ -79,7 +79,7 @@ const ServerDelayNotice = ({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className={`
           fixed top-4 right-4 z-50 max-w-sm bg-gradient-to-r from-blue-50 to-indigo-50 
           dark:from-blue-900/20 dark:to-indigo-900/20 backdrop-blur-sm 
@@ -94,13 +94,13 @@ const ServerDelayNotice = ({
         aria-live="polite"
       >
         <div className="flex items-start space-x-3">
-          <motion.div
+          <m.div
             className="flex-shrink-0 text-blue-500 dark:text-blue-400 mt-0.5"
             variants={iconVariants}
             animate="animate"
           >
             <Server size={20} />
-          </motion.div>
+          </m.div>
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2 mb-1">
@@ -137,7 +137,7 @@ const ServerDelayNotice = ({
             </button>
           )}
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   )
 }

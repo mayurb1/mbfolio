@@ -1,11 +1,16 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
-import CodeEditor from '../ui/CodeEditor'
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
+
+// Monaco-based editor is heavy and only shown after a user click, so it is
+// code-split out of the initial bundle and rendered client-side only.
+const CodeEditor = dynamic(() => import('../ui/CodeEditor'), { ssr: false })
 import { useRandomQuote } from '../../hooks/useRandomQuote'
 import {
   fetchMasterData,
@@ -39,6 +44,7 @@ const About = () => {
   const [showLikeHint] = useState(true)
   const [showCodeHint] = useState(true)
   const [showCodeEditor, setShowCodeEditor] = useState(false)
+  const [profileErrored, setProfileErrored] = useState(false)
   const burstTimeoutRef = useRef(null)
   const lastBurstRef = useRef(0)
   const gradientIdRef = useRef(
@@ -250,7 +256,7 @@ const About = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
@@ -262,11 +268,11 @@ const About = () => {
             <p className="text-xl text-text-secondary max-w-2xl mx-auto">
               Get to know the person behind the code
             </p>
-          </motion.div>
+          </m.div>
 
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Profile Image and Stats */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -50 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -274,7 +280,7 @@ const About = () => {
             >
               {/* Profile Image */}
               <div className="relative">
-                <motion.div
+                <m.div
                   className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 mx-auto"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
@@ -283,41 +289,43 @@ const About = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full opacity-20 animate-pulse-slow" />
                   <div className="absolute -inset-4 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-xl opacity-50" />
 
-                  {/* Profile photo */}
-                  <img
-                    src={profileImage}
-                    alt={`${userName} - Software Engineer`}
-                    className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-2xl select-none"
-                    onError={e => {
-                      // Fallback to placeholder if image doesn't exist
-                      e.target.src = `data:image/svg+xml,${encodeURIComponent(`
-                        <svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="100%" height="100%" fill="#e2e8f0"/>
-                          <circle cx="160" cy="130" r="40" fill="#64748b"/>
-                          <path d="M100 260 Q160 220 220 260" fill="#64748b"/>
-                          <text x="160" y="300" text-anchor="middle" font-family="Arial" font-size="12" fill="#64748b">Profile Photo</text>
-                        </svg>
-                      `)}`
-                    }}
-                    draggable={false}
-                  />
+                  {/* Profile photo — LCP element, so eagerly loaded with priority.
+                      next/image serves an optimized, correctly-sized asset and
+                      reserves layout space (width/height) to avoid CLS. */}
+                  {profileErrored ? (
+                    <div className="relative w-full h-full rounded-full border-4 border-background shadow-2xl flex items-center justify-center bg-surface text-text-secondary text-sm select-none">
+                      Profile Photo
+                    </div>
+                  ) : (
+                    <Image
+                      src={profileImage}
+                      alt={`${userName} - Software Engineer`}
+                      width={320}
+                      height={320}
+                      priority
+                      sizes="(max-width: 640px) 256px, (max-width: 1024px) 288px, 320px"
+                      className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-2xl select-none"
+                      onError={() => setProfileErrored(true)}
+                      draggable={false}
+                    />
+                  )}
 
                   {/* Instagram-like heart burst from bottom-left heart icon */}
                   {showLikeBurst && (
                     <>
                       {/* central gradient heart near heart icon */}
-                      <motion.div
+                      <m.div
                         className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 pointer-events-none"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: [0.8, 1.25, 1], opacity: [0, 1, 0] }}
                         transition={{ duration: 2.2, ease: 'easeInOut' }}
                       >
                         <GradientHeart size={110} />
-                      </motion.div>
+                      </m.div>
 
                       {/* small confetti hearts flying out from heart icon */}
                       {likeParticles.map((p, i) => (
-                        <motion.div
+                        <m.div
                           key={i}
                           className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 pointer-events-none"
                           initial={{
@@ -341,13 +349,13 @@ const About = () => {
                           }}
                         >
                           <GradientHeart size={18} />
-                        </motion.div>
+                        </m.div>
                       ))}
                     </>
                   )}
 
                   {/* Floating badges */}
-                  <motion.button
+                  <m.button
                     type="button"
                     className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-primary text-background p-2 sm:p-3 rounded-full shadow-lg cursor-pointer sm:cursor-pointer cursor-default sm:pointer-events-auto pointer-events-none"
                     animate={{ y: [0, -10, 0] }}
@@ -359,7 +367,7 @@ const About = () => {
 
                     {/* Code indicator - same as heart indicator */}
                     {showCodeHint && (
-                      <motion.div
+                      <m.div
                         className="absolute pointer-events-none hidden sm:flex items-center"
                         style={{
                           top: '50%',
@@ -373,7 +381,7 @@ const About = () => {
                         transition={{ duration: 0.3 }}
                       >
                         {/* Text label */}
-                        <motion.span
+                        <m.span
                           className="ml-2 sm:ml-3 text-xs sm:text-sm font-medium whitespace-nowrap text-text-secondary"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -385,10 +393,10 @@ const About = () => {
                         >
                           <span className="hidden sm:inline">Genius Tap</span>
                           <span className="sm:hidden">Tap</span>
-                        </motion.span>
+                        </m.span>
 
                         {/* Straight horizontal line */}
-                        <motion.div
+                        <m.div
                           className="h-px bg-text-secondary w-6 sm:w-8 md:w-10"
                           initial={{ width: 0 }}
                           animate={{ width: '100%' }}
@@ -398,12 +406,12 @@ const About = () => {
                             delay: 0.2,
                           }}
                         />
-                      </motion.div>
+                      </m.div>
                     )}
 
                     {/* Mobile version for code - hidden on mobile */}
                     {showCodeHint && (
-                      <motion.div
+                      <m.div
                         className="absolute pointer-events-none hidden"
                         style={{
                           top: '120%',
@@ -415,7 +423,7 @@ const About = () => {
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <motion.span
+                        <m.span
                           className="bg-surface/90 text-text-secondary border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
@@ -426,12 +434,12 @@ const About = () => {
                           }}
                         >
                           CODE
-                        </motion.span>
-                      </motion.div>
+                        </m.span>
+                      </m.div>
                     )}
-                  </motion.button>
+                  </m.button>
 
-                  <motion.button
+                  <m.button
                     type="button"
                     className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-secondary text-background p-2 sm:p-3 rounded-full shadow-lg"
                     animate={{ y: [0, 10, 0] }}
@@ -447,7 +455,7 @@ const About = () => {
 
                     {/* CyBuild-style indicator - line extends from heart to label */}
                     {showLikeHint && (
-                      <motion.div
+                      <m.div
                         className="absolute pointer-events-none hidden sm:flex items-center"
                         style={{
                           top: '50%',
@@ -461,7 +469,7 @@ const About = () => {
                         transition={{ duration: 0.3 }}
                       >
                         {/* Text label - responsive sizing */}
-                        <motion.span
+                        <m.span
                           className="mr-2 sm:mr-3 text-xs sm:text-sm font-medium whitespace-nowrap text-text-secondary"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -475,10 +483,10 @@ const About = () => {
                             Tap to see the magic
                           </span>
                           <span className="sm:hidden">Tap</span>
-                        </motion.span>
+                        </m.span>
 
                         {/* Straight horizontal line - responsive width */}
-                        <motion.div
+                        <m.div
                           className="h-px bg-text-secondary w-6 sm:w-8 md:w-10"
                           initial={{ width: 0 }}
                           animate={{ width: '100%' }}
@@ -488,12 +496,12 @@ const About = () => {
                             delay: 0.2,
                           }}
                         />
-                      </motion.div>
+                      </m.div>
                     )}
 
                     {/* Mobile-only version - simpler indicator */}
                     {showLikeHint && (
-                      <motion.div
+                      <m.div
                         className="absolute pointer-events-none sm:hidden"
                         style={{
                           bottom: '120%',
@@ -505,7 +513,7 @@ const About = () => {
                         exit={{ opacity: 0, y: 5 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <motion.span
+                        <m.span
                           className="bg-surface/90 text-text-secondary border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
@@ -516,14 +524,14 @@ const About = () => {
                           }}
                         >
                           TAP
-                        </motion.span>
-                      </motion.div>
+                        </m.span>
+                      </m.div>
                     )}
-                  </motion.button>
-                </motion.div>
+                  </m.button>
+                </m.div>
 
                 {/* Location */}
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.6, delay: 0.6 }}
@@ -535,11 +543,11 @@ const About = () => {
                       ? `${userLocation.city}, ${userLocation.country}`
                       : 'Ahmedabad, India'}
                   </span>
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Stats Grid */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.4 }}
@@ -548,7 +556,7 @@ const About = () => {
                 {statsData.map((stat, index) => {
                   const Icon = stat.icon
                   return (
-                    <motion.div
+                    <m.div
                       key={stat.label}
                       className="bg-background border border-border rounded-lg p-4 sm:p-6 text-center hover:shadow-lg transition-shadow duration-200"
                       whileHover={{ scale: 1.05 }}
@@ -566,14 +574,14 @@ const About = () => {
                       <div className="text-xs sm:text-sm text-text-secondary">
                         {stat.label}
                       </div>
-                    </motion.div>
+                    </m.div>
                   )
                 })}
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
 
             {/* Bio and Content */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 50 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -624,7 +632,7 @@ const About = () => {
                 </h4>
                 <div className="grid gap-3">
                   {skillHighlights.map((highlight, index) => (
-                    <motion.div
+                    <m.div
                       key={index}
                       className="flex items-start space-x-3"
                       initial={{ opacity: 0, x: 20 }}
@@ -635,13 +643,13 @@ const About = () => {
                       <span className="text-text-secondary text-sm sm:text-base">
                         {highlight}
                       </span>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
               </div>
 
               {/* Quote */}
-              <motion.blockquote
+              <m.blockquote
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 1.4 }}
@@ -655,8 +663,8 @@ const About = () => {
                   &ldquo;{quote}&rdquo;
                 </p>
                 <footer className="text-text text-sm mt-2">- {author}</footer>
-              </motion.blockquote>
-            </motion.div>
+              </m.blockquote>
+            </m.div>
           </div>
         </div>
       </div>

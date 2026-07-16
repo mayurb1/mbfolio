@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { m } from 'framer-motion'
 import {
   Calendar,
   Clock,
@@ -18,6 +19,7 @@ import ReactMarkdown from 'react-markdown'
 
 const BlogPost = () => {
   const router = useRouter()
+  const [authorImgErrored, setAuthorImgErrored] = useState(false)
 
   // Mock blog post data - in a real app, this would be fetched from an API
   const post = {
@@ -273,7 +275,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto">
             {/* Back Button */}
-            <motion.button
+            <m.button
               onClick={goBack}
               className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-colors duration-200 mb-8"
               initial={{ opacity: 0, x: -20 }}
@@ -284,10 +286,10 @@ What patterns do you use in your React applications? Share your thoughts in the 
             >
               <ArrowLeft size={20} />
               <span>Back to Blog</span>
-            </motion.button>
+            </m.button>
 
             {/* Article Header */}
-            <motion.header
+            <m.header
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -328,7 +330,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
               </div>
 
               {/* Share Button */}
-              <motion.button
+              <m.button
                 onClick={handleShare}
                 className="inline-flex items-center space-x-2 px-6 py-3 bg-surface border border-border rounded-lg text-text hover:bg-background transition-colors duration-200"
                 whileHover={{ scale: 1.05 }}
@@ -337,8 +339,8 @@ What patterns do you use in your React applications? Share your thoughts in the 
               >
                 <Share2 size={16} />
                 <span>Share Article</span>
-              </motion.button>
-            </motion.header>
+              </m.button>
+            </m.header>
           </div>
         </div>
       </section>
@@ -347,7 +349,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
       <section className="py-16">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <motion.article
+            <m.article
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -416,10 +418,10 @@ What patterns do you use in your React applications? Share your thoughts in the 
               >
                 {post.content}
               </ReactMarkdown>
-            </motion.article>
+            </m.article>
 
             {/* Tags */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
@@ -437,30 +439,30 @@ What patterns do you use in your React applications? Share your thoughts in the 
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Author Bio */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
               className="mt-12 p-6 bg-surface border border-border rounded-lg"
             >
               <div className="flex items-start space-x-4">
-                <img
-                  src="/profile-photo.jpg"
-                  alt={post.author}
-                  className="w-16 h-16 rounded-full object-cover"
-                  onError={e => {
-                    e.target.src = `data:image/svg+xml,${encodeURIComponent(`
-                      <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100%" height="100%" fill="#e2e8f0"/>
-                        <circle cx="32" cy="24" r="12" fill="#64748b"/>
-                        <path d="M16 48 Q32 40 48 48" fill="#64748b"/>
-                      </svg>
-                    `)}`
-                  }}
-                />
+                {authorImgErrored ? (
+                  <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center text-text-secondary text-xs">
+                    {(post.author || '?').charAt(0)}
+                  </div>
+                ) : (
+                  <Image
+                    src="/profile-photo.jpg"
+                    alt={post.author}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover"
+                    onError={() => setAuthorImgErrored(true)}
+                  />
+                )}
                 <div>
                   <h4 className="text-lg font-semibold text-text mb-2">
                     About {post.author}
@@ -473,7 +475,7 @@ What patterns do you use in your React applications? Share your thoughts in the 
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>

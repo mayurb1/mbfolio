@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 const LoadingSpinner = ({ size = 'medium', className = '' }) => {
   const sizeClasses = {
@@ -34,7 +34,7 @@ const LoadingSpinner = ({ size = 'medium', className = '' }) => {
 
   return (
     <div className={`flex items-center justify-center ${className}`} role="status" aria-label="Loading">
-      <motion.div
+      <m.div
         className={`${sizeClasses[size]} relative`}
         variants={spinnerVariants}
         animate="animate"
@@ -44,7 +44,7 @@ const LoadingSpinner = ({ size = 'medium', className = '' }) => {
           viewBox="0 0 50 50"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <motion.circle
+          <m.circle
             className="stroke-primary"
             cx="25"
             cy="25"
@@ -57,7 +57,7 @@ const LoadingSpinner = ({ size = 'medium', className = '' }) => {
             style={{ strokeDasharray: '0 100' }}
           />
         </svg>
-      </motion.div>
+      </m.div>
       <span className="sr-only">Loading...</span>
     </div>
   )
@@ -80,7 +80,7 @@ export const DotLoader = ({ className = '' }) => {
   return (
     <div className={`flex items-center space-x-1 ${className}`} role="status" aria-label="Loading">
       {[0, 1, 2].map((index) => (
-        <motion.div
+        <m.div
           key={index}
           className="w-2 h-2 bg-primary rounded-full"
           variants={dotVariants}
@@ -115,7 +115,7 @@ export const SkeletonLoader = ({
   return (
     <div className={`space-y-3 ${className}`} role="status" aria-label="Loading content">
       {Array.from({ length: lines }, (_, index) => (
-        <motion.div
+        <m.div
           key={index}
           className="skeleton h-4 bg-surface rounded"
           style={{
@@ -145,7 +145,7 @@ export const ProgressLoader = ({
         )}
       </div>
       <div className="w-full bg-surface rounded-full h-2 overflow-hidden">
-        <motion.div
+        <m.div
           className="h-full bg-gradient-to-r from-primary to-secondary rounded-full"
           initial={{ width: '0%' }}
           animate={{ width: `${progress}%` }}

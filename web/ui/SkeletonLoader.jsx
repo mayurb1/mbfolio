@@ -1,11 +1,11 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 // Base skeleton component
 const Skeleton = ({ className = "", animate = true, ...props }) => {
   return (
-    <motion.div
+    <m.div
       className={`bg-surface/60 rounded ${animate ? 'animate-pulse' : ''} ${className}`}
       {...props}
     />
@@ -15,7 +15,7 @@ const Skeleton = ({ className = "", animate = true, ...props }) => {
 // Project Card Skeleton
 const ProjectCardSkeleton = ({ index = 0 }) => {
   return (
-    <motion.div
+    <m.div
       className="bg-surface border border-border rounded-xl overflow-hidden"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -61,7 +61,7 @@ const ProjectCardSkeleton = ({ index = 0 }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -79,7 +79,7 @@ const ProjectsGridSkeleton = ({ count = 6 }) => {
 // Blog Card Skeleton
 const BlogCardSkeleton = ({ index = 0, featured = false }) => {
   return (
-    <motion.div
+    <m.div
       className={`bg-surface border border-border rounded-xl overflow-hidden ${
         featured ? 'lg:col-span-2' : ''
       }`}
@@ -124,7 +124,7 @@ const BlogCardSkeleton = ({ index = 0, featured = false }) => {
           <Skeleton className="h-3 sm:h-4 w-16 sm:w-20" />
         </div>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -171,7 +171,7 @@ const BlogGridSkeleton = ({ count = 6, featured = true }) => {
 // Timeline Item Skeleton (for Experience)
 const TimelineItemSkeleton = ({ index = 0, isLast = false }) => {
   return (
-    <motion.div
+    <m.div
       className="relative flex items-start space-x-4 sm:space-x-6 pb-8 sm:pb-12"
       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
       animate={{ opacity: 1, x: 0 }}
@@ -241,7 +241,7 @@ const TimelineItemSkeleton = ({ index = 0, isLast = false }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -265,7 +265,7 @@ const TestimonialsSkeleton = ({ count = 3 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       {Array.from({ length: count }).map((_, index) => (
-        <motion.div
+        <m.div
           key={index}
           className="bg-surface border border-border rounded-xl p-4 sm:p-6"
           initial={{ opacity: 0, y: 30 }}
@@ -289,7 +289,7 @@ const TestimonialsSkeleton = ({ count = 3 }) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   )
@@ -300,7 +300,7 @@ const SkillsSkeleton = ({ count = 8 }) => {
   return (
     <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
       {Array.from({ length: count }).map((_, index) => (
-        <motion.div
+        <m.div
           key={index}
           className="px-3 sm:px-4 py-1.5 sm:py-2 bg-surface border border-border rounded-full"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -308,7 +308,7 @@ const SkillsSkeleton = ({ count = 8 }) => {
           transition={{ duration: 0.3, delay: index * 0.05 }}
         >
           <Skeleton className="h-3 sm:h-4 w-12 sm:w-16" animate={false} />
-        </motion.div>
+        </m.div>
       ))}
     </div>
   )
@@ -324,7 +324,7 @@ const LoadingSpinner = ({ size = "md", className = "" }) => {
   
   return (
     <div className={`flex justify-center items-center py-8 sm:py-12 ${className}`}>
-      <motion.div
+      <m.div
         className={`animate-spin rounded-full border-b-2 border-primary ${sizeClasses[size]}`}
         animate={{ rotate: 360 }}
         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}

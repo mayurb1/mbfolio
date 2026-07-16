@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useMemo, useCallback, memo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { ExternalLink, Github, Calendar, Users, Star, X } from 'lucide-react'
+import Image from 'next/image'
 import { LINKS } from '../../data/links'
 import Select from '../ui/Select'
 import Carousel from '../ui/Carousel'
@@ -519,9 +520,10 @@ const Projects = () => {
 
   const ProjectCard = memo(({ project, index }) => {
     const isOrganization = project.type === 'organization'
+    const [imgErrored, setImgErrored] = useState(false)
 
     return (
-      <motion.div
+      <m.div
         className="group bg-surface border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
         initial={{ opacity: 0, y: 30 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -531,23 +533,14 @@ const Projects = () => {
       >
         {/* Project Image */}
         <div className="relative w-full aspect-[16/10] overflow-hidden rounded-t-xl">
-          {project.mainImage ? (
-            <img
+          {project.mainImage && !imgErrored ? (
+            <Image
               src={project.mainImage}
               alt={project.title}
-              className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-              onError={e => {
-                e.target.style.display = 'none'
-                e.target.parentElement.innerHTML = `
-                  <div class="absolute inset-0 flex items-center justify-center" style="background-color: var(--color-surface);">
-                    <div class="text-center" style="color: var(--color-text-secondary);">
-                      <div class="text-2xl mb-2">📷</div>
-                      <div class="text-sm font-medium">Project Image</div>
-                      <div class="text-xs">Not Available</div>
-                    </div>
-                  </div>
-                `
-              }}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+              onError={() => setImgErrored(true)}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface)' }}>
@@ -643,7 +636,7 @@ const Projects = () => {
 
             <div className="flex space-x-2">
               {!isOrganization && project.github && (
-                <motion.button
+                <m.button
                   className="p-2 hover:bg-background rounded-full transition-colors duration-200"
                   whileHover={{ scale: 1.1 }}
                   onClick={e => {
@@ -653,10 +646,10 @@ const Projects = () => {
                   aria-label={`View ${project.title} source code on GitHub`}
                 >
                   <Github size={16} />
-                </motion.button>
+                </m.button>
               )}
               {!isOrganization && project.demo && (
-                <motion.button
+                <m.button
                   className="p-2 hover:bg-background rounded-full transition-colors duration-200"
                   whileHover={{ scale: 1.1 }}
                   onClick={e => {
@@ -666,12 +659,12 @@ const Projects = () => {
                   aria-label={`View ${project.title} live demo`}
                 >
                   <ExternalLink size={16} />
-                </motion.button>
+                </m.button>
               )}
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     )
   })
   ProjectCard.displayName = 'ProjectCard'
@@ -681,14 +674,14 @@ const Projects = () => {
 
     return (
       <AnimatePresence>
-        <motion.div
+        <m.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             className="bg-background rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -809,8 +802,8 @@ const Projects = () => {
                 </div>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </AnimatePresence>
     )
   })

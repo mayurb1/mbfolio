@@ -1,7 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { m } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+import Image from 'next/image'
 import { Calendar, MapPin, ExternalLink, Award, TrendingUp } from 'lucide-react'
 import { ExperienceTimelineSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
 import RetryState from '../ui/RetryState'
@@ -89,6 +91,7 @@ const Experience = () => {
   })
 
   const TimelineItem = ({ item, index, isLast, type = 'experience' }) => {
+    const [logoErrored, setLogoErrored] = useState(false)
     // Inline SVG shown when a company has no logo (empty src) or the logo
     // fails to load — avoids passing "" to the img src attribute.
     const logoFallback = `data:image/svg+xml,${encodeURIComponent(`
@@ -98,7 +101,7 @@ const Experience = () => {
       </svg>
     `)}`
     return (
-      <motion.div
+      <m.div
         className="relative flex items-start space-x-4 sm:space-x-6 pb-8 sm:pb-12"
         initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
         animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -107,7 +110,7 @@ const Experience = () => {
         {/* Timeline Line */}
         <div className="relative flex flex-col items-center">
           {/* Timeline Dot */}
-          <motion.div
+          <m.div
             className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center border-4 border-background shadow-lg z-10"
             whileHover={{ scale: 1.1 }}
             initial={{ scale: 0 }}
@@ -115,22 +118,33 @@ const Experience = () => {
             transition={{ duration: 0.3, delay: index * 0.2 + 0.3 }}
           >
             {type === 'experience' ? (
-              <img
-                src={item.logo || logoFallback}
-                alt={`${item.company} logo`}
-                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
-                onError={e => {
-                  e.target.src = logoFallback
-                }}
-              />
+              item.logo && !logoErrored ? (
+                <Image
+                  src={item.logo}
+                  alt={`${item.company} logo`}
+                  width={24}
+                  height={24}
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                  onError={() => setLogoErrored(true)}
+                />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={logoFallback}
+                  alt={`${item.company} logo`}
+                  width={24}
+                  height={24}
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                />
+              )
             ) : (
               <Award size={18} className="sm:w-5 sm:h-5 text-background" />
             )}
-          </motion.div>
+          </m.div>
 
           {/* Timeline Line */}
           {!isLast && (
-            <motion.div
+            <m.div
               className="w-0.5 bg-border h-full absolute top-10 sm:top-12"
               initial={{ height: 0 }}
               animate={inView ? { height: '100%' } : {}}
@@ -140,7 +154,7 @@ const Experience = () => {
         </div>
 
         {/* Content */}
-        <motion.div
+        <m.div
           className="flex-1 bg-surface border border-border rounded-lg p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200"
           whileHover={{ scale: 1.02 }}
         >
@@ -253,8 +267,8 @@ const Experience = () => {
               </div>
             </div>
           )}
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     )
   }
 
@@ -266,7 +280,7 @@ const Experience = () => {
           {loading ? (
             <SectionHeaderSkeleton />
           ) : (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6 }}
@@ -278,12 +292,12 @@ const Experience = () => {
               <p className="text-xl text-text-secondary max-w-2xl mx-auto">
                 My professional journey and academic background
               </p>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Experience Timeline */}
           <div className="mb-16">
-            <motion.h3
+            <m.h3
               initial={{ opacity: 0, x: -30 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -291,7 +305,7 @@ const Experience = () => {
             >
               <div className="w-1 h-6 sm:h-8 bg-primary rounded-full mr-4" />
               Professional Experience
-            </motion.h3>
+            </m.h3>
 
             {/* Loading state for experiences */}
             {loading ? (
@@ -321,7 +335,7 @@ const Experience = () => {
 
           {/* Education Timeline */}
           <div>
-            <motion.h3
+            <m.h3
               initial={{ opacity: 0, x: -30 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -329,7 +343,7 @@ const Experience = () => {
             >
               <div className="w-1 h-6 sm:h-8 bg-secondary rounded-full mr-4" />
               Education
-            </motion.h3>
+            </m.h3>
 
             {/* Loading state */}
             {loading ? (
@@ -358,7 +372,7 @@ const Experience = () => {
           </div>
 
           {/* Call to Action */}
-          {/* <motion.div
+          {/* <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.8 }}
@@ -371,7 +385,7 @@ const Experience = () => {
               I&apos;m always interested in new opportunities and exciting
               projects.
             </p>
-            <motion.button
+            <m.button
               onClick={() => {
                 const element = document.getElementById('contact')
                 if (element) {
@@ -383,8 +397,8 @@ const Experience = () => {
               whileTap={{ scale: 0.95 }}
             >
               Get In Touch
-            </motion.button>
-          </motion.div> */}
+            </m.button>
+          </m.div> */}
         </div>
       </div>
     </section>

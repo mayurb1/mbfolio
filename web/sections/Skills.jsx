@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { SkillsSkeleton, SectionHeaderSkeleton } from '../ui/SkeletonLoader'
 import EmptyState from '../ui/EmptyState'
@@ -50,7 +50,7 @@ const Skills = () => {
             </>
           ) : (
             <>
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6 }}
@@ -62,18 +62,18 @@ const Skills = () => {
                 <p className="text-xl text-text-secondary max-w-2xl mx-auto">
                   A selection of technologies I use to craft modern web experiences
                 </p>
-              </motion.div>
+              </m.div>
 
               {/* Animated Chips */}
               {skills.length > 0 ? (
-            <motion.div
+            <m.div
               variants={chipsContainer}
               initial="hidden"
               animate={inView ? 'show' : 'hidden'}
               className="flex flex-wrap gap-3 sm:gap-4 justify-center"
             >
               {skills.map(tech => (
-                <motion.span
+                <m.span
                   key={tech}
                   variants={chipItem}
                   className="px-4 py-2 bg-surface border border-border rounded-full text-text-secondary hover:text-background hover:bg-primary transition-colors duration-200 shadow-sm will-change-transform"
@@ -86,9 +86,9 @@ const Skills = () => {
                   }}
                 >
                   {tech}
-                </motion.span>
+                </m.span>
               ))}
-            </motion.div>
+            </m.div>
               ) : (
                 <EmptyState
                   message="No skills found"
