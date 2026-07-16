@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { Palette, Check } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 
@@ -28,7 +28,7 @@ const ThemeToggle = () => {
   return (
     <div className="relative">
       {/* Toggle Button */}
-      <motion.button
+      <m.button
         onClick={toggleMenu}
         className="w-12 h-12 bg-surface border border-border rounded-full flex items-center justify-center text-text hover:bg-primary hover:text-background transition-colors duration-200 shadow-lg"
         whileHover={{ scale: 1.1 }}
@@ -37,18 +37,18 @@ const ThemeToggle = () => {
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
-        <motion.div
+        <m.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3 }}
         >
           <Palette size={20} />
-        </motion.div>
-      </motion.button>
+        </m.div>
+      </m.button>
 
       {/* Theme Menu */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <m.div
             className="absolute bottom-full right-0 mb-2 bg-background border border-border rounded-lg shadow-xl overflow-hidden min-w-48"
             initial={{ opacity: 0, scale: 0.8, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -68,7 +68,7 @@ const ThemeToggle = () => {
             {/* Theme Options */}
             <div className="py-2">
               {Object.entries(themes).map(([themeName, theme]) => (
-                <motion.button
+                <m.button
                   key={themeName}
                   onClick={() => handleThemeChange(themeName)}
                   onKeyDown={(e) => handleKeyDown(e, themeName)}
@@ -120,7 +120,7 @@ const ThemeToggle = () => {
                       }}
                     />
                   </div>
-                </motion.button>
+                </m.button>
               ))}
             </div>
 
@@ -130,14 +130,14 @@ const ThemeToggle = () => {
                 Theme preference is saved automatically
               </p>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Backdrop */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <m.div
             className="fixed inset-0 z-[-1]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

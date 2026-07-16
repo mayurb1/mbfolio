@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { Download, ArrowDown } from 'lucide-react'
 import { LINKS } from '../../data/links'
@@ -24,35 +24,70 @@ const Hero = () => {
     const canvas = canvasRef.current
     if (!canvas) return
 
+    // Respect users who prefer reduced motion — skip the animation entirely.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
     const ctx = canvas.getContext('2d')
     const particles = []
     const isMobile = window.innerWidth < 768
     const isLowEnd = navigator.hardwareConcurrency <= 4 || window.innerWidth < 480
-    
+
     // Reduce particle count for better performance
     const particleCount = isLowEnd ? 25 : isMobile ? 40 : 80
+
+    // Cached CSS size of the canvas, refreshed only on resize. Reading it every
+    // frame (or per-particle) forces a synchronous layout reflow, which was the
+    // main-thread bottleneck; caching removes thousands of reflows per second.
+    let width = 0
+    let height = 0
+
+    // Cache the theme colour too — getComputedStyle is expensive and was being
+    // called once per particle per frame. Refresh it on resize / theme change.
+    let primaryColor = '#3B82F6'
+    const readPrimaryColor = () => {
+      const c = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-primary')
+        .trim()
+      if (c) primaryColor = c
+    }
 
     // Set canvas size with device pixel ratio optimization
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect()
+      width = rect.width
+      height = rect.height
       const dpr = Math.min(window.devicePixelRatio || 1, 2) // Cap at 2x for performance
-      
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      canvas.style.width = rect.width + 'px'
-      canvas.style.height = rect.height + 'px'
-      
+
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      canvas.style.width = width + 'px'
+      canvas.style.height = height + 'px'
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.scale(dpr, dpr)
     }
 
     resizeCanvas()
-    window.addEventListener('resize', resizeCanvas)
+    readPrimaryColor()
+
+    const onResize = () => {
+      resizeCanvas()
+      readPrimaryColor()
+    }
+    window.addEventListener('resize', onResize)
+
+    // Re-read the colour when the theme class on <html> changes.
+    const themeObserver = new MutationObserver(readPrimaryColor)
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
 
     // Particle class with performance optimizations
     class Particle {
       constructor() {
-        this.x = Math.random() * canvas.width
-        this.y = Math.random() * canvas.height
+        this.x = Math.random() * width
+        this.y = Math.random() * height
         this.size = Math.random() * (isLowEnd ? 1 : isMobile ? 1.5 : 2) + 0.5
         const speed = isLowEnd ? 1 : isMobile ? 1.5 : 2
         this.speedX = Math.random() * speed - speed/2
@@ -64,24 +99,19 @@ const Hero = () => {
         this.x += this.speedX
         this.y += this.speedY
 
-        // Use canvas dimensions from getBoundingClientRect for accuracy
-        const rect = canvas.getBoundingClientRect()
-        if (this.x > rect.width) this.x = 0
-        if (this.x < 0) this.x = rect.width
-        if (this.y > rect.height) this.y = 0
-        if (this.y < 0) this.y = rect.height
+        // Use cached canvas dimensions (no per-frame layout reflow).
+        if (this.x > width) this.x = 0
+        if (this.x < 0) this.x = width
+        if (this.y > height) this.y = 0
+        if (this.y < 0) this.y = height
       }
 
       draw() {
-        ctx.save()
         ctx.globalAlpha = this.opacity
-        ctx.fillStyle = getComputedStyle(
-          document.documentElement
-        ).getPropertyValue('--color-primary')
+        ctx.fillStyle = primaryColor
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
         ctx.fill()
-        ctx.restore()
       }
     }
 
@@ -105,10 +135,10 @@ const Hero = () => {
       }
       lastTime = currentTime
 
-      const rect = canvas.getBoundingClientRect()
-      ctx.clearRect(0, 0, rect.width, rect.height)
+      ctx.clearRect(0, 0, width, height)
 
-      // Update and draw particles
+      // Update and draw filled particles in one alpha state.
+      ctx.globalAlpha = 1
       particles.forEach(particle => {
         particle.update()
         particle.draw()
@@ -118,7 +148,9 @@ const Hero = () => {
       if (!isLowEnd) { // Skip connections on low-end devices
         const connectionDistance = isMobile ? 60 : 80
         const maxConnections = isMobile ? 2 : 3 // Limit connections per particle
-        
+        ctx.strokeStyle = primaryColor
+        ctx.lineWidth = 0.5
+
         particles.forEach((particle, index) => {
           let connectionCount = 0
           for (let i = index + 1; i < particles.length && connectionCount < maxConnections; i++) {
@@ -128,17 +160,11 @@ const Hero = () => {
             const distance = Math.sqrt(dx * dx + dy * dy)
 
             if (distance < connectionDistance) {
-              ctx.save()
               ctx.globalAlpha = (1 - distance / connectionDistance) * (isMobile ? 0.1 : 0.15)
-              ctx.strokeStyle = getComputedStyle(
-                document.documentElement
-              ).getPropertyValue('--color-primary')
-              ctx.lineWidth = 0.5
               ctx.beginPath()
               ctx.moveTo(particle.x, particle.y)
               ctx.lineTo(otherParticle.x, otherParticle.y)
               ctx.stroke()
-              ctx.restore()
               connectionCount++
             }
           }
@@ -149,7 +175,8 @@ const Hero = () => {
     animate()
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas)
+      window.removeEventListener('resize', onResize)
+      themeObserver.disconnect()
       if (animationId) {
         cancelAnimationFrame(animationId)
       }
@@ -204,7 +231,7 @@ const Hero = () => {
         <div className="container mx-auto px-4 lg:px-8 py-16 sm:py-20 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
             {/* Main heading */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -216,10 +243,10 @@ const Hero = () => {
                   {user.name || 'Mayur Bhalgama'}
                 </span>
               </h1>
-            </motion.div>
+            </m.div>
 
             {/* Tagline */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -228,7 +255,7 @@ const Hero = () => {
               {user.headline || (
                 <>
                   A passionate{' '}
-                  <motion.span
+                  <m.span
                     className="text-primary font-semibold"
                     animate={{
                       color: [
@@ -240,15 +267,15 @@ const Hero = () => {
                     transition={{ duration: 3, repeat: Infinity }}
                   >
                     Software Engineer
-                  </motion.span>{' '}
+                  </m.span>{' '}
                   who creates innovative digital experiences with clean code and
                   beautiful design.
                 </>
               )}
-            </motion.p>
+            </m.p>
 
             {/* Specialties */}
-            {/* <motion.div
+            {/* <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -256,7 +283,7 @@ const Hero = () => {
             >
               {['React', 'Node.js', 'TypeScript', 'Full-Stack', 'UI/UX'].map(
                 (skill, index) => (
-                  <motion.span
+                  <m.span
                     key={skill}
                     className="px-3 py-2 sm:px-4 bg-surface border border-border rounded-full text-text-secondary text-xs sm:text-sm font-medium"
                     whileHover={{
@@ -270,19 +297,19 @@ const Hero = () => {
                     style={{ transitionDelay: `${0.8 + index * 0.1}s` }}
                   >
                     {skill}
-                  </motion.span>
+                  </m.span>
                 )
               )}
-            </motion.div> */}
+            </m.div> */}
 
             {/* Call to action buttons */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12"
             >
-              <motion.button
+              <m.button
                 onClick={() => scrollToSection('projects')}
                 className="group bg-primary text-background px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-secondary transition-colors duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl w-full sm:w-auto justify-center"
                 whileHover={{ scale: 1.05 }}
@@ -294,9 +321,9 @@ const Hero = () => {
                   size={18}
                   className="sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-200"
                 /> */}
-              </motion.button>
+              </m.button>
 
-              <motion.button
+              <m.button
                 onClick={handleDownloadResume}
                 className="group border-2 border-primary text-primary px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-primary hover:text-background transition-colors duration-200 flex items-center space-x-2 w-full sm:w-auto justify-center"
                 whileHover={{ scale: 1.05 }}
@@ -308,11 +335,11 @@ const Hero = () => {
                   className="sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform duration-200"
                 />
                 <span>Download Resume</span>
-              </motion.button>
-            </motion.div>
+              </m.button>
+            </m.div>
 
             {/* Social links */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 1.0 }}
@@ -329,7 +356,7 @@ const Hero = () => {
                 : socialLinks.map((social, index) => {
                     const Icon = social.icon
                     return (
-                      <motion.a
+                      <m.a
                         key={social.name}
                         href={social.url}
                         target="_blank"
@@ -343,13 +370,13 @@ const Hero = () => {
                         aria-label={`Visit my ${social.name} profile`}
                       >
                         <Icon size={24} className="sm:w-7 sm:h-7" />
-                      </motion.a>
+                      </m.a>
                     )
                   })}
-            </motion.div>
+            </m.div>
 
             {/* Scroll indicator */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.8, delay: 1.4 }}
@@ -358,7 +385,7 @@ const Hero = () => {
               <p className="text-text-secondary text-xs sm:text-sm mb-4">
                 Scroll to explore
               </p>
-              <motion.button
+              <m.button
                 onClick={() => scrollToSection('about')}
                 className="text-text-secondary hover:text-primary transition-colors duration-200"
                 animate={{ y: [0, 10, 0] }}
@@ -366,8 +393,8 @@ const Hero = () => {
                 aria-label="Scroll to about section"
               >
                 <ArrowDown size={20} className="sm:w-6 sm:h-6" />
-              </motion.button>
-            </motion.div>
+              </m.button>
+            </m.div>
           </div>
         </div>
       </div>

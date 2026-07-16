@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -56,14 +56,14 @@ const FormField = ({
         {...props}
       />
       {hasError && (
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-red-500 text-xs sm:text-sm flex items-center space-x-1"
         >
           <AlertCircle size={12} className="sm:w-3.5 sm:h-3.5" />
           <span>{formik.errors[name]}</span>
-        </motion.p>
+        </m.p>
       )}
     </div>
   )
@@ -263,7 +263,7 @@ const Contact = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
@@ -276,13 +276,13 @@ const Contact = () => {
               Have a project in mind? I&apos;d love to hear about it. Send me a
               message and let&apos;s create something amazing together.
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Instruction about unique email submission */}
 
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Contact Information */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -30 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -311,7 +311,7 @@ const Contact = () => {
                   contactInfo.map((info, index) => {
                     const Icon = info.icon
                     return (
-                      <motion.a
+                      <m.a
                         key={index}
                         href={info.href}
                         target={
@@ -347,14 +347,14 @@ const Contact = () => {
                             </p>
                           </div>
                         </div>
-                      </motion.a>
+                      </m.a>
                     )
                   })
                 )}
               </div>
 
               {/* Availability */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.8 }}
@@ -400,10 +400,10 @@ const Contact = () => {
                     <span>Timezone: IST (UTC+5:30)</span>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Social Links */}
-              {/* <motion.div
+              {/* <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 1.0 }}
@@ -416,7 +416,7 @@ const Contact = () => {
                   {socialLinks.map((social, index) => {
                     const Icon = social.icon
                     return (
-                      <motion.a
+                      <m.a
                         key={index}
                         href={social.href}
                         target="_blank"
@@ -427,15 +427,15 @@ const Contact = () => {
                         aria-label={`Visit my ${social.label} profile`}
                       >
                         <Icon size={18} className="sm:w-5 sm:h-5" />
-                      </motion.a>
+                      </m.a>
                     )
                   })}
                 </div>
-              </motion.div> */}
-            </motion.div>
+              </m.div> */}
+            </m.div>
 
             {/* Contact Form */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 30 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -455,7 +455,7 @@ const Contact = () => {
 
                 {/* Success Message */}
                 {submitStatus === 'success' && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-start space-x-3"
@@ -473,12 +473,12 @@ const Contact = () => {
                         within 24 hours.
                       </p>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {/* Error Message */}
                 {submitStatus === 'error' && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start space-x-3"
@@ -496,7 +496,7 @@ const Contact = () => {
                           'Sorry, there was an error sending your message. Please try again or contact me directly.'}
                       </p>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 <form
@@ -560,14 +560,14 @@ const Contact = () => {
                       </option>
                     </Select>
                     {formik.touched.subject && formik.errors.subject && (
-                      <motion.p
+                      <m.p
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-red-500 text-xs sm:text-sm flex items-center space-x-1"
                       >
                         <AlertCircle size={12} className="sm:w-3.5 sm:h-3.5" />
                         <span>{formik.errors.subject}</span>
-                      </motion.p>
+                      </m.p>
                     )}
                   </div>
 
@@ -639,7 +639,7 @@ const Contact = () => {
                   />
 
                   {/* Submit Button */}
-                  <motion.button
+                  <m.button
                     type="submit"
                     disabled={isSubmitting || !formik.isValid}
                     className={`w-full flex items-center justify-center space-x-2 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
@@ -665,14 +665,14 @@ const Contact = () => {
                         <span>Send Message</span>
                       </>
                     )}
-                  </motion.button>
+                  </m.button>
                 </form>
               </div>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Map Section */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.8 }}
@@ -716,7 +716,7 @@ const Contact = () => {
                 </span>
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
       {/* Toast */}

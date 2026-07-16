@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { Home, ArrowLeft, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -19,7 +19,7 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="max-w-md w-full text-center">
         {/* Animated 404 */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -33,16 +33,16 @@ const NotFound = () => {
             The page you&apos;re looking for doesn&apos;t exist. It might have
             been moved, deleted, or you entered the wrong URL.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Animated search icon */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mb-8"
         >
-          <motion.div
+          <m.div
             animate={{
               rotate: [0, 10, -10, 0],
               scale: [1, 1.1, 1],
@@ -55,11 +55,11 @@ const NotFound = () => {
             className="inline-flex items-center justify-center w-20 h-20 bg-surface border border-border rounded-full text-text-secondary"
           >
             <Search size={32} />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Action buttons */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
@@ -82,10 +82,10 @@ const NotFound = () => {
             <ArrowLeft size={20} />
             <span>Go Back</span>
           </button>
-        </motion.div>
+        </m.div>
 
         {/* Fun fact */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.8 }}
@@ -96,7 +96,7 @@ const NotFound = () => {
             error code was named after room 404 at CERN, where the World Wide
             Web was created. The room contained the central database of the web!
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   )

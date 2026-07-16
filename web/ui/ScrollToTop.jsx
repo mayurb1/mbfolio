@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { ArrowUp } from 'lucide-react'
 
 const ScrollToTop = () => {
@@ -49,7 +49,7 @@ const ScrollToTop = () => {
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.button
+        <m.button
           onClick={scrollToTop}
           onKeyDown={handleKeyDown}
           className="relative w-12 h-12 bg-surface border border-border rounded-full flex items-center justify-center text-text hover:bg-primary hover:text-background transition-colors duration-200 shadow-lg group overflow-hidden"
@@ -75,7 +75,7 @@ const ScrollToTop = () => {
               strokeWidth="2"
               className="text-border"
             />
-            <motion.circle
+            <m.circle
               cx="24"
               cy="24"
               r="20"
@@ -93,22 +93,22 @@ const ScrollToTop = () => {
           </svg>
 
           {/* Arrow icon */}
-          <motion.div
+          <m.div
             className="relative z-10"
             whileHover={{ y: -1 }}
             transition={{ duration: 0.2 }}
           >
             <ArrowUp size={18} />
-          </motion.div>
+          </m.div>
 
           {/* Pulse effect on hover */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-primary rounded-full opacity-0 group-hover:opacity-20"
             initial={false}
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1, repeat: Infinity }}
           />
-        </motion.button>
+        </m.button>
       )}
     </AnimatePresence>
   )

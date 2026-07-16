@@ -6,16 +6,20 @@ import './globals.css'
 
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  // Only 400/500/600/700 are used (font-medium/semibold/bold + default).
+  weight: ['400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
 })
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['300', '400', '500'],
+  weight: ['400', '500'],
   variable: '--font-jetbrains',
   display: 'swap',
+  // Mono is only used in the blog, error states and the lazy code editor —
+  // never above the fold on the home page — so keep it off the critical path.
+  preload: false,
 })
 
 export const metadata = {

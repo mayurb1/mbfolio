@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import {
   Menu,
   X,
@@ -13,6 +13,7 @@ import {
   Mail,
 } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import Image from 'next/image'
 import { scrollToSection as scrollToSectionSmooth } from '../../lib/scroll'
 
 const Header = () => {
@@ -103,7 +104,7 @@ const Header = () => {
 
   // Drawer component with smooth animations
   const Drawer = () => (
-    <motion.div
+    <m.div
       key="drawer-root"
       className="fixed inset-0 z-50 lg:hidden"
       initial={{ opacity: 0 }}
@@ -112,7 +113,7 @@ const Header = () => {
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       {/* Backdrop */}
-      <motion.div
+      <m.div
         className="absolute inset-0 bg-black/70 z-10"
         onClick={closeDrawer}
         initial={{ opacity: 0 }}
@@ -123,7 +124,7 @@ const Header = () => {
       />
 
       {/* Panel */}
-      <motion.div
+      <m.div
         className="absolute right-0 top-0 h-[100dvh] max-h-[100dvh] w-[90%] max-w-[360px] bg-surface border-l border-border shadow-2xl overflow-y-auto flex flex-col z-20"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
@@ -141,9 +142,11 @@ const Header = () => {
               className="focus:outline-none"
               aria-label="Go to top of page"
             >
-              <img
+              <Image
                 src="/images/logo.webp"
                 alt="MB Logo"
+                width={87}
+                height={40}
                 className="h-8 w-auto"
               />
             </button>
@@ -186,12 +189,12 @@ const Header = () => {
             })}
           </ul>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   )
 
   return (
-    <motion.header
+    <m.header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         isScrolled
           ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-lg'
@@ -208,7 +211,7 @@ const Header = () => {
       >
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <motion.div
+          <m.div
             className="flex items-center space-x-2"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -218,20 +221,23 @@ const Header = () => {
               className="focus:outline-none rounded-lg p-1"
               aria-label="Go to top of page"
             >
-              <img
+              <Image
                 src="/images/logo.webp"
                 alt="MB Logo"
+                width={105}
+                height={48}
+                priority
                 className="h-10 lg:h-12 w-auto"
               />
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
             {navItems.map(item => {
               const Icon = item.icon
               return (
-                <motion.button
+                <m.button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
                   onKeyDown={e => handleKeyDown(e, item.id)}
@@ -249,19 +255,19 @@ const Header = () => {
                     <span>{item.label}</span>
                   </div>
                   {activeSection === item.id && (
-                    <motion.div
+                    <m.div
                       className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"
                       layoutId="activeIndicator"
                       initial={false}
                     />
                   )}
-                </motion.button>
+                </m.button>
               )
             })}
           </div>
 
           {/* Mobile Menu Button */}
-          <motion.button
+          <m.button
             className="lg:hidden p-2 rounded-lg text-text hover:bg-surface focus:outline-none"
             onClick={() => (isMenuOpen ? setIsMenuOpen(false) : openDrawer())}
             whileTap={{ scale: 0.95 }}
@@ -270,7 +276,7 @@ const Header = () => {
             aria-controls="mobile-drawer"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </motion.button>
+          </m.button>
         </div>
 
         {/* Mobile Drawer Navigation (via portal + AnimatePresence) */}
@@ -282,7 +288,7 @@ const Header = () => {
             document.body
           )}
       </nav>
-    </motion.header>
+    </m.header>
   )
 }
 
