@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const Carousel = ({ images = [], altPrefix = 'Slide' }) => {
@@ -31,7 +31,7 @@ const Carousel = ({ images = [], altPrefix = 'Slide' }) => {
         aria-label="Project media"
       >
         <AnimatePresence mode="wait" initial={false}>
-          <motion.img
+          <m.img
             key={safeImages[current]}
             src={safeImages[current]}
             alt={`${altPrefix} ${current + 1}`}

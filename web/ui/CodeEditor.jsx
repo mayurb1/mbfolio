@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import {
   X,
   Copy,
@@ -236,7 +236,7 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
         initial={{ opacity: 0 }}
@@ -244,7 +244,7 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
-        <motion.div
+        <m.div
           className={`${isFullscreen ? 'w-full h-full' : 'max-w-6xl w-full h-[90vh]'} flex flex-col rounded-xl overflow-hidden shadow-2xl`}
           style={{ backgroundColor: 'var(--color-background)' }}
           initial={{ scale: 0.9, opacity: 0 }}
@@ -587,8 +587,8 @@ console.log("👋 Hi! I'm Mayur Bhalgama - Frontend Developer");`,
               </div>
             )}
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   )
 }
