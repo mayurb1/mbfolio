@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { MapPin, Calendar, Code, Heart, Award } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 import CodeEditor from '../ui/CodeEditor'
+import { useRandomQuote } from '../../hooks/useRandomQuote'
 import {
   fetchMasterData,
   selectUser,
@@ -24,6 +25,9 @@ const About = () => {
   const highlights = useSelector(selectHighlights)
   const loading = useSelector(selectMasterLoading)
   const error = useSelector(selectMasterError)
+
+  // Random motivational quote from the external motivational-spark API.
+  const { quote, author, loading: quoteLoading } = useRandomQuote()
 
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -643,11 +647,14 @@ const About = () => {
                 transition={{ duration: 0.6, delay: 1.4 }}
                 className="border-l-4 border-primary pl-4 sm:pl-6 py-4 bg-surface/50 rounded-r-lg"
               >
-                <p className="text-text-secondary italic text-base sm:text-lg">
-                  &ldquo;Code is like humor. When you have to explain it,
-                  it&apos;s bad.&rdquo;
+                <p
+                  className={`text-text-secondary italic text-base sm:text-lg transition-opacity duration-300 ${
+                    quoteLoading ? 'opacity-60' : 'opacity-100'
+                  }`}
+                >
+                  &ldquo;{quote}&rdquo;
                 </p>
-                <footer className="text-text text-sm mt-2">- Cory House</footer>
+                <footer className="text-text text-sm mt-2">- {author}</footer>
               </motion.blockquote>
             </motion.div>
           </div>
