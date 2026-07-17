@@ -259,7 +259,7 @@ const Contact = () => {
   ]
 
   return (
-    <section id="contact" className="py-24 lg:py-40 bg-background" ref={ref}>
+    <section className="py-24 lg:py-40 bg-background" ref={ref}>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
