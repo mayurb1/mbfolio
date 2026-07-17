@@ -230,26 +230,24 @@ const Hero = () => {
       <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-5rem)]">
         <div className="container mx-auto px-4 lg:px-8 py-16 sm:py-20 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Main heading */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mb-6"
-            >
+            {/* Main heading — this block contains the LCP element. It must
+                paint straight from the server HTML, so it is NOT wrapped in a
+                framer-motion opacity animation (which would keep it invisible
+                until JS hydrates + LazyMotion features load, causing the
+                ~4.6s "element render delay" PageSpeed flagged). */}
+            <div className="mb-6">
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 break-words leading-snug overflow-visible">
                 <span className="block text-text">Hi, I&apos;m</span>
                 <span className="block text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pb-1 sm:pb-1.5">
                   {user.name || 'Mayur Bhalgama'}
                 </span>
               </h1>
-            </m.div>
+            </div>
 
-            {/* Tagline */}
-            <m.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.4 }}
+            {/* Tagline — the measured LCP element. Rendered as a plain <p> so it
+                is visible in the initial paint. The inner colour-cycling span is
+                kept: it animates colour, not visibility, so it never blocks LCP. */}
+            <p
               className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed"
             >
               {user.headline || (
@@ -272,7 +270,7 @@ const Hero = () => {
                   beautiful design.
                 </>
               )}
-            </m.p>
+            </p>
 
             {/* Specialties */}
             {/* <m.div
