@@ -122,11 +122,15 @@ const Hero = () => {
 
     // Animation loop with performance optimizations
     let animationId
+    let running = false
     let lastTime = 0
     const targetFPS = isLowEnd ? 30 : isMobile ? 45 : 60
     const frameInterval = 1000 / targetFPS
 
     const animate = (currentTime) => {
+      // Bail out if the loop has been paused (hero scrolled out of view or the
+      // component unmounted) so we stop scheduling frames and free the thread.
+      if (!running) return
       animationId = requestAnimationFrame(animate)
 
       // Throttle frame rate for better performance
@@ -172,14 +176,39 @@ const Hero = () => {
       }
     }
 
-    animate()
+    const startLoop = () => {
+      if (running) return
+      running = true
+      lastTime = 0
+      animationId = requestAnimationFrame(animate)
+    }
+
+    const stopLoop = () => {
+      running = false
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+        animationId = null
+      }
+    }
+
+    // Only animate while the hero is actually on screen. This defers the very
+    // first frame until after first paint (the observer fires post-layout) and
+    // stops the rAF loop entirely once the user scrolls past the hero, keeping
+    // it off the main thread for the rest of the page.
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) startLoop()
+        else stopLoop()
+      },
+      { threshold: 0 }
+    )
+    visibilityObserver.observe(canvas)
 
     return () => {
       window.removeEventListener('resize', onResize)
       themeObserver.disconnect()
-      if (animationId) {
-        cancelAnimationFrame(animationId)
-      }
+      visibilityObserver.disconnect()
+      stopLoop()
     }
   }, [])
 
