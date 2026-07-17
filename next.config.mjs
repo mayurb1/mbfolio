@@ -17,6 +17,17 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // Barrel-file optimization: import only the specific icons/helpers actually
+  // used from these packages instead of pulling their full index into the
+  // client bundle. Trims unused JavaScript across the app.
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@reduxjs/toolkit',
+      'react-redux',
+    ],
+  },
   // Empty Turbopack config silences the Next 16 warning about the webpack
   // config injected by next-pwa. PWA/webpack only matter for the production
   // build (`next build --webpack`); dev runs on Turbopack with PWA disabled.

@@ -3,7 +3,7 @@ import About from '@/web/sections/About'
 import Skills from '@/web/sections/Skills'
 import Experience from '@/web/sections/Experience'
 import Projects from '@/web/sections/Projects'
-import Contact from '@/web/sections/Contact'
+import Contact from '@/web/sections/ContactLazy'
 import { SITE_URL } from '@/lib/site'
 
 export const metadata = {
