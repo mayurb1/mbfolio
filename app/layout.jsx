@@ -50,6 +50,17 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {/* Warm the connection to the external quote API early. PageSpeed
+            estimates ~80ms LCP savings from preconnecting this origin. */}
+        <link
+          rel="preconnect"
+          href="https://motivational-spark-api.vercel.app"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://motivational-spark-api.vercel.app"
+        />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
         {children}
